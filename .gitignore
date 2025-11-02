@@ -1,0 +1,51 @@
+# Environment variables
+.env
+*.env
+
+# Database files
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Logs
+*.log
+*.out
+*.err
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Archives and snapshots
+*.tar.gz
+*.zip
+
+# Excel files with wallet data
+*.xls
+*.xlsx
+
+# Temporary files
+*.tmp
+*.temp
+
