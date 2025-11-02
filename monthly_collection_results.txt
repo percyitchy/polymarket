@@ -1,0 +1,54 @@
+Polymarket Wallet Collection Results - Monthly Leaderboard Focus
+================================================================
+
+Collection Date: 2025-10-25
+Source: Monthly overall leaderboard + category-specific monthly leaderboards
+Criteria Applied: 40-1000 predictions, 60-95% win rate, ≤10 trades/day
+
+FINAL RESULTS:
+=============
+Total Wallets Collected: 2
+
+WALLET DETAILS:
+==============
+1. 0x0a854897a06d4999e5b2dde5693609f1428ffe9d  |  62 trades  |  64% win rate
+2. 0x0d3b10b8eac8b089c6e4a695e65d8e044167c46b  |  47 trades  |  80% win rate
+
+EXCLUSION ANALYSIS:
+==================
+Many wallets were excluded during collection:
+
+1. TOO MANY PREDICTIONS (>1000):
+   - 0x63d43bbb87f85af03b8f2f9e2fad7b54334fa2f1: 22,231 predictions
+   - 0x24c8cf69a0e0a17eee21f69d29752bfa32e823e1: 3,511 predictions
+   - 0xa9b44dca52ed35e59ac2a6f49d1203b8155464ed: 2,435 predictions
+   - 0x0c0e270cf879583d6a0142fc817e05b768d0434e: 1,178 predictions
+   - 0x509587cbb541251c74f261df3421f1fcc9fdc97c: 1,031 predictions
+
+2. WIN RATES TOO HIGH (100% - excluded by 95% limit):
+   - Multiple wallets with 100% win rates were excluded
+   - This includes many of the top performers from the leaderboard
+
+KEY INSIGHTS:
+=============
+1. The monthly leaderboard is dominated by extremely high-volume traders
+2. Most successful traders have >1000 predictions (excluded by our limit)
+3. Many top performers have 100% win rates (excluded by 95% limit)
+4. The 2 wallets found represent moderate-volume traders with good but not perfect win rates
+
+RECOMMENDATIONS TO GET MORE WALLETS:
+===================================
+1. Increase prediction limit from 1000 to 2000+ to include high-volume traders
+2. Remove or increase the 95% win rate cap to include perfect performers
+3. Consider scraping more pages of the leaderboard (currently only getting top 20-50 per page)
+4. Add pagination to scrape deeper into the leaderboard rankings
+
+CURRENT STATUS:
+==============
+The script is now monitoring these 2 wallets for consensus buying patterns.
+Both wallets are actively trading (50 new events detected for each).
+
+Generated: 2025-10-25 02:50 UTC
+
+
+

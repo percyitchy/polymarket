@@ -1,0 +1,1122 @@
+================================================================================
+POLYMARKET TRACKED WALLETS (ACTIVE MONITORING)
+Generated: 2025-10-26T09:44:55.027523
+================================================================================
+
+CONFIGURATION:
+  Total Tracked Wallets: 205
+  Max Trades Limit: <=1200
+  Criteria: >=10 trades, winrate >65%
+  Monitoring: New bets only (from this moment)
+
+================================================================================
+
+Total Wallets: 205
+Average Win Rate: 97.38%
+Total PnL: $33,636,002.03
+
+================================================================================
+
+1. Address: 0x83b9f9e2d28ab875b9c9f73cdd5535c4c8926124
+   Display: 0x83b9f9e2d28ab875b9c9f73cdd5535c4c8926124
+   Trades: 785
+   Win Rate: 100.00%
+   PnL: $3,692,181.39
+   Daily Frequency: 100.00
+
+2. Address: 0x42592084120b0d5287059919d2a96b3b7acb936f
+   Trades: 140
+   Win Rate: 100.00%
+   PnL: $2,604,158.13
+
+3. Address: 0x9f138019d5481fdc5c59b93b0ae4b9b817cce0fd
+   Trades: 103
+   Win Rate: 100.00%
+   PnL: $2,429,819.93
+
+4. Address: 0x3cdaf931c538750ffa43b4de25366401d7446e17
+   Display: 0x3cdaf931c538750ffa43b4de25366401d7446e17
+   Trades: 554
+   Win Rate: 100.00%
+   PnL: $2,345,679.76
+   Daily Frequency: 6.67
+
+5. Address: 0xd38b71f3e8ed1af71983e5c309eac3dfa9b35029
+   Trades: 211
+   Win Rate: 100.00%
+   PnL: $2,087,914.68
+
+6. Address: 0x2131a32e8dbb7199480e710abe94983c3044aaf2
+   Display: 0x2131a32e8dbb7199480e710abe94983c3044aaf2
+   Trades: 148
+   Win Rate: 100.00%
+   PnL: $1,973,219.29
+   Daily Frequency: 5.89
+
+7. Address: 0x2f09642639aedd6ced432519c1a86e7d52034632
+   Display: 0x2f09642639aedd6ced432519c1a86e7d52034632
+   Trades: 683
+   Win Rate: 100.00%
+   PnL: $1,497,803.22
+   Daily Frequency: 59.73
+
+8. Address: 0xc3c3b3ef304ddbea39fa2246e683a71da5d0eec8
+   Trades: 797
+   Win Rate: 100.00%
+   PnL: $1,405,945.77
+
+9. Address: 0x054964a95e2cb3fc2105a62a1edf3da44979c052
+   Display: 0x054964a95e2cb3fc2105a62a1edf3da44979c052
+   Trades: 107
+   Win Rate: 100.00%
+   PnL: $1,203,617.03
+   Daily Frequency: 0.55
+
+10. Address: 0x16b29c50f2439faf627209b2ac0c7bbddaa8a881
+   Trades: 318
+   Win Rate: 100.00%
+   PnL: $1,083,143.19
+
+11. Address: 0x900c83447eb74c3f29f17658e848e2715ca41d7a
+   Trades: 416
+   Win Rate: 100.00%
+   PnL: $954,803.39
+
+12. Address: 0x2c335066fe58fe9237c3d3dc7b275c2a034a0563
+   Trades: 785
+   Win Rate: 100.00%
+   PnL: $709,478.25
+
+13. Address: 0xcd9bc2939f0dac121f6ccde59cca5e0b6a91414d
+   Display: 0xcd9bc2939f0dac121f6ccde59cca5e0b6a91414d
+   Trades: 154
+   Win Rate: 100.00%
+   PnL: $630,760.12
+   Daily Frequency: 100.00
+
+14. Address: 0x01baeccca6daf3d1ed2b562007f1f9e7ef9cb77a
+   Display: 0x01baeccca6daf3d1ed2b562007f1f9e7ef9cb77a
+   Trades: 180
+   Win Rate: 100.00%
+   PnL: $560,240.80
+   Daily Frequency: 1.10
+
+15. Address: 0x1fce2f3a01964e84d32ba7a099024662c8882229
+   Trades: 82
+   Win Rate: 100.00%
+   PnL: $544,752.27
+
+16. Address: 0x17db3fcd93ba12d38382a0cade24b200185c5f6d
+   Trades: 39
+   Win Rate: 100.00%
+   PnL: $544,663.03
+
+17. Address: 0xfa1991cd8082174eedce066381c6565d6fbd4f3c
+   Trades: 31
+   Win Rate: 100.00%
+   PnL: $493,012.67
+
+18. Address: 0x821d0fcf5643c18c663c8960bf79fdbc9f6d0a01
+   Trades: 259
+   Win Rate: 100.00%
+   PnL: $445,704.45
+
+19. Address: 0xb2304a93c928e05c13e3b96b07be1f2ea8374193
+   Trades: 1002
+   Win Rate: 100.00%
+   PnL: $442,307.72
+
+20. Address: 0x252d7bae5ec87553dcafb23e275c202ac0d3c456
+   Display: 0x252d7bae5ec87553dcafb23e275c202ac0d3c456
+   Trades: 551
+   Win Rate: 100.00%
+   PnL: $343,326.50
+   Daily Frequency: 39.60
+
+21. Address: 0xc2a37f1eb84fcc156c8aece9105dc1a73a36c3a6
+   Trades: 313
+   Win Rate: 100.00%
+   PnL: $294,626.77
+
+22. Address: 0xdaad6f960d507dba148c1ff908db5a28743169cc
+   Trades: 120
+   Win Rate: 100.00%
+   PnL: $278,261.25
+
+23. Address: 0x2b51107e8d030397ea728a794405ffbcf1d2e165
+   Trades: 753
+   Win Rate: 100.00%
+   PnL: $241,604.70
+
+24. Address: 0xb45d9c6dc1ed17b1da83a7eb4d638710b371a406
+   Display: 0xb45d9c6dc1ed17b1da83a7eb4d638710b371a406
+   Trades: 319
+   Win Rate: 100.00%
+   PnL: $200,347.24
+   Daily Frequency: 34.78
+
+25. Address: 0x1e3a3d3b980255bab982d366ca1fa2b09c104033
+   Trades: 73
+   Win Rate: 100.00%
+   PnL: $200,136.06
+
+26. Address: 0x5235578efe24555b0c98e7dc10a902b09089c04a
+   Display: 0x5235578efe24555b0c98e7dc10a902b09089c04a
+   Trades: 534
+   Win Rate: 100.00%
+   PnL: $178,591.43
+   Daily Frequency: 56.56
+
+27. Address: 0xade8dfeb4550b7938d9061e7ea02b20ba753b0bd
+   Trades: 823
+   Win Rate: 100.00%
+   PnL: $169,916.76
+
+28. Address: 0xf7a302c48b8d0598987a5b99e603fc8d74bcd8ae
+   Trades: 222
+   Win Rate: 100.00%
+   PnL: $150,021.10
+
+29. Address: 0xc7ed9805c6354c0a1955215e7705647fc0506c8b
+   Display: 0xc7ed9805c6354c0a1955215e7705647fc0506c8b
+   Trades: 799
+   Win Rate: 100.00%
+   PnL: $106,176.82
+   Daily Frequency: 9.07
+
+30. Address: 0x1d854ccc47d157edd117732ba0be216b8876228e
+   Trades: 195
+   Win Rate: 100.00%
+   PnL: $77,660.33
+
+31. Address: 0x4b92a2d2fd3807981a5dddae7315122530a542e6
+   Trades: 498
+   Win Rate: 100.00%
+   PnL: $61,816.49
+
+32. Address: 0x617f1f4166204111bd89d090c19f300e12395631
+   Trades: 32
+   Win Rate: 100.00%
+   PnL: $59,299.50
+
+33. Address: 0xcce58e5acdea9edb7747be73125d7929ba0bbdaf
+   Display: 0xcce58e5acdea9edb7747be73125d7929ba0bbdaf
+   Trades: 262
+   Win Rate: 100.00%
+   PnL: $47,741.84
+   Daily Frequency: 32.24
+
+34. Address: 0x70c09e0b31b57d80253426e60c7f7a972083ef89
+   Trades: 30
+   Win Rate: 100.00%
+   PnL: $45,168.00
+
+35. Address: 0xd5898169674f7eeccd39dc0ef3071cb1fe6327c2
+   Display: 0xd5898169674f7eeccd39dc0ef3071cb1fe6327c2
+   Trades: 424
+   Win Rate: 100.00%
+   PnL: $38,258.32
+   Daily Frequency: 10.07
+
+36. Address: 0xccc1c17bb4a9bf6659508ba8bfe450d4671d1539
+   Trades: 14
+   Win Rate: 100.00%
+   PnL: $33,744.00
+
+37. Address: 0xf5a7b2ed20e42f02ba08fcabac6dbb445dcf63e7
+   Trades: 342
+   Win Rate: 100.00%
+   PnL: $33,247.26
+
+38. Address: 0x1fe589dcd6c23be15aea3a7a4b24fe25ac940309
+   Display: 0x1fe589dcd6c23be15aea3a7a4b24fe25ac940309
+   Trades: 468
+   Win Rate: 100.00%
+   PnL: $33,232.93
+   Daily Frequency: 3.21
+
+39. Address: 0x7ac973b11b599d60bb5f4e0db7b93a932629d652
+   Trades: 13
+   Win Rate: 100.00%
+   PnL: $30,918.50
+
+40. Address: 0x79ed2b43e5a1476c7f82f8d79001e316b90e1619
+   Trades: 47
+   Win Rate: 100.00%
+   PnL: $29,983.79
+
+41. Address: 0xcf9efbdb300d03a6c462eda8840dcc3ab9b1518e
+   Trades: 132
+   Win Rate: 100.00%
+   PnL: $29,407.38
+
+42. Address: 0x7fa2af502629c59aee5cc870bc9c1d34ffc6f343
+   Display: 0x7fa2af502629c59aee5cc870bc9c1d34ffc6f343
+   Trades: 474
+   Win Rate: 100.00%
+   PnL: $29,174.18
+   Daily Frequency: 100.00
+
+43. Address: 0x97e0e30dd7ef720a85a90b8c79a03a8f91288194
+   Trades: 113
+   Win Rate: 100.00%
+   PnL: $25,416.61
+
+44. Address: 0x557bed924a1bb6f62842c5742d1dc789b8d480d4
+   Display: 0x557bed924a1bb6f62842c5742d1dc789b8d480d4
+   Trades: 967
+   Win Rate: 100.00%
+   PnL: $25,150.79
+   Daily Frequency: 100.00
+
+45. Address: 0x9cb48ddd4185f3e947edf596589e40e574588285
+   Trades: 858
+   Win Rate: 100.00%
+   PnL: $22,193.93
+
+46. Address: 0x7d31bff96a064b2216c856af1959648b675ccb04
+   Display: 0x7d31bff96a064b2216c856af1959648b675ccb04
+   Trades: 87
+   Win Rate: 100.00%
+   PnL: $21,177.25
+   Daily Frequency: 0.28
+
+47. Address: 0x1d949489f736378cbde40db18c093c5cff459100
+   Trades: 269
+   Win Rate: 100.00%
+   PnL: $21,100.70
+
+48. Address: 0x1b7ea7350948e50d55da7b6316aeecc5930979e5
+   Trades: 63
+   Win Rate: 100.00%
+   PnL: $20,572.81
+
+49. Address: 0x4c86e038874aed8993dfb12e55f057f1b0dd366b
+   Display: 0x4c86e038874aed8993dfb12e55f057f1b0dd366b
+   Trades: 144
+   Win Rate: 100.00%
+   PnL: $20,119.81
+   Daily Frequency: 7.07
+
+50. Address: 0xab21252b603aea73ed9c89adede6d523cf6cc521
+   Trades: 428
+   Win Rate: 100.00%
+   PnL: $15,959.82
+
+51. Address: 0x0727d59ff57669d4bf68800606830196b3faec27
+   Trades: 149
+   Win Rate: 100.00%
+   PnL: $14,621.72
+
+52. Address: 0x9354093672da5fa6df48baa49133808231c56502
+   Trades: 1044
+   Win Rate: 100.00%
+   PnL: $14,031.19
+
+53. Address: 0x140a25cd5dbba61238956e48fa24cd1b1f2a15eb
+   Trades: 835
+   Win Rate: 100.00%
+   PnL: $13,874.64
+
+54. Address: 0xb4f706554d8c38be7fcc33467f14c466e5068bd2
+   Trades: 1156
+   Win Rate: 100.00%
+   PnL: $12,864.95
+
+55. Address: 0xf2c29fa94f5a18b1c68c00baee66155b89254de7
+   Trades: 294
+   Win Rate: 100.00%
+   PnL: $11,089.94
+
+56. Address: 0xe6cbefad4e8c1d286f47e84e333b4075c2ea2b12
+   Trades: 539
+   Win Rate: 100.00%
+   PnL: $10,746.33
+
+57. Address: 0x1fdf06dfd0d91cc60d63ce05709d40d0d0c9ec4b
+   Trades: 46
+   Win Rate: 100.00%
+   PnL: $10,423.58
+
+58. Address: 0xa5dcb282cab760e31df1f3f5c18350731c95ec43
+   Trades: 343
+   Win Rate: 100.00%
+   PnL: $9,608.67
+
+59. Address: 0xc610d1bc1edbe4e0605e2776eef7c47ee433707a
+   Trades: 181
+   Win Rate: 100.00%
+   PnL: $9,001.55
+
+60. Address: 0x0ef42f5c4446d8b17fc62f141055810fc98b4e4e
+   Trades: 513
+   Win Rate: 100.00%
+   PnL: $8,271.29
+
+61. Address: 0x5825b839db66966dccf1c4e1030da13a25474ffb
+   Display: 0x5825b839db66966dccf1c4e1030da13a25474ffb
+   Trades: 738
+   Win Rate: 100.00%
+   PnL: $8,005.36
+   Daily Frequency: 8.35
+
+62. Address: 0x1e3f673cbd329df727d564e07e9f9dfcd40ae00b
+   Trades: 247
+   Win Rate: 100.00%
+   PnL: $7,595.14
+
+63. Address: 0xddc7100752c446b821d027301c917e0ba4af7f4b
+   Trades: 64
+   Win Rate: 100.00%
+   PnL: $7,101.04
+
+64. Address: 0xd95768b03f9ba188d5f0c65c619837a13601572f
+   Trades: 800
+   Win Rate: 100.00%
+   PnL: $6,578.14
+
+65. Address: 0x67430a12dcf1a219ff03ec620672920f3aac4ccb
+   Trades: 146
+   Win Rate: 100.00%
+   PnL: $5,923.16
+
+66. Address: 0x897a3146a9dadfbec9c339364a9a6bd07994b17e
+   Trades: 255
+   Win Rate: 100.00%
+   PnL: $5,877.90
+
+67. Address: 0xe998cd1bcfe301fada3947d2fd146df093bd348a
+   Trades: 56
+   Win Rate: 100.00%
+   PnL: $5,002.36
+
+68. Address: 0x3804fb6b5781d6829f2ac3967647e98021b66136
+   Trades: 228
+   Win Rate: 100.00%
+   PnL: $4,773.84
+
+69. Address: 0x17aa8c93cd9ebc5c3751e0dfe18914039873cb3d
+   Trades: 82
+   Win Rate: 100.00%
+   PnL: $4,408.94
+
+70. Address: 0x55f596bea1d875ad871c612814b032e4bd4ec20e
+   Trades: 83
+   Win Rate: 100.00%
+   PnL: $4,303.51
+
+71. Address: 0x1b1c58e1e803fd73c41efca91a48719e997955ca
+   Trades: 212
+   Win Rate: 100.00%
+   PnL: $4,110.12
+
+72. Address: 0x4243d448f4629968fd1da4ac81a1cab0f4a135d1
+   Display: 0x4243d448f4629968fd1da4ac81a1cab0f4a135d1
+   Trades: 72
+   Win Rate: 100.00%
+   PnL: $4,030.38
+   Daily Frequency: 0.88
+
+73. Address: 0xd88fe79fc797f163211f02c72947def08ac18d2c
+   Trades: 188
+   Win Rate: 100.00%
+   PnL: $3,936.38
+
+74. Address: 0x605d80660ed7cc251961373123f152e5fcbc52de
+   Trades: 85
+   Win Rate: 100.00%
+   PnL: $3,784.24
+
+75. Address: 0x8de674db0dfe57e85594a32c06b94703d2842938
+   Trades: 275
+   Win Rate: 100.00%
+   PnL: $3,708.60
+
+76. Address: 0x9e8077593bf0a6fd63f988dcf589f7558897f694
+   Display: 0x9e8077593bf0a6fd63f988dcf589f7558897f694
+   Trades: 195
+   Win Rate: 100.00%
+   PnL: $3,673.21
+   Daily Frequency: 8.26
+
+77. Address: 0x30b27d56e661a08a8f84c3c80cdc08e902429e25
+   Display: 0x30b27d56e661a08a8f84c3c80cdc08e902429e25
+   Trades: 337
+   Win Rate: 100.00%
+   PnL: $3,313.73
+   Daily Frequency: 13.75
+
+78. Address: 0x4f6b88ca3e7053da95989cb1c3f16f471717075f
+   Trades: 70
+   Win Rate: 100.00%
+   PnL: $3,302.49
+
+79. Address: 0xcf7069df3f86ee860f41e9632b7fb667d9847d5f
+   Trades: 142
+   Win Rate: 100.00%
+   PnL: $3,201.48
+
+80. Address: 0x7078ec57b871e46b746617c639699f51b370aeac
+   Trades: 455
+   Win Rate: 100.00%
+   PnL: $3,145.53
+
+81. Address: 0x7c1290038874a52578dec84796044b70338293a7
+   Trades: 739
+   Win Rate: 100.00%
+   PnL: $3,097.58
+
+82. Address: 0x5b1d887976a550dc67b68c25565e9027b1df6a8b
+   Display: 0x5b1d887976a550dc67b68c25565e9027b1df6a8b
+   Trades: 151
+   Win Rate: 100.00%
+   PnL: $2,683.73
+   Daily Frequency: 6.09
+
+83. Address: 0xf244d58b9e0a83ad68b16fb7c940aeb391b7bedd
+   Trades: 144
+   Win Rate: 100.00%
+   PnL: $2,661.64
+
+84. Address: 0xc8ee861a982a8fc53942b063f7f0e1785baaefe0
+   Trades: 119
+   Win Rate: 100.00%
+   PnL: $2,641.25
+
+85. Address: 0x1db3a02b73d5845c722257c97c9607826e9aada1
+   Trades: 184
+   Win Rate: 100.00%
+   PnL: $2,626.69
+
+86. Address: 0x4cfa0b3813df5928bf0f14fd9314b2a426f2de43
+   Trades: 347
+   Win Rate: 100.00%
+   PnL: $2,622.36
+
+87. Address: 0x8dee870d785252755765918e6db7fd4af335412b
+   Trades: 24
+   Win Rate: 100.00%
+   PnL: $2,591.31
+
+88. Address: 0xda779356466f84d9a2196c756b01fb8557708240
+   Display: 0xda779356466f84d9a2196c756b01fb8557708240
+   Trades: 136
+   Win Rate: 100.00%
+   PnL: $2,360.97
+   Daily Frequency: 100.00
+
+89. Address: 0x7a29b0fb03ab04e087d20c61685c903cdd45c0b6
+   Trades: 391
+   Win Rate: 100.00%
+   PnL: $2,331.93
+
+90. Address: 0x491975172323eb53220ee3efa463311f9e320c56
+   Trades: 158
+   Win Rate: 100.00%
+   PnL: $2,203.09
+
+91. Address: 0x6d896a422a3d010db7db49e484da481046c4340c
+   Trades: 266
+   Win Rate: 100.00%
+   PnL: $2,165.80
+
+92. Address: 0x3f55c9fbbba239df5408aa84a977945e0954bbad
+   Trades: 245
+   Win Rate: 100.00%
+   PnL: $2,140.16
+
+93. Address: 0x5913bf779530fff27379e0fedddd5940901a3bbe
+   Trades: 191
+   Win Rate: 100.00%
+   PnL: $2,083.83
+
+94. Address: 0xacd3521366431cf0da2329fb70c499fc188f9e40
+   Trades: 82
+   Win Rate: 100.00%
+   PnL: $2,049.42
+
+95. Address: 0xc75975f347581be12d05f26ab5b9b1b61b7cb0d2
+   Display: 0xc75975f347581be12d05f26ab5b9b1b61b7cb0d2
+   Trades: 262
+   Win Rate: 100.00%
+   PnL: $2,047.30
+   Daily Frequency: 100.00
+
+96. Address: 0x19fe88da83a58ac50bb76f30804c7934011933de
+   Trades: 191
+   Win Rate: 100.00%
+   PnL: $1,732.20
+
+97. Address: 0xcdd4bb5ef1365e8b7db5282c4632051850687696
+   Trades: 1058
+   Win Rate: 100.00%
+   PnL: $1,697.09
+
+98. Address: 0x413fa4676c85a60bec92dff14d26a14dd3c91747
+   Trades: 122
+   Win Rate: 100.00%
+   PnL: $1,672.92
+
+99. Address: 0xd002f63bbec300ee4dc7bf3d75987f1e02832ee8
+   Trades: 136
+   Win Rate: 100.00%
+   PnL: $1,312.18
+
+100. Address: 0xceced08d52c841856447837d8608220c1f2c8c50
+   Trades: 56
+   Win Rate: 100.00%
+   PnL: $1,309.82
+
+101. Address: 0x9363110fc61836f4d9e8d1d0e27db255b7a9fbfa
+   Trades: 127
+   Win Rate: 100.00%
+   PnL: $1,174.60
+
+102. Address: 0xa63c7a00f8434d0110cae4f402d30656ba984eba
+   Trades: 150
+   Win Rate: 100.00%
+   PnL: $1,126.93
+
+103. Address: 0x9d89ffcafb30d43e3404f234997ee420a0063e65
+   Trades: 88
+   Win Rate: 100.00%
+   PnL: $1,123.57
+
+104. Address: 0x51cbddef50428513a4282ccf7bd3a3034da5b68e
+   Trades: 120
+   Win Rate: 100.00%
+   PnL: $974.99
+
+105. Address: 0x5fd48440d810ca1e3b77aaf6215d62283f158d9f
+   Display: 0x5fd48440d810ca1e3b77aaf6215d62283f158d9f
+   Trades: 742
+   Win Rate: 100.00%
+   PnL: $922.04
+   Daily Frequency: 84.43
+
+106. Address: 0x78d4b6de35029f402157956407cfb2b5515f7120
+   Trades: 190
+   Win Rate: 100.00%
+   PnL: $805.44
+
+107. Address: 0xbace19b995b39ecafb2b6cf21234fffa11f76a61
+   Trades: 77
+   Win Rate: 100.00%
+   PnL: $734.81
+
+108. Address: 0x80ab6ab7646efb38367ea5a180f29042fab16c7a
+   Trades: 349
+   Win Rate: 100.00%
+   PnL: $707.66
+
+109. Address: 0x498b4ae0562a6091d24faa9c703469cd12f6ca86
+   Trades: 95
+   Win Rate: 100.00%
+   PnL: $683.34
+
+110. Address: 0xaf2f8b7d0e7b556f6e4245d68118b969f48f2f32
+   Trades: 284
+   Win Rate: 100.00%
+   PnL: $672.00
+
+111. Address: 0x0a43977fd2e2e43050a07d174dd9ff869c117786
+   Trades: 46
+   Win Rate: 100.00%
+   PnL: $671.33
+
+112. Address: 0xa7b41106c7028ebb8d5ce8e1bbcd15b9129666ba
+   Trades: 67
+   Win Rate: 100.00%
+   PnL: $664.52
+
+113. Address: 0xcca7bfc8d20d4a783c4798ef9731ecfa79685762
+   Trades: 553
+   Win Rate: 100.00%
+   PnL: $652.83
+
+114. Address: 0xd44fe64428cfdd6ef1f0f4e7b31fbea71f694d77
+   Trades: 221
+   Win Rate: 100.00%
+   PnL: $651.68
+
+115. Address: 0xb7d1cbe288a8ae304f8de91511df9a01fedf4cb7
+   Trades: 159
+   Win Rate: 100.00%
+   PnL: $645.71
+
+116. Address: 0xc6fbfc6be44d64b22311b56450018f22e2fe2b2a
+   Trades: 138
+   Win Rate: 100.00%
+   PnL: $630.46
+
+117. Address: 0xfe8ec0a30679e3099c812d84370603d3fbce029a
+   Display: 0xfe8ec0a30679e3099c812d84370603d3fbce029a
+   Trades: 269
+   Win Rate: 100.00%
+   PnL: $628.22
+   Daily Frequency: 4.72
+
+118. Address: 0x4cad0e2a4f4580ef90991f402cb6cfe593502032
+   Trades: 21
+   Win Rate: 100.00%
+   PnL: $564.24
+
+119. Address: 0x4fe26ba5a23446de30da3b33202b26a9951f6d60
+   Trades: 434
+   Win Rate: 100.00%
+   PnL: $502.26
+
+120. Address: 0x16b335bfbb6a7a90458e205d30e8c76a568c403b
+   Trades: 171
+   Win Rate: 100.00%
+   PnL: $500.44
+
+121. Address: 0xa038a07b30a48dbd9da6c8a67298077602f0341d
+   Trades: 126
+   Win Rate: 100.00%
+   PnL: $470.77
+
+122. Address: 0xb42a02d1b2327a93675156564b2d9baeb40ac102
+   Trades: 70
+   Win Rate: 100.00%
+   PnL: $470.68
+
+123. Address: 0x369956d03aba746f4fa3ec9f17cefee0375f80d1
+   Trades: 124
+   Win Rate: 100.00%
+   PnL: $460.45
+
+124. Address: 0xb29e765fab0ea00829c4a3c7e88c4971def8fd62
+   Trades: 101
+   Win Rate: 100.00%
+   PnL: $457.30
+
+125. Address: 0xf8c00d00be71d6de555893772de2ecdbe10e93e6
+   Display: 0xf8c00d00be71d6de555893772de2ecdbe10e93e6
+   Trades: 847
+   Win Rate: 100.00%
+   PnL: $435.13
+   Daily Frequency: 68.39
+
+126. Address: 0x8b88f1467865e7bbed0d4ca99d52807e22a17cc0
+   Trades: 797
+   Win Rate: 100.00%
+   PnL: $427.93
+
+127. Address: 0x81232188d5ef9d4d5703b260bd83b39e7a9303e3
+   Trades: 131
+   Win Rate: 100.00%
+   PnL: $403.88
+
+128. Address: 0x0a8533c12779642daee159fa3250c997966da309
+   Trades: 266
+   Win Rate: 100.00%
+   PnL: $395.99
+
+129. Address: 0x9641c20f1834ce3504bcf06f725a2ffe1d1bc287
+   Trades: 876
+   Win Rate: 100.00%
+   PnL: $381.19
+
+130. Address: 0xaf1d3055031cea98a5805d94781f67cd8959b206
+   Trades: 122
+   Win Rate: 100.00%
+   PnL: $380.66
+
+131. Address: 0x655e8557f9848054945ed050467125349589bf3a
+   Trades: 47
+   Win Rate: 100.00%
+   PnL: $375.54
+
+132. Address: 0xce0a9a3c325820a078fda1f74fc973b7c16cc836
+   Display: 0xce0a9a3c325820a078fda1f74fc973b7c16cc836
+   Trades: 139
+   Win Rate: 100.00%
+   PnL: $359.29
+   Daily Frequency: 100.00
+
+133. Address: 0x5caf4f083f645c3dd0883a3ccf2fe9abca775470
+   Display: 0x5caf4f083f645c3dd0883a3ccf2fe9abca775470
+   Trades: 590
+   Win Rate: 100.00%
+   PnL: $290.59
+   Daily Frequency: 2.91
+
+134. Address: 0xbb930d17f4434a576f6938d561562c9435130fe2
+   Trades: 66
+   Win Rate: 100.00%
+   PnL: $276.74
+
+135. Address: 0x1761f1b53cb6645c29f49c9edae2b8a4f31f502a
+   Trades: 15
+   Win Rate: 100.00%
+   PnL: $267.05
+
+136. Address: 0x9d012a5442c0b9e5652834a59cd58b1e421dbf99
+   Trades: 558
+   Win Rate: 100.00%
+   PnL: $253.64
+
+137. Address: 0xfe1a600bb3a9c3931c9d8c6079d1480fe8acacea
+   Display: 0xfe1a600bb3a9c3931c9d8c6079d1480fe8acacea
+   Trades: 79
+   Win Rate: 100.00%
+   PnL: $253.42
+   Daily Frequency: 8.60
+
+138. Address: 0x81add8ba2bc769a8a43633bc25caffd6766afa6c
+   Trades: 109
+   Win Rate: 100.00%
+   PnL: $251.10
+
+139. Address: 0x76a9d505c4626745f1d21639a12658fd012a2907
+   Trades: 717
+   Win Rate: 100.00%
+   PnL: $244.94
+
+140. Address: 0x8a87c4aca4befbb55fcd64ce7bca63ecc3681ae6
+   Display: 0x8a87c4aca4befbb55fcd64ce7bca63ecc3681ae6
+   Trades: 132
+   Win Rate: 100.00%
+   PnL: $236.09
+   Daily Frequency: 60.10
+
+141. Address: 0xbe87ae1923ac73f92181d9def1323a7386656c15
+   Trades: 1144
+   Win Rate: 100.00%
+   PnL: $227.85
+
+142. Address: 0xa4858bc2b489bc1891c1b43c634101d679ae2258
+   Trades: 357
+   Win Rate: 100.00%
+   PnL: $215.07
+
+143. Address: 0x933f76492c2f5c140dad27d40047d310b78510e2
+   Trades: 171
+   Win Rate: 100.00%
+   PnL: $203.56
+
+144. Address: 0x11f0b71f62ae16eacb9c309de3053034ad6d890d
+   Trades: 74
+   Win Rate: 100.00%
+   PnL: $202.70
+
+145. Address: 0x09150056d7b579819ca03e6b7b404652ee91d08a
+   Trades: 23
+   Win Rate: 100.00%
+   PnL: $188.79
+
+146. Address: 0xf6099904dea96d51b5df5fcd3baf662789587295
+   Trades: 566
+   Win Rate: 100.00%
+   PnL: $187.41
+
+147. Address: 0x09f36ccce37ae5db615be73f09c91773d373f30f
+   Trades: 35
+   Win Rate: 100.00%
+   PnL: $149.57
+
+148. Address: 0x4efcca87171dfcb036d720bf4f52857ba69fefdb
+   Trades: 87
+   Win Rate: 100.00%
+   PnL: $143.08
+
+149. Address: 0xee25d98bb093f6ccf96604f6f6be57f74ef75abd
+   Trades: 526
+   Win Rate: 100.00%
+   PnL: $134.21
+
+150. Address: 0xa9d8fa0aa2aff4ac6555c8364d0b020c6f7804b3
+   Trades: 182
+   Win Rate: 100.00%
+   PnL: $132.60
+
+151. Address: 0x9020f5df404b39fad6d0642b546c6e358a00518d
+   Trades: 283
+   Win Rate: 100.00%
+   PnL: $112.43
+
+152. Address: 0xfd08d904482abcf32e37942e79e12785da20ee64
+   Trades: 116
+   Win Rate: 100.00%
+   PnL: $100.04
+
+153. Address: 0x71f35ad776798cd817f95bec30f87517ca7abba4
+   Display: 0x71f35ad776798cd817f95bec30f87517ca7abba4
+   Trades: 96
+   Win Rate: 100.00%
+   PnL: $86.55
+   Daily Frequency: 19.50
+
+154. Address: 0x9ff96353e38ae602475729bb6e4fc7e111d5ce7a
+   Trades: 13
+   Win Rate: 100.00%
+   PnL: $79.37
+
+155. Address: 0xdc696da418428d1b5c20ede23f559c991e9b62e9
+   Display: 0xdc696da418428d1b5c20ede23f559c991e9b62e9
+   Trades: 57
+   Win Rate: 100.00%
+   PnL: $69.90
+   Daily Frequency: 100.00
+
+156. Address: 0x81c11ecc4a26378c45cb488a01f3cb8518f2aef1
+   Trades: 164
+   Win Rate: 100.00%
+   PnL: $59.12
+
+157. Address: 0xd3bdf2857f963837d78814c20d3275bf04f454d2
+   Trades: 93
+   Win Rate: 100.00%
+   PnL: $55.69
+
+158. Address: 0xe0701d7cb56b71ad38069c119667b4ad33753058
+   Display: 0xe0701d7cb56b71ad38069c119667b4ad33753058
+   Trades: 266
+   Win Rate: 100.00%
+   PnL: $55.64
+   Daily Frequency: 11.06
+
+159. Address: 0x63b9db08563a62fbd481a3138f274a86151c83ba
+   Trades: 10
+   Win Rate: 100.00%
+   PnL: $42.10
+
+160. Address: 0x9fccf3d12bb54c98b98b6dc11e003bbf8e3a326e
+   Trades: 62
+   Win Rate: 100.00%
+   PnL: $40.86
+
+161. Address: 0xb9616d486a95b5144bad18f0f0e8574a245bd289
+   Trades: 40
+   Win Rate: 100.00%
+   PnL: $38.64
+
+162. Address: 0xe882f7b92b90ed900dda3c42f5154835a266a71d
+   Trades: 40
+   Win Rate: 100.00%
+   PnL: $32.71
+
+163. Address: 0x789eae0370992d095669515497a9a09c22212a23
+   Trades: 330
+   Win Rate: 100.00%
+   PnL: $26.37
+
+164. Address: 0x78567bf789e8d63b1146df94ee65d25b8b75f39a
+   Trades: 20
+   Win Rate: 100.00%
+   PnL: $24.15
+
+165. Address: 0x6caac7f4117588b67f34227f7a95c3caac6b85d4
+   Display: 0x6caac7f4117588b67f34227f7a95c3caac6b85d4
+   Trades: 403
+   Win Rate: 100.00%
+   PnL: $17.91
+   Daily Frequency: 6.52
+
+166. Address: 0x7b9764fc0e3090dcfcfb743f146546828f7efc12
+   Display: 0x7b9764fc0e3090dcfcfb743f146546828f7efc12
+   Trades: 159
+   Win Rate: 100.00%
+   PnL: $16.50
+   Daily Frequency: 4.08
+
+167. Address: 0xf87fe3c429a32bf8eabeeebc8caf4aedcca625c6
+   Trades: 43
+   Win Rate: 100.00%
+   PnL: $13.91
+
+168. Address: 0x50e9704d39a6797b0a46d890656d85cc546540d1
+   Trades: 51
+   Win Rate: 100.00%
+   PnL: $9.64
+
+169. Address: 0xc16a85e6b6c22931b597cb2d7377d34795a325f8
+   Trades: 57
+   Win Rate: 100.00%
+   PnL: $8.59
+
+170. Address: 0x759f3b2400a056bf0b3723615e34c1d795490982
+   Trades: 16
+   Win Rate: 100.00%
+   PnL: $3.83
+
+171. Address: 0x16ea4bb3f9371c39d3cc7a2eb60de11b76c16d24
+   Trades: 19
+   Win Rate: 100.00%
+   PnL: $3.18
+
+172. Address: 0x27c6b2fc81bc7528543b0f18e64b5810794de3d9
+   Trades: 37
+   Win Rate: 100.00%
+   PnL: $2.33
+
+173. Address: 0xd10dc4beb9f3e926b4beeb90541bcda1ad04cf46
+   Trades: 35
+   Win Rate: 96.00%
+   PnL: $1.67
+
+174. Address: 0x9d7ec9c6e52ec1084d67c935a2b2f446ea135ec0
+   Trades: 40
+   Win Rate: 96.00%
+   PnL: $1.47
+
+175. Address: 0x4c3844ee9066fe59f6fbae8dc67599eab402343b
+   Trades: 47
+   Win Rate: 93.75%
+   PnL: $33.10
+
+176. Address: 0x70206b375d931aaaf99392187d89d0e2735cfd20
+   Trades: 35
+   Win Rate: 92.00%
+   PnL: $35,576.77
+
+177. Address: 0x079f2026de4809c217c074f2b58b1f8e0bb4b6de
+   Trades: 25
+   Win Rate: 91.67%
+   PnL: $9.25
+
+178. Address: 0x2cc0cf0cc582efde79f3f9fc2b0cd7fa5eadd2d0
+   Trades: 20
+   Win Rate: 90.00%
+   PnL: $183,889.79
+
+179. Address: 0xce4967e67994d4851fdc4c0efe61c9247626c3b9
+   Trades: 31
+   Win Rate: 90.00%
+   PnL: $80.52
+
+180. Address: 0x31ec6720a8132d2403a598ba7142673ed9b00573
+   Trades: 22
+   Win Rate: 89.47%
+   PnL: $497.05
+
+181. Address: 0x7f599ebb5aeb312d1accd49375d5d7d6b0321176
+   Trades: 18
+   Win Rate: 88.89%
+   PnL: $102,255.12
+
+182. Address: 0x89ad32071549a9cca5c7eddd24b62b1d5593413a
+   Trades: 11
+   Win Rate: 88.89%
+   PnL: $131.29
+
+183. Address: 0xcd0175236e6a9d63b40cbd1e2c4734852003d5ac
+   Trades: 31
+   Win Rate: 88.00%
+   PnL: $3,546.13
+
+184. Address: 0xc9af3f93f3a727191de4cb92a18a979ba3e76371
+   Display: 0xc9af3f93f3a727191de4cb92a18a979ba3e76371
+   Trades: 59
+   Win Rate: 86.36%
+   PnL: $100,568.87
+   Daily Frequency: 4.36
+
+185. Address: 0xb744f56635b537e859152d14b022af5afe485210
+   Trades: 39
+   Win Rate: 85.71%
+   PnL: $2,568,033.91
+
+186. Address: 0x3657862e57070b82a289b5887ec943a7c2166b14
+   Trades: 33
+   Win Rate: 84.00%
+   PnL: $1,812,581.06
+
+187. Address: 0xf89a150f091e3b5c1fdb63c1252e510daab6e663
+   Trades: 25
+   Win Rate: 84.00%
+   PnL: $3,260.00
+
+188. Address: 0x8de2cebd8ec4c7ed023347d2aad27b3fe08e8483
+   Trades: 26
+   Win Rate: 84.00%
+   PnL: $113.01
+
+189. Address: 0x326d9c91e6d1e52a25ba04ab8365941f2135c0be
+   Display: 0x326d9c91e6d1e52a25ba04ab8365941f2135c0be
+   Trades: 61
+   Win Rate: 84.00%
+   PnL: $10.75
+   Daily Frequency: 0.22
+
+190. Address: 0xc0920a0c9b88a57daa9890e01828c95e8fc12fa6
+   Trades: 28
+   Win Rate: 84.00%
+   PnL: $-3.06
+
+191. Address: 0x72a22d4d155079da8f50c89d4c6c03b6428e7b65
+   Trades: 17
+   Win Rate: 83.33%
+   PnL: $833.65
+
+192. Address: 0x538440a29463d25bf536838e26006e83d806fe40
+   Trades: 19
+   Win Rate: 83.33%
+   PnL: $-0.63
+
+193. Address: 0xa4479b84cf7d0fb09cfef68c34818270b405cc98
+   Trades: 17
+   Win Rate: 81.82%
+   PnL: $5,549.69
+
+194. Address: 0x5ebb5aa373ea0ea3f175055320e2d6a5b168685a
+   Trades: 22
+   Win Rate: 81.25%
+   PnL: $-26.77
+
+195. Address: 0x73556342924c28dc4225edb4bd797b13d79f9443
+   Trades: 37
+   Win Rate: 80.00%
+   PnL: $5,039.55
+
+196. Address: 0xa6aa6d3bfd1dee30c8fcb7f264e0fd4797324f8e
+   Trades: 28
+   Win Rate: 80.00%
+   PnL: $-9.69
+
+197. Address: 0x17c018f23d1bde0aa589f76570e4646938568ee9
+   Trades: 24
+   Win Rate: 78.57%
+   PnL: $137.16
+
+198. Address: 0x5cd9f7b462a421b66e534f98145e1760dc2986f3
+   Trades: 18
+   Win Rate: 77.78%
+   PnL: $970.17
+
+199. Address: 0xceaa4179ff87268708dd9d4ab2ce926243ea0a13
+   Trades: 13
+   Win Rate: 77.78%
+   PnL: $-1.38
+
+200. Address: 0x244c2b24f60af309f93ccffa8206a07f4a2f1028
+   Trades: 46
+   Win Rate: 75.00%
+   PnL: $39.41
+
+201. Address: 0xdb7cf27b7bc32e4da254d627c9d721b02afbcc27
+   Trades: 15
+   Win Rate: 75.00%
+   PnL: $9.17
+
+202. Address: 0xb826e1997a23ff14f8144f92877685f131c62606
+   Trades: 54
+   Win Rate: 73.91%
+   PnL: $62.91
+
+203. Address: 0xad83dbb94a03d7f5d31563935fca9493394f992b
+   Trades: 41
+   Win Rate: 73.33%
+   PnL: $72.43
+
+204. Address: 0x97be5211bb897d68be5e8c1fe8fc855423f67580
+   Trades: 23
+   Win Rate: 72.73%
+   PnL: $48.69
+
+205. Address: 0xbd801d53c6b033e37fa0df4dff6fa2a301d37b95
+   Trades: 33
+   Win Rate: 71.43%
+   PnL: $-21.49
+

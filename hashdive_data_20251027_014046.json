@@ -1,0 +1,823 @@
+{
+  "timestamp": "2025-10-27T01:39:45.716588",
+  "tables": [
+    {
+      "index": 0,
+      "headers": [
+        "Market",
+        "Outcome",
+        "User",
+        "Current Price",
+        "Avg Entry Price",
+        "PnL (%)",
+        "Invested (USD)"
+      ],
+      "rows": [
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0x8fdf1f799b502d3c989df4c3ad184cb2ed95f38e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F",
+            "links": []
+          },
+          {
+            "text": "0.835",
+            "links": []
+          },
+          {
+            "text": "0.19986",
+            "links": []
+          },
+          {
+            "text": "3.1779245471830277",
+            "links": []
+          },
+          {
+            "text": "5060.142419100001",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0xaa71be5472994f4a547671a4b6915d5fad477193&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F",
+            "links": []
+          },
+          {
+            "text": "0.9915",
+            "links": []
+          },
+          {
+            "text": "0.24",
+            "links": []
+          },
+          {
+            "text": "3.1312500000000005",
+            "links": []
+          },
+          {
+            "text": "2728.4448371999997",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0xc9006cd24e9e599e6d899aef360900069d3c981d&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F",
+            "links": []
+          },
+          {
+            "text": "0.9915",
+            "links": []
+          },
+          {
+            "text": "0.312384",
+            "links": []
+          },
+          {
+            "text": "2.173978180700676",
+            "links": []
+          },
+          {
+            "text": "14185.601820814656",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0x99dd461f9772db357b51b520ad66a47ce25061cc&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F",
+            "links": []
+          },
+          {
+            "text": "0.9915",
+            "links": []
+          },
+          {
+            "text": "0.313356",
+            "links": []
+          },
+          {
+            "text": "2.1641328074139317",
+            "links": []
+          },
+          {
+            "text": "6916.03402778796",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0x6fa1383aa839e0d87d2a43814f089749b6831f74&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F",
+            "links": []
+          },
+          {
+            "text": "0.9915",
+            "links": []
+          },
+          {
+            "text": "0.321831",
+            "links": []
+          },
+          {
+            "text": "2.0808094931812042",
+            "links": []
+          },
+          {
+            "text": "5567.221575003339",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0x0f74c48b3f3a5810c8254eef9f3a12374462f2a6&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F",
+            "links": []
+          },
+          {
+            "text": "0.9915",
+            "links": []
+          },
+          {
+            "text": "0.333404",
+            "links": []
+          },
+          {
+            "text": "1.9738695396575927",
+            "links": []
+          },
+          {
+            "text": "1017.849356993824",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0x1af5e93445e0851b9287d8394159957c1822f44e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F",
+            "links": []
+          },
+          {
+            "text": "0.9915",
+            "links": []
+          },
+          {
+            "text": "0.338591",
+            "links": []
+          },
+          {
+            "text": "1.9283117389416733",
+            "links": []
+          },
+          {
+            "text": "6245.44791138126",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Israel+strike+Gaza+on+October+23%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0x5bb4a865e5a2b432b7c421bcc9e98560d477cb1e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BIsrael%2Bstrike%2BGaza%2Bon%2BOctober%2B23%253F",
+            "links": []
+          },
+          {
+            "text": "0.9995",
+            "links": []
+          },
+          {
+            "text": "0.349464",
+            "links": []
+          },
+          {
+            "text": "1.8600943158665841",
+            "links": []
+          },
+          {
+            "text": "1499.8699324316638",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0x2dc59d2d026fc8f5376d2512061ae5e7b0aa9b92&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F",
+            "links": []
+          },
+          {
+            "text": "0.9915",
+            "links": []
+          },
+          {
+            "text": "0.348941",
+            "links": []
+          },
+          {
+            "text": "1.8414545725495146",
+            "links": []
+          },
+          {
+            "text": "1253.36872200442",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0x0dd05f547e6cbe6a0e08555f32c2e67bebb8445c&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F",
+            "links": []
+          },
+          {
+            "text": "0.9915",
+            "links": []
+          },
+          {
+            "text": "0.368567",
+            "links": []
+          },
+          {
+            "text": "1.6901486025607286",
+            "links": []
+          },
+          {
+            "text": "5695.01142263168",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0xa3a3d1f7ca16c20a821bd7987a298913b42d3411&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F",
+            "links": []
+          },
+          {
+            "text": "0.9915",
+            "links": []
+          },
+          {
+            "text": "0.369797",
+            "links": []
+          },
+          {
+            "text": "1.6812007669072495",
+            "links": []
+          },
+          {
+            "text": "14096.240255948704",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0x372d7df860b5bd482e1b3e535e668d33f7a09a27&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F",
+            "links": []
+          },
+          {
+            "text": "0.9915",
+            "links": []
+          },
+          {
+            "text": "0.374268",
+            "links": []
+          },
+          {
+            "text": "1.649171182147552",
+            "links": []
+          },
+          {
+            "text": "2876.409486003",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0x9fa2b5bb916e6c8190c120224426d9d5b655a115&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F",
+            "links": []
+          },
+          {
+            "text": "0.9915",
+            "links": []
+          },
+          {
+            "text": "0.377203",
+            "links": []
+          },
+          {
+            "text": "1.628558097364019",
+            "links": []
+          },
+          {
+            "text": "25161.394096410677",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0x6a49f5add137b654b14a4f95ec9d1d643153bddd&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F",
+            "links": []
+          },
+          {
+            "text": "0.9915",
+            "links": []
+          },
+          {
+            "text": "0.389978",
+            "links": []
+          },
+          {
+            "text": "1.5424511126268667",
+            "links": []
+          },
+          {
+            "text": "1331.256108785104",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0x3bb4e8c2bbcbcd9fe48217bd76d193e9b00126d3&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F",
+            "links": []
+          },
+          {
+            "text": "0.9915",
+            "links": []
+          },
+          {
+            "text": "0.39",
+            "links": []
+          },
+          {
+            "text": "1.5423076923076922",
+            "links": []
+          },
+          {
+            "text": "1594.08746445",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0x0923e3f9ac6c40df0b0d1e802085965967efd78f&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F",
+            "links": []
+          },
+          {
+            "text": "0.9915",
+            "links": []
+          },
+          {
+            "text": "0.396911",
+            "links": []
+          },
+          {
+            "text": "1.4980411225690395",
+            "links": []
+          },
+          {
+            "text": "1092.4975275",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0x7c775d6837c0fbe6ec8d3ec64b7d634f2c298656&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F",
+            "links": []
+          },
+          {
+            "text": "0.835",
+            "links": []
+          },
+          {
+            "text": "0.348198",
+            "links": []
+          },
+          {
+            "text": "1.398060873411105",
+            "links": []
+          },
+          {
+            "text": "1072.977110660232",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0x3c916e5946d3b180c780ad43cab142f53a50b2fe&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F",
+            "links": []
+          },
+          {
+            "text": "0.9915",
+            "links": []
+          },
+          {
+            "text": "0.417098",
+            "links": []
+          },
+          {
+            "text": "1.377139185515155",
+            "links": []
+          },
+          {
+            "text": "16786.72693651602",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0xc076e5519ea09c27e978a9d445e1522fdee82b2e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F",
+            "links": []
+          },
+          {
+            "text": "0.835",
+            "links": []
+          },
+          {
+            "text": "0.35141",
+            "links": []
+          },
+          {
+            "text": "1.3761418286332203",
+            "links": []
+          },
+          {
+            "text": "1056.0503038",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3F",
+            "links": []
+          },
+          {
+            "text": "No",
+            "links": []
+          },
+          {
+            "text": "https://hashdive.com/Analyze_User?user_address=0x0a604060006c3bd2649c762c50d3c503a598d692&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F",
+            "links": []
+          },
+          {
+            "text": "0.9915",
+            "links": []
+          },
+          {
+            "text": "0.441758",
+            "links": []
+          },
+          {
+            "text": "1.244441526808796",
+            "links": []
+          },
+          {
+            "text": "14549.44876103712",
+            "links": []
+          }
+        ]
+      ]
+    },
+    {
+      "index": 1,
+      "headers": [
+        "Market",
+        "Outcome",
+        "User",
+        "Current Price",
+        "Avg Entry Price",
+        "PnL (%)",
+        "Invested (USD)"
+      ],
+      "rows": [
+        [
+          {
+            "text": "",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "",
+            "links": []
+          },
+          {
+            "text": "",
+            "links": []
+          },
+          {
+            "text": "",
+            "links": []
+          },
+          {
+            "text": "",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "MarketOutcomeUserCurrent PriceAvg Entry PricePnL (%)Invested (USD)/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3FNohttps://hashdive.com/Analyze_User?user_address=0x8fdf1f799b502d3c989df4c3ad184cb2ed95f38e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F0.8350.199863.17792454718302775060.142419100001/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0xaa71be5472994f4a547671a4b6915d5fad477193&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.243.13125000000000052728.4448371999997/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0xc9006cd24e9e599e6d899aef360900069d3c981d&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3123842.17397818070067614185.601820814656/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x99dd461f9772db357b51b520ad66a47ce25061cc&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3133562.16413280741393176916.03402778796/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x6fa1383aa839e0d87d2a43814f089749b6831f74&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3218312.08080949318120425567.221575003339/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0f74c48b3f3a5810c8254eef9f3a12374462f2a6&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3334041.97386953965759271017.849356993824/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x1af5e93445e0851b9287d8394159957c1822f44e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3385911.92831173894167336245.44791138126/Analyze_Market?market=Will+Israel+strike+Gaza+on+October+23%3FNohttps://hashdive.com/Analyze_User?user_address=0x5bb4a865e5a2b432b7c421bcc9e98560d477cb1e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BIsrael%2Bstrike%2BGaza%2Bon%2BOctober%2B23%253F0.99950.3494641.86009431586658411499.8699324316638/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x2dc59d2d026fc8f5376d2512061ae5e7b0aa9b92&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3489411.84145457254951461253.36872200442/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0dd05f547e6cbe6a0e08555f32c2e67bebb8445c&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3685671.69014860256072865695.01142263168/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0xa3a3d1f7ca16c20a821bd7987a298913b42d3411&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3697971.681200766907249514096.240255948704/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x372d7df860b5bd482e1b3e535e668d33f7a09a27&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3742681.6491711821475522876.409486003/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x9fa2b5bb916e6c8190c120224426d9d5b655a115&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3772031.62855809736401925161.394096410677/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x6a49f5add137b654b14a4f95ec9d1d643153bddd&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3899781.54245111262686671331.256108785104/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x3bb4e8c2bbcbcd9fe48217bd76d193e9b00126d3&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.391.54230769230769221594.08746445/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0923e3f9ac6c40df0b0d1e802085965967efd78f&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3969111.49804112256903951092.4975275/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3FNohttps://hashdive.com/Analyze_User?user_address=0x7c775d6837c0fbe6ec8d3ec64b7d634f2c298656&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F0.8350.3481981.3980608734111051072.977110660232/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x3c916e5946d3b180c780ad43cab142f53a50b2fe&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.4170981.37713918551515516786.72693651602/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3FNohttps://hashdive.com/Analyze_User?user_address=0xc076e5519ea09c27e978a9d445e1522fdee82b2e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F0.8350.351411.37614182863322031056.0503038/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0a604060006c3bd2649c762c50d3c503a598d692&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.4417581.24444152680879614549.44876103712",
+            "links": []
+          },
+          {
+            "text": "",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "MarketOutcomeUserCurrent PriceAvg Entry PricePnL (%)Invested (USD)/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3FNohttps://hashdive.com/Analyze_User?user_address=0x8fdf1f799b502d3c989df4c3ad184cb2ed95f38e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F0.8350.199863.17792454718302775060.142419100001/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0xaa71be5472994f4a547671a4b6915d5fad477193&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.243.13125000000000052728.4448371999997/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0xc9006cd24e9e599e6d899aef360900069d3c981d&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3123842.17397818070067614185.601820814656/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x99dd461f9772db357b51b520ad66a47ce25061cc&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3133562.16413280741393176916.03402778796/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x6fa1383aa839e0d87d2a43814f089749b6831f74&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3218312.08080949318120425567.221575003339/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0f74c48b3f3a5810c8254eef9f3a12374462f2a6&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3334041.97386953965759271017.849356993824/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x1af5e93445e0851b9287d8394159957c1822f44e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3385911.92831173894167336245.44791138126/Analyze_Market?market=Will+Israel+strike+Gaza+on+October+23%3FNohttps://hashdive.com/Analyze_User?user_address=0x5bb4a865e5a2b432b7c421bcc9e98560d477cb1e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BIsrael%2Bstrike%2BGaza%2Bon%2BOctober%2B23%253F0.99950.3494641.86009431586658411499.8699324316638/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x2dc59d2d026fc8f5376d2512061ae5e7b0aa9b92&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3489411.84145457254951461253.36872200442/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0dd05f547e6cbe6a0e08555f32c2e67bebb8445c&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3685671.69014860256072865695.01142263168/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0xa3a3d1f7ca16c20a821bd7987a298913b42d3411&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3697971.681200766907249514096.240255948704/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x372d7df860b5bd482e1b3e535e668d33f7a09a27&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3742681.6491711821475522876.409486003/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x9fa2b5bb916e6c8190c120224426d9d5b655a115&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3772031.62855809736401925161.394096410677/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x6a49f5add137b654b14a4f95ec9d1d643153bddd&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3899781.54245111262686671331.256108785104/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x3bb4e8c2bbcbcd9fe48217bd76d193e9b00126d3&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.391.54230769230769221594.08746445/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0923e3f9ac6c40df0b0d1e802085965967efd78f&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3969111.49804112256903951092.4975275/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3FNohttps://hashdive.com/Analyze_User?user_address=0x7c775d6837c0fbe6ec8d3ec64b7d634f2c298656&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F0.8350.3481981.3980608734111051072.977110660232/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x3c916e5946d3b180c780ad43cab142f53a50b2fe&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.4170981.37713918551515516786.72693651602/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3FNohttps://hashdive.com/Analyze_User?user_address=0xc076e5519ea09c27e978a9d445e1522fdee82b2e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F0.8350.351411.37614182863322031056.0503038/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0a604060006c3bd2649c762c50d3c503a598d692&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.4417581.24444152680879614549.44876103712",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "MarketOutcomeUserCurrent PriceAvg Entry PricePnL (%)Invested (USD)/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3FNohttps://hashdive.com/Analyze_User?user_address=0x8fdf1f799b502d3c989df4c3ad184cb2ed95f38e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F0.8350.199863.17792454718302775060.142419100001/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0xaa71be5472994f4a547671a4b6915d5fad477193&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.243.13125000000000052728.4448371999997/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0xc9006cd24e9e599e6d899aef360900069d3c981d&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3123842.17397818070067614185.601820814656/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x99dd461f9772db357b51b520ad66a47ce25061cc&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3133562.16413280741393176916.03402778796/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x6fa1383aa839e0d87d2a43814f089749b6831f74&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3218312.08080949318120425567.221575003339/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0f74c48b3f3a5810c8254eef9f3a12374462f2a6&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3334041.97386953965759271017.849356993824/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x1af5e93445e0851b9287d8394159957c1822f44e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3385911.92831173894167336245.44791138126/Analyze_Market?market=Will+Israel+strike+Gaza+on+October+23%3FNohttps://hashdive.com/Analyze_User?user_address=0x5bb4a865e5a2b432b7c421bcc9e98560d477cb1e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BIsrael%2Bstrike%2BGaza%2Bon%2BOctober%2B23%253F0.99950.3494641.86009431586658411499.8699324316638/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x2dc59d2d026fc8f5376d2512061ae5e7b0aa9b92&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3489411.84145457254951461253.36872200442/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0dd05f547e6cbe6a0e08555f32c2e67bebb8445c&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3685671.69014860256072865695.01142263168/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0xa3a3d1f7ca16c20a821bd7987a298913b42d3411&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3697971.681200766907249514096.240255948704/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x372d7df860b5bd482e1b3e535e668d33f7a09a27&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3742681.6491711821475522876.409486003/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x9fa2b5bb916e6c8190c120224426d9d5b655a115&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3772031.62855809736401925161.394096410677/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x6a49f5add137b654b14a4f95ec9d1d643153bddd&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3899781.54245111262686671331.256108785104/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x3bb4e8c2bbcbcd9fe48217bd76d193e9b00126d3&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.391.54230769230769221594.08746445/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0923e3f9ac6c40df0b0d1e802085965967efd78f&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3969111.49804112256903951092.4975275/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3FNohttps://hashdive.com/Analyze_User?user_address=0x7c775d6837c0fbe6ec8d3ec64b7d634f2c298656&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F0.8350.3481981.3980608734111051072.977110660232/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x3c916e5946d3b180c780ad43cab142f53a50b2fe&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.4170981.37713918551515516786.72693651602/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3FNohttps://hashdive.com/Analyze_User?user_address=0xc076e5519ea09c27e978a9d445e1522fdee82b2e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F0.8350.351411.37614182863322031056.0503038/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0a604060006c3bd2649c762c50d3c503a598d692&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.4417581.24444152680879614549.44876103712",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "MarketOutcomeUserCurrent PriceAvg Entry PricePnL (%)Invested (USD)/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3FNohttps://hashdive.com/Analyze_User?user_address=0x8fdf1f799b502d3c989df4c3ad184cb2ed95f38e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F0.8350.199863.17792454718302775060.142419100001/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0xaa71be5472994f4a547671a4b6915d5fad477193&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.243.13125000000000052728.4448371999997/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0xc9006cd24e9e599e6d899aef360900069d3c981d&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3123842.17397818070067614185.601820814656/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x99dd461f9772db357b51b520ad66a47ce25061cc&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3133562.16413280741393176916.03402778796/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x6fa1383aa839e0d87d2a43814f089749b6831f74&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3218312.08080949318120425567.221575003339/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0f74c48b3f3a5810c8254eef9f3a12374462f2a6&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3334041.97386953965759271017.849356993824/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x1af5e93445e0851b9287d8394159957c1822f44e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3385911.92831173894167336245.44791138126/Analyze_Market?market=Will+Israel+strike+Gaza+on+October+23%3FNohttps://hashdive.com/Analyze_User?user_address=0x5bb4a865e5a2b432b7c421bcc9e98560d477cb1e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BIsrael%2Bstrike%2BGaza%2Bon%2BOctober%2B23%253F0.99950.3494641.86009431586658411499.8699324316638/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x2dc59d2d026fc8f5376d2512061ae5e7b0aa9b92&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3489411.84145457254951461253.36872200442/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0dd05f547e6cbe6a0e08555f32c2e67bebb8445c&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3685671.69014860256072865695.01142263168/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0xa3a3d1f7ca16c20a821bd7987a298913b42d3411&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3697971.681200766907249514096.240255948704/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x372d7df860b5bd482e1b3e535e668d33f7a09a27&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3742681.6491711821475522876.409486003/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x9fa2b5bb916e6c8190c120224426d9d5b655a115&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3772031.62855809736401925161.394096410677/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x6a49f5add137b654b14a4f95ec9d1d643153bddd&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3899781.54245111262686671331.256108785104/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x3bb4e8c2bbcbcd9fe48217bd76d193e9b00126d3&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.391.54230769230769221594.08746445/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0923e3f9ac6c40df0b0d1e802085965967efd78f&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3969111.49804112256903951092.4975275/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3FNohttps://hashdive.com/Analyze_User?user_address=0x7c775d6837c0fbe6ec8d3ec64b7d634f2c298656&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F0.8350.3481981.3980608734111051072.977110660232/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x3c916e5946d3b180c780ad43cab142f53a50b2fe&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.4170981.37713918551515516786.72693651602/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3FNohttps://hashdive.com/Analyze_User?user_address=0xc076e5519ea09c27e978a9d445e1522fdee82b2e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F0.8350.351411.37614182863322031056.0503038/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0a604060006c3bd2649c762c50d3c503a598d692&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.4417581.24444152680879614549.44876103712",
+            "links": []
+          },
+          {
+            "text": "",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "",
+            "links": []
+          },
+          {
+            "text": "",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "",
+            "links": []
+          }
+        ]
+      ]
+    },
+    {
+      "index": 2,
+      "headers": [
+        "Market",
+        "Outcome",
+        "User",
+        "Current Price",
+        "Avg Entry Price",
+        "PnL (%)",
+        "Invested (USD)"
+      ],
+      "rows": [
+        [
+          {
+            "text": "MarketOutcomeUserCurrent PriceAvg Entry PricePnL (%)Invested (USD)/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3FNohttps://hashdive.com/Analyze_User?user_address=0x8fdf1f799b502d3c989df4c3ad184cb2ed95f38e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F0.8350.199863.17792454718302775060.142419100001/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0xaa71be5472994f4a547671a4b6915d5fad477193&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.243.13125000000000052728.4448371999997/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0xc9006cd24e9e599e6d899aef360900069d3c981d&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3123842.17397818070067614185.601820814656/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x99dd461f9772db357b51b520ad66a47ce25061cc&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3133562.16413280741393176916.03402778796/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x6fa1383aa839e0d87d2a43814f089749b6831f74&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3218312.08080949318120425567.221575003339/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0f74c48b3f3a5810c8254eef9f3a12374462f2a6&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3334041.97386953965759271017.849356993824/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x1af5e93445e0851b9287d8394159957c1822f44e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3385911.92831173894167336245.44791138126/Analyze_Market?market=Will+Israel+strike+Gaza+on+October+23%3FNohttps://hashdive.com/Analyze_User?user_address=0x5bb4a865e5a2b432b7c421bcc9e98560d477cb1e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BIsrael%2Bstrike%2BGaza%2Bon%2BOctober%2B23%253F0.99950.3494641.86009431586658411499.8699324316638/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x2dc59d2d026fc8f5376d2512061ae5e7b0aa9b92&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3489411.84145457254951461253.36872200442/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0dd05f547e6cbe6a0e08555f32c2e67bebb8445c&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3685671.69014860256072865695.01142263168/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0xa3a3d1f7ca16c20a821bd7987a298913b42d3411&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3697971.681200766907249514096.240255948704/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x372d7df860b5bd482e1b3e535e668d33f7a09a27&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3742681.6491711821475522876.409486003/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x9fa2b5bb916e6c8190c120224426d9d5b655a115&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3772031.62855809736401925161.394096410677/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x6a49f5add137b654b14a4f95ec9d1d643153bddd&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3899781.54245111262686671331.256108785104/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x3bb4e8c2bbcbcd9fe48217bd76d193e9b00126d3&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.391.54230769230769221594.08746445/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0923e3f9ac6c40df0b0d1e802085965967efd78f&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3969111.49804112256903951092.4975275/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3FNohttps://hashdive.com/Analyze_User?user_address=0x7c775d6837c0fbe6ec8d3ec64b7d634f2c298656&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F0.8350.3481981.3980608734111051072.977110660232/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x3c916e5946d3b180c780ad43cab142f53a50b2fe&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.4170981.37713918551515516786.72693651602/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3FNohttps://hashdive.com/Analyze_User?user_address=0xc076e5519ea09c27e978a9d445e1522fdee82b2e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F0.8350.351411.37614182863322031056.0503038/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0a604060006c3bd2649c762c50d3c503a598d692&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.4417581.24444152680879614549.44876103712",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "MarketOutcomeUserCurrent PriceAvg Entry PricePnL (%)Invested (USD)/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3FNohttps://hashdive.com/Analyze_User?user_address=0x8fdf1f799b502d3c989df4c3ad184cb2ed95f38e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F0.8350.199863.17792454718302775060.142419100001/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0xaa71be5472994f4a547671a4b6915d5fad477193&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.243.13125000000000052728.4448371999997/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0xc9006cd24e9e599e6d899aef360900069d3c981d&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3123842.17397818070067614185.601820814656/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x99dd461f9772db357b51b520ad66a47ce25061cc&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3133562.16413280741393176916.03402778796/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x6fa1383aa839e0d87d2a43814f089749b6831f74&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3218312.08080949318120425567.221575003339/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0f74c48b3f3a5810c8254eef9f3a12374462f2a6&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3334041.97386953965759271017.849356993824/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x1af5e93445e0851b9287d8394159957c1822f44e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3385911.92831173894167336245.44791138126/Analyze_Market?market=Will+Israel+strike+Gaza+on+October+23%3FNohttps://hashdive.com/Analyze_User?user_address=0x5bb4a865e5a2b432b7c421bcc9e98560d477cb1e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BIsrael%2Bstrike%2BGaza%2Bon%2BOctober%2B23%253F0.99950.3494641.86009431586658411499.8699324316638/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x2dc59d2d026fc8f5376d2512061ae5e7b0aa9b92&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3489411.84145457254951461253.36872200442/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0dd05f547e6cbe6a0e08555f32c2e67bebb8445c&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3685671.69014860256072865695.01142263168/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0xa3a3d1f7ca16c20a821bd7987a298913b42d3411&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3697971.681200766907249514096.240255948704/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x372d7df860b5bd482e1b3e535e668d33f7a09a27&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3742681.6491711821475522876.409486003/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x9fa2b5bb916e6c8190c120224426d9d5b655a115&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3772031.62855809736401925161.394096410677/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x6a49f5add137b654b14a4f95ec9d1d643153bddd&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3899781.54245111262686671331.256108785104/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x3bb4e8c2bbcbcd9fe48217bd76d193e9b00126d3&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.391.54230769230769221594.08746445/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0923e3f9ac6c40df0b0d1e802085965967efd78f&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.3969111.49804112256903951092.4975275/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3FNohttps://hashdive.com/Analyze_User?user_address=0x7c775d6837c0fbe6ec8d3ec64b7d634f2c298656&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F0.8350.3481981.3980608734111051072.977110660232/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x3c916e5946d3b180c780ad43cab142f53a50b2fe&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.4170981.37713918551515516786.72693651602/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3FNohttps://hashdive.com/Analyze_User?user_address=0xc076e5519ea09c27e978a9d445e1522fdee82b2e&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BNovember%2B15%253F0.8350.351411.37614182863322031056.0503038/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+October+31%3FNohttps://hashdive.com/Analyze_User?user_address=0x0a604060006c3bd2649c762c50d3c503a598d692&market=%2FAnalyze_Market%3Fmarket%3DWill%2BMonad%2Bperform%2Ban%2Bairdrop%2Bby%2BOctober%2B31%253F0.99150.4417581.24444152680879614549.44876103712",
+            "links": []
+          },
+          {
+            "text": "",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "",
+            "links": []
+          },
+          {
+            "text": "",
+            "links": []
+          }
+        ]
+      ]
+    },
+    {
+      "index": 3,
+      "headers": [],
+      "rows": [
+        [
+          {
+            "text": "",
+            "links": []
+          }
+        ],
+        [
+          {
+            "text": "",
+            "links": []
+          },
+          {
+            "text": "",
+            "links": []
+          }
+        ]
+      ]
+    }
+  ],
+  "all_text": "\n\n\n\n\nPolymarket Insiders\n\n\n\n\n\n\nHashdive is a powerful Polymarket Analytics platform.\n    \nPolymarket Analytics\nPolymarket: Market Overview\nAnalyze the top trading markets on Polymarket, track liquidity, volume, and AI-powered probabilities.\nKey Market Statistics\n\nTop 20 Markets: Ordered by liquidity and trading volume.\nAI Probability: Compare human vs AI-calculated probabilities.\nMarket Trends: Interactive charts and insights.\nSmart Score: Evaluate user performance based on historical trading success.\n\nUser Trading Performance\nEnter a Polygon address to analyze user positions, profit/loss details, and trading scores.\nAnalyze User\nTop Market Trends\n\nCheck out the latest market trends and price movements. Data-driven insights available for all top markets.\n\nMarket Analysis Charts\n\nMarket Data (Yes vs No): A comparison of market sentiment and price action.\nValue per Entry Price: A visualization of positions by entry price.\nProfit and Loss Distribution: Analysis of the top traders' positions.\nSmart Score Distribution: Breakdown of traders' performance based on past market activities.\n\nExplore the Markets\nAnalyze Markets\nContact Us\nEmail: contact@hashdive.com\n\n© 2025 Hashdive. All rights reserved.\n\n\n\nAnalysisinsightsAnalyze MarketpersonAnalyze UserarchiveAnalyze Resolved MarketSmart Scoresnetwork_intelligenceSmart ScoresstorageSmart Trades LiveexploreSmart Trader ExplorerDiscoverytable_chartScreenermapMarket Mapemoji_eventsPnL LeaderboardradarYour Tracked TradersWhalessensorsWhales Positionsshow_chartWhale Tradesnotifications_activeUnusual TradesInsidersmysteryInsider DetectionDocumentationlock_openWhy Upgrade to Pro?noteTerms of UseschoolUser GuideDataapiHashdive APIHomehomeHomeKalshitable_chartScreenerinsightsAnalyze MarketpersonAnalyze useremoji_eventsLeaderboardnotifications_activeUnusual TradesAccountmanage_accountsYour AccountlogoutLog out\n\n\n\n\n\n\n🔎 New: Potential Insiders Dashboard\nMonitor suspicious traders and the markets where they may be active. 👉 Explore Potential InsidersPossible Insiders\nBETA\n\n\nThis feature is still in beta — we’re actively improving it.  \nIf you have feedback, please DM us on Discord or X.\nThis table highlights traders whose behavior looks unusual. Typically these traders enter at relatively low prices, place very large bets, have new accounts with little history, and rarely trade in other markets. The Z-Score helps put their investment in context: it compares the size of a trader’s bet to what is normal in that market. A very high Z-Score means their position is much larger than average. These patterns can sometimes hint at insider information or abnormal confidence.However, this is only a guide — it does not prove anything. Always do your own research before drawing conclusions.Filter InsidersChoose optionsopenMarketOutcomeUserCurrent PriceAvg Entry PricePnL (%)Invested (USD)/Analyze_Market?market=Will+Monad+perform+an+airdrop+by+November+15%3FNohttps://hashdive.com/Analyze_User?user_address=0x8fdf1f799b502d3c989df4c3ad",
+  "links": []
+}

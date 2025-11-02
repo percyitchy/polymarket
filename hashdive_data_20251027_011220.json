@@ -1,0 +1,741 @@
+{
+  "tables": [],
+  "text": "Analysis\nSmart Scores\nDiscovery\nWhales\nInsiders\nDocumentation\nData\nHome\nKalshi\nAccount",
+  "elements": [
+    {
+      "index": 0,
+      "tag": "DIV",
+      "className": "withScreencast",
+      "dataTestId": "stScreencast",
+      "innerText": "Analysis\nSmart Scores\nDiscovery\nWhales\nInsiders\nDocumentation\nData\nHome\nKalshi\nAccount"
+    },
+    {
+      "index": 1,
+      "tag": "DIV",
+      "className": "stApp stAppEmbeddingId-t4rezkjz2f0p streamlit-wide st-emotion-cache-1f1yg7e ee4bbma0",
+      "dataTestId": "stApp",
+      "innerText": "Analysis\nSmart Scores\nDiscovery\nWhales\nInsiders\nDocumentation\nData\nHome\nKalshi\nAccount"
+    },
+    {
+      "index": 2,
+      "tag": "DIV",
+      "className": "stAppViewContainer appview-container st-emotion-cache-1yiq2ps e4man110",
+      "dataTestId": "stAppViewContainer",
+      "innerText": "Analysis\nSmart Scores\nDiscovery\nWhales\nInsiders\nDocumentation\nData\nHome\nKalshi\nAccount"
+    },
+    {
+      "index": 3,
+      "tag": "HEADER",
+      "className": "stAppHeader st-emotion-cache-hu6cvb e3g0k5y1",
+      "dataTestId": "stHeader",
+      "innerText": "Analysis\nSmart Scores\nDiscovery\nWhales\nInsiders\nDocumentation\nData\nHome\nKalshi\nAccount"
+    },
+    {
+      "index": 4,
+      "tag": "DIV",
+      "className": "stAppToolbar st-emotion-cache-14vh5up e3g0k5y2",
+      "dataTestId": "stToolbar",
+      "innerText": "Analysis\nSmart Scores\nDiscovery\nWhales\nInsiders\nDocumentation\nData\nHome\nKalshi\nAccount"
+    },
+    {
+      "index": 5,
+      "tag": "DIV",
+      "className": "st-emotion-cache-9fr24m en0apyo14",
+      "dataTestId": "stTopNavSection",
+      "innerText": "Analysis"
+    },
+    {
+      "index": 6,
+      "tag": "DIV",
+      "className": "st-emotion-cache-c707t en0apyo19",
+      "dataTestId": "stTopNavPopover",
+      "innerText": "insightsAnalyze MarketpersonAnalyze UserarchiveAnalyze Resolved Market"
+    },
+    {
+      "index": 7,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "insightsAnalyze Market"
+    },
+    {
+      "index": 8,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "insightsAnalyze Market"
+    },
+    {
+      "index": 9,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "insights"
+    },
+    {
+      "index": 10,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "personAnalyze User"
+    },
+    {
+      "index": 11,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "personAnalyze User"
+    },
+    {
+      "index": 12,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "person"
+    },
+    {
+      "index": 13,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "archiveAnalyze Resolved Market"
+    },
+    {
+      "index": 14,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "archiveAnalyze Resolved Market"
+    },
+    {
+      "index": 15,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "archive"
+    },
+    {
+      "index": 16,
+      "tag": "DIV",
+      "className": "st-emotion-cache-9fr24m en0apyo14",
+      "dataTestId": "stTopNavSection",
+      "innerText": "Smart Scores"
+    },
+    {
+      "index": 17,
+      "tag": "DIV",
+      "className": "st-emotion-cache-c707t en0apyo19",
+      "dataTestId": "stTopNavPopover",
+      "innerText": "network_intelligenceSmart ScoresstorageSmart Trades LiveexploreSmart Trader Explorer"
+    },
+    {
+      "index": 18,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "network_intelligenceSmart Scores"
+    },
+    {
+      "index": 19,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "network_intelligenceSmart Scores"
+    },
+    {
+      "index": 20,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "network_intelligence"
+    },
+    {
+      "index": 21,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "storageSmart Trades Live"
+    },
+    {
+      "index": 22,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "storageSmart Trades Live"
+    },
+    {
+      "index": 23,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "storage"
+    },
+    {
+      "index": 24,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "exploreSmart Trader Explorer"
+    },
+    {
+      "index": 25,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "exploreSmart Trader Explorer"
+    },
+    {
+      "index": 26,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "explore"
+    },
+    {
+      "index": 27,
+      "tag": "DIV",
+      "className": "st-emotion-cache-9fr24m en0apyo14",
+      "dataTestId": "stTopNavSection",
+      "innerText": "Discovery"
+    },
+    {
+      "index": 28,
+      "tag": "DIV",
+      "className": "st-emotion-cache-c707t en0apyo19",
+      "dataTestId": "stTopNavPopover",
+      "innerText": "table_chartScreenermapMarket Mapemoji_eventsPnL LeaderboardradarYour Tracked Traders"
+    },
+    {
+      "index": 29,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "table_chartScreener"
+    },
+    {
+      "index": 30,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "table_chartScreener"
+    },
+    {
+      "index": 31,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "table_chart"
+    },
+    {
+      "index": 32,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "mapMarket Map"
+    },
+    {
+      "index": 33,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "mapMarket Map"
+    },
+    {
+      "index": 34,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "map"
+    },
+    {
+      "index": 35,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "emoji_eventsPnL Leaderboard"
+    },
+    {
+      "index": 36,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "emoji_eventsPnL Leaderboard"
+    },
+    {
+      "index": 37,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "emoji_events"
+    },
+    {
+      "index": 38,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "radarYour Tracked Traders"
+    },
+    {
+      "index": 39,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "radarYour Tracked Traders"
+    },
+    {
+      "index": 40,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "radar"
+    },
+    {
+      "index": 41,
+      "tag": "DIV",
+      "className": "st-emotion-cache-9fr24m en0apyo14",
+      "dataTestId": "stTopNavSection",
+      "innerText": "Whales"
+    },
+    {
+      "index": 42,
+      "tag": "DIV",
+      "className": "st-emotion-cache-c707t en0apyo19",
+      "dataTestId": "stTopNavPopover",
+      "innerText": "sensorsWhales Positionsshow_chartWhale Tradesnotifications_activeUnusual Trades"
+    },
+    {
+      "index": 43,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "sensorsWhales Positions"
+    },
+    {
+      "index": 44,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "sensorsWhales Positions"
+    },
+    {
+      "index": 45,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "sensors"
+    },
+    {
+      "index": 46,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "show_chartWhale Trades"
+    },
+    {
+      "index": 47,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "show_chartWhale Trades"
+    },
+    {
+      "index": 48,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "show_chart"
+    },
+    {
+      "index": 49,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "notifications_activeUnusual Trades"
+    },
+    {
+      "index": 50,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "notifications_activeUnusual Trades"
+    },
+    {
+      "index": 51,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "notifications_active"
+    },
+    {
+      "index": 52,
+      "tag": "DIV",
+      "className": "st-emotion-cache-9fr24m en0apyo14",
+      "dataTestId": "stTopNavSection",
+      "innerText": "Insiders"
+    },
+    {
+      "index": 53,
+      "tag": "DIV",
+      "className": "st-emotion-cache-c707t en0apyo19",
+      "dataTestId": "stTopNavPopover",
+      "innerText": "mysteryInsider Detection"
+    },
+    {
+      "index": 54,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "mysteryInsider Detection"
+    },
+    {
+      "index": 55,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "mysteryInsider Detection"
+    },
+    {
+      "index": 56,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "mystery"
+    },
+    {
+      "index": 57,
+      "tag": "DIV",
+      "className": "st-emotion-cache-9fr24m en0apyo14",
+      "dataTestId": "stTopNavSection",
+      "innerText": "Documentation"
+    },
+    {
+      "index": 58,
+      "tag": "DIV",
+      "className": "st-emotion-cache-c707t en0apyo19",
+      "dataTestId": "stTopNavPopover",
+      "innerText": "lock_openWhy Upgrade to Pro?noteTerms of UseschoolUser Guide"
+    },
+    {
+      "index": 59,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "lock_openWhy Upgrade to Pro?"
+    },
+    {
+      "index": 60,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "lock_openWhy Upgrade to Pro?"
+    },
+    {
+      "index": 61,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "lock_open"
+    },
+    {
+      "index": 62,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "noteTerms of Use"
+    },
+    {
+      "index": 63,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "noteTerms of Use"
+    },
+    {
+      "index": 64,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "note"
+    },
+    {
+      "index": 65,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "schoolUser Guide"
+    },
+    {
+      "index": 66,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "schoolUser Guide"
+    },
+    {
+      "index": 67,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "school"
+    },
+    {
+      "index": 68,
+      "tag": "DIV",
+      "className": "st-emotion-cache-9fr24m en0apyo14",
+      "dataTestId": "stTopNavSection",
+      "innerText": "Data"
+    },
+    {
+      "index": 69,
+      "tag": "DIV",
+      "className": "st-emotion-cache-c707t en0apyo19",
+      "dataTestId": "stTopNavPopover",
+      "innerText": "apiHashdive API"
+    },
+    {
+      "index": 70,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "apiHashdive API"
+    },
+    {
+      "index": 71,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "apiHashdive API"
+    },
+    {
+      "index": 72,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "api"
+    },
+    {
+      "index": 73,
+      "tag": "DIV",
+      "className": "st-emotion-cache-9fr24m en0apyo14",
+      "dataTestId": "stTopNavSection",
+      "innerText": "Home"
+    },
+    {
+      "index": 74,
+      "tag": "DIV",
+      "className": "st-emotion-cache-c707t en0apyo19",
+      "dataTestId": "stTopNavPopover",
+      "innerText": "homeHome"
+    },
+    {
+      "index": 75,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "homeHome"
+    },
+    {
+      "index": 76,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "homeHome"
+    },
+    {
+      "index": 77,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "home"
+    },
+    {
+      "index": 78,
+      "tag": "DIV",
+      "className": "st-emotion-cache-9fr24m en0apyo14",
+      "dataTestId": "stTopNavSection",
+      "innerText": "Kalshi"
+    },
+    {
+      "index": 79,
+      "tag": "DIV",
+      "className": "st-emotion-cache-c707t en0apyo19",
+      "dataTestId": "stTopNavPopover",
+      "innerText": "table_chartScreenerinsightsAnalyze MarketpersonAnalyze useremoji_eventsLeaderboardnotifications_activeUnusual Trades"
+    },
+    {
+      "index": 80,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "table_chartScreener"
+    },
+    {
+      "index": 81,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "table_chartScreener"
+    },
+    {
+      "index": 82,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "table_chart"
+    },
+    {
+      "index": 83,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "insightsAnalyze Market"
+    },
+    {
+      "index": 84,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "insightsAnalyze Market"
+    },
+    {
+      "index": 85,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "insights"
+    },
+    {
+      "index": 86,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "personAnalyze user"
+    },
+    {
+      "index": 87,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "personAnalyze user"
+    },
+    {
+      "index": 88,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "person"
+    },
+    {
+      "index": 89,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "emoji_eventsLeaderboard"
+    },
+    {
+      "index": 90,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "emoji_eventsLeaderboard"
+    },
+    {
+      "index": 91,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "emoji_events"
+    },
+    {
+      "index": 92,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "notifications_activeUnusual Trades"
+    },
+    {
+      "index": 93,
+      "tag": "A",
+      "className": "st-emotion-cache-on4li4 en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "notifications_activeUnusual Trades"
+    },
+    {
+      "index": 94,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-c74s1j ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "notifications_active"
+    },
+    {
+      "index": 95,
+      "tag": "DIV",
+      "className": "st-emotion-cache-9fr24m en0apyo14",
+      "dataTestId": "stTopNavSection",
+      "innerText": "Account"
+    },
+    {
+      "index": 96,
+      "tag": "DIV",
+      "className": "st-emotion-cache-c707t en0apyo19",
+      "dataTestId": "stTopNavPopover",
+      "innerText": "loginLog in"
+    },
+    {
+      "index": 97,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1gb1rig en0apyo2",
+      "dataTestId": "stTopNavLinkContainer",
+      "innerText": "loginLog in"
+    },
+    {
+      "index": 98,
+      "tag": "A",
+      "className": "st-emotion-cache-14cy2nx en0apyo5",
+      "dataTestId": "stTopNavDropdownLink",
+      "innerText": "loginLog in"
+    },
+    {
+      "index": 99,
+      "tag": "SPAN",
+      "className": "st-emotion-cache-pw96zd ejhh0er0",
+      "dataTestId": "stIconMaterial",
+      "innerText": "login"
+    },
+    {
+      "index": 100,
+      "tag": "SECTION",
+      "className": "stMain st-emotion-cache-4rsbii e4man111",
+      "dataTestId": "stMain",
+      "innerText": ""
+    },
+    {
+      "index": 101,
+      "tag": "DIV",
+      "className": "stMainBlockContainer block-container st-emotion-cache-c38l67 e4man114",
+      "dataTestId": "stMainBlockContainer",
+      "innerText": ""
+    },
+    {
+      "index": 102,
+      "tag": "DIV",
+      "className": "stVerticalBlock st-emotion-cache-tn0cau e196pkbe2",
+      "dataTestId": "stVerticalBlock",
+      "innerText": ""
+    },
+    {
+      "index": 103,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1dumvfu e4man119",
+      "dataTestId": "stAppIframeResizerAnchor",
+      "innerText": ""
+    },
+    {
+      "index": 104,
+      "tag": "DIV",
+      "className": "st-emotion-cache-1q6lfs0 e19n7mk11",
+      "dataTestId": "portal",
+      "innerText": ""
+    }
+  ]
+}

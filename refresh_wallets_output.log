@@ -1,0 +1,142 @@
+2025-10-30 02:07:26,069 - INFO - ============================================================
+2025-10-30 02:07:26,069 - INFO - Starting wallet refresh from Polymarket leaderboards
+2025-10-30 02:07:26,069 - INFO - ============================================================
+2025-10-30 02:07:26,069 - WARNING - min_consensus is 2, forcing to 3
+2025-10-30 02:07:26,070 - INFO - Database initialized successfully
+2025-10-30 02:07:26,070 - INFO - Scanning leaderboards: ['https://polymarket.com/leaderboard/overall/weekly/profit', 'https://polymarket.com/leaderboard/overall/monthly/profit']
+2025-10-30 02:07:26,070 - INFO - WalletAnalyzer-1 started
+2025-10-30 02:07:26,070 - INFO - WalletAnalyzer-2 started
+2025-10-30 02:07:26,070 - INFO - WalletAnalyzer-3 started
+2025-10-30 02:07:26,070 - INFO - Started 3 wallet analysis workers
+2025-10-30 02:07:26,070 - INFO - Starting wallet collection from Polymarket APIs...
+2025-10-30 02:07:26,070 - INFO - Using official Polymarket API scraper
+2025-10-30 02:07:26,071 - INFO - Starting Polymarket API wallet scraping...
+2025-10-30 02:07:26,071 - INFO - Strategy 1: Exploring Data API endpoints...
+2025-10-30 02:07:26,071 - INFO - Trying Data API: https://data-api.polymarket.com/users
+2025-10-30 02:07:26,403 - INFO - Trying Data API: https://data-api.polymarket.com/traders
+2025-10-30 02:07:26,596 - INFO - Trying Data API: https://data-api.polymarket.com/leaderboard
+2025-10-30 02:07:26,743 - INFO -   Found 25 wallets in /leaderboard
+2025-10-30 02:07:26,844 - INFO - Trying Data API: https://data-api.polymarket.com/leaderboards
+2025-10-30 02:07:27,037 - INFO - Trying Data API: https://data-api.polymarket.com/profiles
+2025-10-30 02:07:27,240 - INFO - Trying Data API: https://data-api.polymarket.com/accounts
+2025-10-30 02:07:27,440 - INFO - Trying Data API: https://data-api.polymarket.com/wallets
+2025-10-30 02:07:27,636 - INFO - Trying Data API: https://data-api.polymarket.com/addresses
+2025-10-30 02:07:27,833 - INFO - Trying Data API: https://data-api.polymarket.com/stats
+2025-10-30 02:07:28,030 - INFO - Trying Data API: https://data-api.polymarket.com/metrics
+2025-10-30 02:07:28,228 - INFO - Trying Data API: https://data-api.polymarket.com/top-traders
+2025-10-30 02:07:28,429 - INFO - Trying Data API: https://data-api.polymarket.com/best-traders
+2025-10-30 02:07:28,634 - INFO - Trying Data API: https://data-api.polymarket.com/active-traders
+2025-10-30 02:07:28,845 - INFO - Trying Data API: https://data-api.polymarket.com/recent-traders
+2025-10-30 02:07:29,046 - INFO - Trying Data API: https://data-api.polymarket.com/volume-leaders
+2025-10-30 02:07:29,243 - INFO - Trying Data API: https://data-api.polymarket.com/profit-leaders
+2025-10-30 02:07:29,438 - INFO - Trying Data API: https://data-api.polymarket.com/trade-leaders
+2025-10-30 02:07:29,671 - INFO - Trying Data API: https://data-api.polymarket.com/pnl-leaders
+2025-10-30 02:07:29,871 - INFO - Trying Data API: https://data-api.polymarket.com/performance
+2025-10-30 02:07:30,069 - INFO - Trying Data API: https://data-api.polymarket.com/rankings
+2025-10-30 02:07:30,266 - INFO - Trying Data API: https://data-api.polymarket.com/scores
+2025-10-30 02:07:30,473 - INFO - Trying Data API: https://data-api.polymarket.com/analytics
+2025-10-30 02:07:30,668 - INFO - Trying Data API: https://data-api.polymarket.com/data
+2025-10-30 02:07:30,862 - INFO - Trying Data API: https://data-api.polymarket.com/core
+2025-10-30 02:07:31,056 - INFO - Trying Data API: https://data-api.polymarket.com/misc
+2025-10-30 02:07:31,262 - INFO - Strategy 2: Getting CLOB trader data...
+2025-10-30 02:07:31,262 - INFO - Trying CLOB API: https://clob.polymarket.com/trades
+2025-10-30 02:07:31,772 - INFO - Trying CLOB API: https://clob.polymarket.com/orders
+2025-10-30 02:07:31,972 - INFO - Trying CLOB API: https://clob.polymarket.com/notifications
+2025-10-30 02:07:32,179 - INFO - Trying CLOB API: https://clob.polymarket.com/markets
+2025-10-30 02:07:32,545 - INFO -   Found 2839 wallets in CLOB /markets
+2025-10-30 02:07:32,647 - INFO - Trying CLOB API: https://clob.polymarket.com/book
+2025-10-30 02:07:32,847 - INFO - Trying CLOB API: https://clob.polymarket.com/price
+2025-10-30 02:07:33,058 - INFO - Trying CLOB API: https://clob.polymarket.com/midprice
+2025-10-30 02:07:33,258 - INFO - Trying CLOB API: https://clob.polymarket.com/spreads
+2025-10-30 02:07:33,466 - INFO - Trying CLOB API: https://clob.polymarket.com/ledger
+2025-10-30 02:07:33,663 - INFO - Trying CLOB API: https://clob.polymarket.com/data/orders
+2025-10-30 02:07:33,856 - INFO - Trying CLOB API: https://clob.polymarket.com/data/trades
+2025-10-30 02:07:34,064 - INFO - Trying CLOB API: https://clob.polymarket.com/users
+2025-10-30 02:07:34,278 - INFO - Trying CLOB API: https://clob.polymarket.com/accounts
+2025-10-30 02:07:34,490 - INFO - Trying CLOB API: https://clob.polymarket.com/profiles
+2025-10-30 02:07:34,711 - INFO - Strategy 3: Getting recent trades data...
+2025-10-30 02:07:34,712 - INFO - Trying trades: https://data-api.polymarket.com/trades
+2025-10-30 02:07:34,849 - INFO -   Found 197 wallets in trades
+2025-10-30 02:07:35,050 - INFO - Trying trades: https://clob.polymarket.com/trades
+2025-10-30 02:07:35,356 - INFO - Trying trades: https://data-api.polymarket.com/trades?limit=1000
+2025-10-30 02:07:35,677 - INFO -   Found 853 wallets in trades
+2025-10-30 02:07:35,878 - INFO - Trying trades: https://clob.polymarket.com/trades?limit=1000
+2025-10-30 02:07:36,175 - INFO - Trying trades: https://data-api.polymarket.com/trades?limit=5000
+2025-10-30 02:07:36,455 - INFO -   Found 853 wallets in trades
+2025-10-30 02:07:36,656 - INFO - Trying trades: https://clob.polymarket.com/trades?limit=5000
+2025-10-30 02:07:36,955 - INFO - Strategy 4: Trying API patterns...
+2025-10-30 02:07:36,955 - INFO - Trying pattern: https://data-api.polymarket.com/trades?sort=volume&limit=1000
+2025-10-30 02:07:37,240 - INFO -   Found 853 wallets in pattern
+2025-10-30 02:07:37,440 - INFO - Trying pattern: https://data-api.polymarket.com/trades?sort=profit&limit=1000
+2025-10-30 02:07:37,743 - INFO -   Found 853 wallets in pattern
+2025-10-30 02:07:37,944 - INFO - Trying pattern: https://data-api.polymarket.com/trades?sort=trades&limit=1000
+2025-10-30 02:07:38,241 - INFO -   Found 853 wallets in pattern
+2025-10-30 02:07:38,442 - INFO - Trying pattern: https://data-api.polymarket.com/trades?timeframe=week&limit=1000
+2025-10-30 02:07:38,628 - INFO -   Found 853 wallets in pattern
+2025-10-30 02:07:38,829 - INFO - Trying pattern: https://data-api.polymarket.com/trades?timeframe=month&limit=1000
+2025-10-30 02:07:39,025 - INFO -   Found 853 wallets in pattern
+2025-10-30 02:07:39,225 - INFO - Trying pattern: https://data-api.polymarket.com/trades?timeframe=all&limit=1000
+2025-10-30 02:07:39,494 - INFO -   Found 853 wallets in pattern
+2025-10-30 02:07:39,696 - INFO - Trying pattern: https://clob.polymarket.com/trades?sort=volume&limit=1000
+2025-10-30 02:07:39,989 - INFO - Trying pattern: https://clob.polymarket.com/trades?sort=profit&limit=1000
+2025-10-30 02:07:40,286 - INFO - Trying pattern: https://clob.polymarket.com/trades?sort=trades&limit=1000
+2025-10-30 02:07:40,577 - INFO - Trying pattern: https://data-api.polymarket.com/markets?limit=1000
+2025-10-30 02:07:40,886 - INFO - Trying pattern: https://clob.polymarket.com/markets?limit=1000
+2025-10-30 02:07:41,213 - INFO -   Found 2839 wallets in pattern
+2025-10-30 02:07:41,416 - INFO - 🎉 FINAL RESULT: 3714 unique wallets found via API!
+2025-10-30 02:07:41,417 - INFO - Collected 3714 unique wallets from APIs
+2025-10-30 02:07:41,417 - INFO - Collected 3714 unique wallets from leaderboards
+2025-10-30 02:07:41,417 - INFO - Adding 3714 wallets to analysis queue...
+2025-10-30 02:07:42,149 - INFO - WalletAnalyzer-3 processing job 73417 for 0xf1f9a438f2697381b4ac8eb283d6f4dd772d1245
+2025-10-30 02:07:42,152 - INFO - WalletAnalyzer-2 processing job 73418 for 0xa4cb8fe1d2b5ecec1603c20ddc53a9e6604d1359
+2025-10-30 02:07:42,153 - INFO - Using cached analysis for 0xa4cb8fe1d2b5ecec1603c20ddc53a9e6604d1359
+2025-10-30 02:07:42,153 - INFO - Skipping 0xa4cb8fe1d2b5ecec1603c20ddc53a9e6604d1359: 0 trades, 0.00% win rate (criteria: >=20 trades, >65% win rate)
+2025-10-30 02:07:42,153 - INFO - WalletAnalyzer-2 completed job 73418 for 0xa4cb8fe1d2b5ecec1603c20ddc53a9e6604d1359
+2025-10-30 02:07:42,156 - INFO - WalletAnalyzer-1 processing job 73419 for 0x857b16c40346117b4dce2b62d250251578340f89
+2025-10-30 02:07:42,156 - INFO - Using cached analysis for 0x857b16c40346117b4dce2b62d250251578340f89
+2025-10-30 02:07:42,157 - INFO - Skipping 0x857b16c40346117b4dce2b62d250251578340f89: 0 trades, 0.00% win rate (criteria: >=20 trades, >65% win rate)
+2025-10-30 02:07:42,157 - INFO - WalletAnalyzer-1 completed job 73419 for 0x857b16c40346117b4dce2b62d250251578340f89
+2025-10-30 02:07:42,655 - INFO - WalletAnalyzer-2 processing job 73423 for 0x47a53b22a1aeabde0bc95539e5f4bc966d92202e
+2025-10-30 02:07:42,656 - INFO - Using cached analysis for 0x47a53b22a1aeabde0bc95539e5f4bc966d92202e
+2025-10-30 02:07:42,656 - INFO - Skipping 0x47a53b22a1aeabde0bc95539e5f4bc966d92202e: 0 trades, 0.00% win rate (criteria: >=20 trades, >65% win rate)
+2025-10-30 02:07:42,656 - INFO - WalletAnalyzer-2 completed job 73423 for 0x47a53b22a1aeabde0bc95539e5f4bc966d92202e
+2025-10-30 02:07:42,660 - INFO - WalletAnalyzer-1 processing job 73424 for 0x8cb5196f9cd554c55abdb18b8c65a2d44b7909f5
+2025-10-30 02:07:42,660 - INFO - Using cached analysis for 0x8cb5196f9cd554c55abdb18b8c65a2d44b7909f5
+2025-10-30 02:07:42,661 - INFO - Skipping 0x8cb5196f9cd554c55abdb18b8c65a2d44b7909f5: 0 trades, 0.00% win rate (criteria: >=20 trades, >65% win rate)
+2025-10-30 02:07:42,661 - INFO - WalletAnalyzer-1 completed job 73424 for 0x8cb5196f9cd554c55abdb18b8c65a2d44b7909f5
+2025-10-30 02:07:43,092 - INFO - Added 0xf1f9a438f2697381b4ac8eb283d6f4dd772d1245: 1581 trades, 100.00% win rate, 81012.11 PnL
+2025-10-30 02:07:43,092 - INFO - WalletAnalyzer-3 completed job 73417 for 0xf1f9a438f2697381b4ac8eb283d6f4dd772d1245
+2025-10-30 02:07:43,165 - INFO - WalletAnalyzer-2 processing job 73427 for 0xb7f27c243f3c15a6cfa67158f6ceae18f81068cb
+2025-10-30 02:07:43,165 - INFO - Using cached analysis for 0xb7f27c243f3c15a6cfa67158f6ceae18f81068cb
+2025-10-30 02:07:43,165 - INFO - Skipping 0xb7f27c243f3c15a6cfa67158f6ceae18f81068cb: 0 trades, 0.00% win rate (criteria: >=20 trades, >65% win rate)
+2025-10-30 02:07:43,165 - INFO - WalletAnalyzer-2 completed job 73427 for 0xb7f27c243f3c15a6cfa67158f6ceae18f81068cb
+2025-10-30 02:07:43,167 - INFO - WalletAnalyzer-1 processing job 73428 for 0x2e7a7a3f4e8f6f5079f32947b75b41312dcaddd1
+2025-10-30 02:07:43,167 - INFO - Using cached analysis for 0x2e7a7a3f4e8f6f5079f32947b75b41312dcaddd1
+2025-10-30 02:07:43,167 - INFO - Skipping 0x2e7a7a3f4e8f6f5079f32947b75b41312dcaddd1: 0 trades, 0.00% win rate (criteria: >=20 trades, >65% win rate)
+2025-10-30 02:07:43,167 - INFO - WalletAnalyzer-1 completed job 73428 for 0x2e7a7a3f4e8f6f5079f32947b75b41312dcaddd1
+2025-10-30 02:07:43,373 - INFO - Added 3645 wallets to analysis queue
+2025-10-30 02:07:43,374 - INFO - Added 3645 wallets to queue. Queue status: {'pending_jobs': 3630, 'processing_jobs': 313, 'total_jobs': 3943, 'ready_jobs': 3630, 'workers_running': True, 'active_workers': 3}
+2025-10-30 02:07:43,600 - INFO - WalletAnalyzer-3 processing job 73431 for 0x98c01e1f5053e57fcb59add64b9c0f74ac784609
+2025-10-30 02:07:43,601 - INFO - Using cached analysis for 0x98c01e1f5053e57fcb59add64b9c0f74ac784609
+2025-10-30 02:07:43,601 - INFO - Skipping 0x98c01e1f5053e57fcb59add64b9c0f74ac784609: 0 trades, 0.00% win rate (criteria: >=20 trades, >65% win rate)
+2025-10-30 02:07:43,602 - INFO - WalletAnalyzer-3 completed job 73431 for 0x98c01e1f5053e57fcb59add64b9c0f74ac784609
+2025-10-30 02:07:43,674 - INFO - WalletAnalyzer-1 processing job 73432 for 0x6eaad22e333ebfdd4cecebd1a0c2a5ac26f3ca56
+2025-10-30 02:07:43,674 - INFO - Using cached analysis for 0x6eaad22e333ebfdd4cecebd1a0c2a5ac26f3ca56
+2025-10-30 02:07:43,675 - INFO - Skipping 0x6eaad22e333ebfdd4cecebd1a0c2a5ac26f3ca56: 0 trades, 0.00% win rate (criteria: >=20 trades, >65% win rate)
+2025-10-30 02:07:43,675 - INFO - WalletAnalyzer-1 completed job 73432 for 0x6eaad22e333ebfdd4cecebd1a0c2a5ac26f3ca56
+2025-10-30 02:07:43,677 - INFO - WalletAnalyzer-2 processing job 73433 for 0x3dd748f11097f1f4fe8c1adb5344360fd3ec2f04
+2025-10-30 02:07:43,677 - INFO - Using cached analysis for 0x3dd748f11097f1f4fe8c1adb5344360fd3ec2f04
+2025-10-30 02:07:43,678 - INFO - Skipping 0x3dd748f11097f1f4fe8c1adb5344360fd3ec2f04: 0 trades, 0.00% win rate (criteria: >=20 trades, >65% win rate)
+2025-10-30 02:07:43,679 - INFO - WalletAnalyzer-2 completed job 73433 for 0x3dd748f11097f1f4fe8c1adb5344360fd3ec2f04
+2025-10-30 02:07:43,717 - INFO - Telegram message sent successfully
+2025-10-30 02:07:43,718 - INFO - Added 3645 wallets to analysis queue
+2025-10-30 02:07:43,720 - INFO - Queue status: {'pending_jobs': 3627, 'processing_jobs': 313, 'total_jobs': 3940, 'ready_jobs': 3627, 'workers_running': True, 'active_workers': 3}
+2025-10-30 02:07:43,720 - INFO - ============================================================
+2025-10-30 02:07:43,720 - INFO - Wallet refresh completed successfully
+2025-10-30 02:07:43,720 - INFO - ============================================================
+2025-10-30 02:07:43,720 - INFO - Stopping wallet analysis workers...
+2025-10-30 02:07:44,105 - INFO - WalletAnalyzer-3 stopped
+2025-10-30 02:07:44,179 - INFO - WalletAnalyzer-1 stopped
+2025-10-30 02:07:44,183 - INFO - WalletAnalyzer-2 stopped
+2025-10-30 02:07:44,183 - INFO - Wallet analysis workers stopped
+Using Playwright scraper
