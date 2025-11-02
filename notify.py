@@ -82,7 +82,8 @@ class TelegramNotifier:
                            alert_id: str = "", market_title: str = "", 
                            market_slug: str = "", side: str = "BUY",
                            consensus_events: Optional[int] = None,
-                           total_usd: Optional[float] = None) -> bool:
+                           total_usd: Optional[float] = None,
+                           end_date: Optional[datetime] = None) -> bool:
         """
         Send a consensus buy signal alert
         
@@ -270,9 +271,35 @@ class TelegramNotifier:
         else:
             total_line = ""
 
+        # Calculate and format market end time if available
+        end_time_info = ""
+        if end_date:
+            try:
+                current_time = datetime.now(timezone.utc)
+                if end_date.tzinfo is None:
+                    end_date = end_date.replace(tzinfo=timezone.utc)
+                
+                # Calculate time remaining
+                time_diff = end_date - current_time
+                if time_diff.total_seconds() > 0:
+                    total_seconds = int(time_diff.total_seconds())
+                    hours = total_seconds // 3600
+                    minutes = (total_seconds % 3600) // 60
+                    
+                    # Format: "Ends in: 3h 24m" (only this line, bold)
+                    ends_in_str = f"*🕐 Ends in: {hours}h {minutes}m*"
+                    
+                    end_time_info = f"\n{ends_in_str}"
+                else:
+                    # Market has already ended - just show the end date
+                    end_date_str = end_date.strftime("%Y-%m-%d %H:%M:%S")
+                    end_time_info = f"\n*📅 Ended: {end_date_str} UTC*"
+            except Exception as e:
+                logger.debug(f"Error formatting end time: {e}")
+
         message = f"""{header}
 
-🎯 Market: {market_title}
+🎯 *Market:* {market_title}
 {total_line}
 
 *Outcome:* {position_display}
@@ -280,7 +307,7 @@ class TelegramNotifier:
 
 {chr(10).join(wallet_info)}
 
-Current price: *{current_price_str}*
+Current price: *{current_price_str}*{end_time_info}
 
 📅 {timestamp_utc} UTC"""
         

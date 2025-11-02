@@ -597,37 +597,89 @@ class PolymarketNotifier:
             logger.warning(f"Error getting new {side} trades for {address}: {e}")
             return [], last_seen_trade_id
 
-    def is_market_active(self, condition_id: str, outcome_index: Optional[int] = None) -> bool:
-        """Check market status via CLOB API and return True if active/open."""
+    def get_market_info(self, condition_id: str) -> Dict[str, Any]:
+        """Get market information including end date from CLOB API"""
         try:
             import requests
             url = f"https://clob.polymarket.com/markets/{condition_id}"
             resp = requests.get(url, timeout=4)
             if resp.status_code != 200:
-                # If API fails, also check price as indicator
-                if outcome_index is not None:
-                    price = self.notifier._get_current_price(condition_id, outcome_index)
-                    if price is not None:
-                        # Price >= 0.98 or <= 0.02 means closed/resolved (same threshold as entry price filter)
-                        if price >= 0.98 or price <= 0.02:
-                            return False
-                return True  # fail-open to avoid silencing alerts on transient errors
+                return {}
             data = resp.json() or {}
-            # Common flags/fields observed in CLOB payloads
-            if isinstance(data, dict):
-                # Check closed flag
-                if data.get("closed") is True:
+            if not isinstance(data, dict):
+                return {}
+            
+            # Extract market info
+            market_info = {
+                "closed": data.get("closed", False),
+                "active": data.get("active", True),
+                "status": data.get("status", ""),
+                "end_date_iso": data.get("end_date_iso"),
+                "game_start_time": data.get("game_start_time"),
+                "accepting_order_timestamp": data.get("accepting_order_timestamp")
+            }
+            
+            # Parse end_date_iso if available
+            if market_info.get("end_date_iso"):
+                try:
+                    from datetime import datetime
+                    end_date_str = market_info["end_date_iso"]
+                    # Parse ISO format: "2025-10-29T00:00:00Z" or "2025-10-29T00:00:00+00:00"
+                    end_date_str = end_date_str.replace("Z", "+00:00")
+                    market_info["end_date"] = datetime.fromisoformat(end_date_str)
+                except Exception as e:
+                    logger.debug(f"Failed to parse end_date_iso: {e}")
+                    market_info["end_date"] = None
+            else:
+                market_info["end_date"] = None
+            
+            return market_info
+        except Exception as e:
+            logger.debug(f"Error getting market info: {e}")
+            return {}
+    
+    def is_market_active(self, condition_id: str, outcome_index: Optional[int] = None) -> bool:
+        """Check market status via CLOB API and return True if active/open."""
+        try:
+            # Get market info (includes end_date check)
+            market_info = self.get_market_info(condition_id)
+            
+            # Check if market has ended based on end_date
+            if market_info.get("end_date"):
+                from datetime import datetime, timezone
+                end_date = market_info["end_date"]
+                if end_date.tzinfo is None:
+                    # Assume UTC if no timezone
+                    end_date = end_date.replace(tzinfo=timezone.utc)
+                current_time = datetime.now(timezone.utc)
+                
+                # If end date has passed, market is closed
+                if current_time > end_date:
+                    logger.debug(f"Market {condition_id[:20]}... ended on {end_date.isoformat()}, current: {current_time.isoformat()}")
                     return False
-                # Check status field
-                status = str(data.get("status") or "").lower()
-                if status in {"resolved", "finished", "closed", "ended", "finalized"}:
-                    return False
-                # Check active flag
-                active = data.get("active")
-                if active is False:
-                    return False
-                # Also check price as additional indicator if outcome_index provided
-                if outcome_index is not None:
+            
+            # Check closed flag
+            if market_info.get("closed") is True:
+                return False
+            
+            # Check status field
+            status = str(market_info.get("status") or "").lower()
+            if status in {"resolved", "finished", "closed", "ended", "finalized"}:
+                return False
+            
+            # Check active flag
+            active = market_info.get("active")
+            if active is False:
+                return False
+            
+            # Also check price as additional indicator if outcome_index provided
+            if outcome_index is not None:
+                # Re-fetch to get tokens data (could be optimized to reuse market_info)
+                import requests
+                url = f"https://clob.polymarket.com/markets/{condition_id}"
+                resp = requests.get(url, timeout=4)
+                if resp.status_code == 200:
+                    data = resp.json() or {}
                     tokens = data.get('tokens') or []
                     if tokens and outcome_index < len(tokens):
                         token = tokens[outcome_index]
@@ -639,6 +691,7 @@ class PolymarketNotifier:
                                 if price >= 0.98 or price <= 0.02:
                                     return False
                                 break
+            
             return True
         except Exception as e:
             logger.debug(f"Error checking market status: {e}")
@@ -1027,13 +1080,18 @@ class PolymarketNotifier:
                     logger.debug(f"Failed to send suppressed alert details: {e}")
                 return
 
+            # Get market info to extract end_date
+            market_info = self.get_market_info(condition_id)
+            end_date = market_info.get("end_date") if market_info else None
+            
             # Send alert with prices and consensus flow (events per minute)
             alert_id = key[:8]
             success = self.notifier.send_consensus_alert(
                 condition_id, outcome_index, wallets_in_window, wallet_prices,
                 self.alert_window_min, self.min_consensus, alert_id, market_title, market_slug, side,
                 consensus_events=len(window_data.get("events", [])),
-                total_usd=total_usd
+                total_usd=total_usd,
+                end_date=end_date
             )
             
             if success:

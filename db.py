@@ -245,12 +245,12 @@ class PolymarketDB:
                 cursor.execute("SELECT COUNT(*) FROM wallets")
                 stats['total_wallets'] = cursor.fetchone()[0]
                 
-                # Wallets meeting criteria
+                # Wallets meeting criteria (updated to match actual tracking criteria)
                 cursor.execute("""
                     SELECT COUNT(*) FROM wallets
-                    WHERE traded_total >= 50 AND traded_total <= 1000
-                    AND win_rate > 0.65 AND win_rate < 0.99
-                    AND daily_trading_frequency <= 10.0
+                    WHERE traded_total >= 6 AND traded_total <= 1000
+                    AND win_rate >= 0.75 AND win_rate <= 1.0
+                    AND daily_trading_frequency <= 20.0
                 """)
                 stats['tracked_wallets'] = cursor.fetchone()[0]
                 
