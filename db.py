@@ -250,7 +250,7 @@ class PolymarketDB:
                     SELECT COUNT(*) FROM wallets
                     WHERE traded_total >= 6 AND traded_total <= 1000
                     AND win_rate >= 0.75 AND win_rate <= 1.0
-                    AND daily_trading_frequency <= 20.0
+                    AND (daily_trading_frequency IS NULL OR daily_trading_frequency <= 20.0)
                 """)
                 stats['tracked_wallets'] = cursor.fetchone()[0]
                 
@@ -286,7 +286,7 @@ class PolymarketDB:
                 cursor.execute("""
                     DELETE FROM wallets WHERE address NOT IN (
                         SELECT address FROM wallets
-                        WHERE traded_total >= 50 AND traded_total <= ?
+                        WHERE traded_total >= 30 AND traded_total <= ?
                         AND win_rate > 0.65 AND win_rate < 0.99
                         AND daily_trading_frequency <= 10.0
                         ORDER BY realized_pnl_total DESC, traded_total DESC
@@ -598,7 +598,13 @@ class PolymarketDB:
                     if total_pending > 0:
                         cursor.execute("SELECT COUNT(*) FROM wallet_analysis_jobs WHERE status = 'pending' AND (next_retry_at IS NULL OR next_retry_at <= ?)", (now,))
                         ready_count = cursor.fetchone()[0]
-                        logger.warning(f"get_pending_jobs: total_pending={total_pending}, ready={ready_count}, limit={limit}, now={now}")
+                        # Log more details for debugging
+                        cursor.execute("SELECT COUNT(*) FROM wallet_analysis_jobs WHERE status = 'pending' AND next_retry_at IS NOT NULL AND next_retry_at > ?", (now,))
+                        delayed_count = cursor.fetchone()[0]
+                        logger.warning(f"get_pending_jobs: total_pending={total_pending}, ready={ready_count}, delayed={delayed_count}, limit={limit}, now={now}")
+                        # If we have ready jobs but query returned nothing, there might be a transaction issue
+                        if ready_count > 0:
+                            logger.error(f"get_pending_jobs: BUG DETECTED - {ready_count} ready jobs exist but query returned 0! This may indicate a transaction isolation issue.")
                 else:
                     logger.debug(f"get_pending_jobs: returning {len(result)} jobs")
                 
@@ -647,8 +653,22 @@ class PolymarketDB:
             logger.error(f"Error updating job status {job_id}: {e}")
             return False
     
+    def get_job_by_id(self, job_id: int) -> Optional[Dict[str, Any]]:
+        """Get job by ID"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT * FROM wallet_analysis_jobs WHERE id = ?", (job_id,))
+                row = cursor.fetchone()
+                if row:
+                    return dict(row)
+                return None
+        except Exception as e:
+            logger.error(f"Error getting job {job_id}: {e}")
+            return None
+    
     def increment_job_retry(self, job_id: int, next_retry_at: str, error_message: str = None) -> bool:
-        """Increment retry count and set next retry time"""
+        """Increment retry count, set next retry time, and reset status to pending"""
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
@@ -659,6 +679,7 @@ class PolymarketDB:
                     SET retry_count = retry_count + 1,
                         next_retry_at = ?,
                         error_message = ?,
+                        status = 'pending',
                         updated_at = ?
                     WHERE id = ?
                 """, (next_retry_at, error_message, now, job_id))
@@ -689,6 +710,19 @@ class PolymarketDB:
                 
                 stats = {}
                 
+                # Clean up stuck processing jobs (older than 1 hour)
+                now = self.now_iso()
+                one_hour_ago = (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat()
+                cursor.execute("""
+                    UPDATE wallet_analysis_jobs
+                    SET status = 'pending', updated_at = ?
+                    WHERE status = 'processing' AND updated_at < ?
+                """, (now, one_hour_ago))
+                stuck_reset = cursor.rowcount
+                if stuck_reset > 0:
+                    logger.warning(f"Reset {stuck_reset} stuck processing jobs back to pending")
+                    conn.commit()
+                
                 # Count by status
                 cursor.execute("""
                     SELECT status, COUNT(*) FROM wallet_analysis_jobs
@@ -703,7 +737,6 @@ class PolymarketDB:
                 stats['total_jobs'] = cursor.fetchone()[0]
                 
                 # Jobs ready for retry
-                now = self.now_iso()
                 cursor.execute("""
                     SELECT COUNT(*) FROM wallet_analysis_jobs
                     WHERE status = 'pending' 

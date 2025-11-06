@@ -106,9 +106,12 @@ class WalletAnalyzer:
                     # Log every 5 minutes that we're idle (for visibility)
                     now = time.time()
                     if now - last_idle_log > 300:
-                        # Check queue size directly
-                        pending_count = len(self.db.get_pending_jobs(limit=1000))
-                        logger.info(f"{worker_name} idle - no pending jobs (checked {pending_count} total pending)")
+                        # Check queue size using stats for better accuracy
+                        queue_stats = self.db.get_queue_stats()
+                        pending_count = queue_stats.get('pending_jobs', 0)
+                        ready_count = queue_stats.get('ready_jobs', 0)
+                        total_count = queue_stats.get('total_jobs', 0)
+                        logger.info(f"{worker_name} idle - no pending jobs (queue: {pending_count} pending, {ready_count} ready, {total_count} total)")
                         last_idle_log = now
                     time.sleep(1)
                     continue
@@ -121,8 +124,8 @@ class WalletAnalyzer:
                         break
                 
                 if not job:
-                    # No job was available for claiming, wait a bit
-                    time.sleep(0.5)
+                    # No job was available for claiming, wait a short moment to reduce contention
+                    time.sleep(0.1)
                     continue
                 
                 logger.info(f"{worker_name} processing job {job['id']} for {job['address']}")
@@ -138,8 +141,8 @@ class WalletAnalyzer:
                     # Job failed, will be retried later
                     logger.warning(f"{worker_name} failed job {job['id']} for {job['address']}")
                 
-                # Small delay between jobs
-                time.sleep(0.5)
+                # Small delay between jobs (tuned for higher throughput)
+                time.sleep(0.05)
                 
             except Exception as e:
                 logger.error(f"{worker_name} error: {e}")
@@ -216,16 +219,17 @@ class WalletAnalyzer:
     def _handle_analysis_error(self, job_id: int, error_message: str):
         """Handle analysis error with retry logic"""
         try:
-            # Get current job info
-            jobs = self.db.get_pending_jobs(limit=1000)  # Get all jobs to find this one
-            job = next((j for j in jobs if j['id'] == job_id), None)
+            # Get current job info directly by ID
+            job = self.db.get_job_by_id(job_id)
             
             if not job:
                 logger.error(f"Job {job_id} not found for error handling")
+                # Reset job to pending if it exists but wasn't found (might be stuck in processing)
+                self.db.update_job_status(job_id, 'pending', error_message)
                 return
             
-            retry_count = job['retry_count']
-            max_retries = job['max_retries']
+            retry_count = job.get('retry_count', 0)
+            max_retries = job.get('max_retries', self.config.api_retry_max)
             
             if retry_count >= max_retries:
                 logger.error(f"Job {job_id} exceeded max retries ({max_retries}), marking as failed")
@@ -276,14 +280,17 @@ class WalletAnalyzer:
                     if retry_after:
                         try:
                             delay = int(retry_after)
+                            # If Retry-After is 0 or too small, use minimum delay
+                            if delay <= 0:
+                                delay = 5  # Minimum 5 seconds even if server says 0
                             logger.warning(f"Rate limited (429), waiting {delay}s as requested by server")
                             time.sleep(delay)
                             continue
                         except ValueError:
                             pass
                     
-                    # Fallback exponential backoff
-                    delay = base_delay * (2 ** attempt)
+                    # Fallback exponential backoff (minimum 5 seconds)
+                    delay = max(5, base_delay * (2 ** attempt))
                     logger.warning(f"Rate limited (429), waiting {delay:.1f}s (attempt {attempt + 1})")
                     time.sleep(delay)
                     continue
