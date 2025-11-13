@@ -26,8 +26,23 @@ except Exception as e:
 
 from db import PolymarketDB
 from notify import TelegramNotifier
-from wallet_analyzer import WalletAnalyzer, AnalysisConfig
-from bet_monitor import BetDetector, TelegramNotifier as BetTelegramNotifier
+from wallet_analyzer import WalletAnalyzer, AnalysisConfig, WIN_RATE_THRESHOLD, MAX_DAILY_FREQUENCY
+try:
+    from bet_monitor import BetDetector, TelegramNotifier as BetTelegramNotifier
+    BET_MONITOR_AVAILABLE = True
+except Exception as e:
+    print(f"Bet monitor not available: {e}")
+    BET_MONITOR_AVAILABLE = False
+    BetDetector = None
+    BetTelegramNotifier = None
+try:
+    from polymarket_auth import PolymarketAuth
+    POLYMARKET_AUTH_AVAILABLE = True
+except Exception as e:
+    print(f"Polymarket auth not available: {e}")
+    POLYMARKET_AUTH_AVAILABLE = False
+    PolymarketAuth = None
+from proxy_manager import ProxyManager
 
 # HashiDive API fallback (optional)
 try:
@@ -94,17 +109,28 @@ class PolymarketNotifier:
         self.telegram_chat_id = os.getenv("TELEGRAM_CHAT_ID")
         self.poll_interval = self._get_env_int("POLL_INTERVAL_SEC", 7)
         self.alert_window_min = self._get_env_float("ALERT_WINDOW_MIN", 15.0)
-        self.alert_cooldown_min = self._get_env_float("ALERT_COOLDOWN_MIN", 10.0)
+        self.alert_cooldown_min = self._get_env_float("ALERT_COOLDOWN_MIN", 30.0)  # 30 minutes cooldown to prevent spam
         self.conflict_window_min = self._get_env_float("ALERT_CONFLICT_WINDOW_MIN", 10.0)
         self.price_band = self._get_env_float("ALERT_PRICE_BAND", 0.02)
         self.refresh_interval_min = self._get_env_float("ALERT_REFRESH_MIN", 60.0)
-        self.min_consensus = self._get_env_int("MIN_CONSENSUS", 3)  # Minimum 3 wallets required
-        if self.min_consensus < 3:
-            logger.warning(f"min_consensus is {self.min_consensus}, forcing to 3")
-            self.min_consensus = 3
+        self.min_consensus = self._get_env_int("MIN_CONSENSUS", 3)  # Minimum wallets required
+        if self.min_consensus < 2:
+            logger.warning(f"min_consensus is {self.min_consensus}, forcing to 2")
+            self.min_consensus = 2
+        
+        # Log configuration at startup
+        logger.info(
+            f"[Config] MIN_CONSENSUS={self.min_consensus}, "
+            f"ALERT_WINDOW_MIN={self.alert_window_min}, "
+            f"ALERT_COOLDOWN_MIN={self.alert_cooldown_min} minutes"
+        )
         self.max_wallets = self._get_env_int("MAX_WALLETS", 2000)
         self.max_predictions = self._get_env_int("MAX_PREDICTIONS", 1000)
         self.db_path = os.getenv("DB_PATH", "polymarket_notifier.db")
+        # Resolve absolute path to ensure consistency
+        if not os.path.isabs(self.db_path):
+            self.db_path = os.path.abspath(self.db_path)
+        logger.info(f"[DB] Using database at {self.db_path}")
         
         # Initialize HashiDive client if available (fallback API)
         self.hashdive_client = None
@@ -137,7 +163,10 @@ class PolymarketNotifier:
         # Initialize components
         self.db = PolymarketDB(self.db_path)
         self.notifier = TelegramNotifier(self.telegram_token, self.telegram_chat_id)
-        self.bet_detector = BetDetector(self.db_path)
+        if BET_MONITOR_AVAILABLE:
+            self.bet_detector = BetDetector(self.db_path)
+        else:
+            self.bet_detector = None
         
         # Initialize wallet analyzer
         analysis_config = AnalysisConfig(
@@ -155,6 +184,15 @@ class PolymarketNotifier:
         self.closed_positions_endpoint = f"{self.data_api}/closed-positions"
         self.traded_endpoint = f"{self.data_api}/traded"
         
+        # Initialize Polymarket API authentication (optional)
+        if POLYMARKET_AUTH_AVAILABLE:
+            self.polymarket_auth = PolymarketAuth()
+        else:
+            self.polymarket_auth = None
+        
+        # Initialize proxy manager (optional)
+        self.proxy_manager = ProxyManager()
+        
         # Headers for API requests
         self.headers = {
             "User-Agent": "PolymarketNotifier/1.0 (+https://polymarket.com)"
@@ -165,11 +203,21 @@ class PolymarketNotifier:
         self.loop_count = 0
         # Diagnostic counters for suppressed alerts
         self.suppressed_counts = {
+            'cooldown': 0,
             'price_high': 0,
             'ignore_30m_same_outcome': 0,
             'dedupe_no_growth_10m': 0,
             'no_trigger_matched': 0,
             'opposite_recent': 0
+        }
+        # Diagnostic counters for errors
+        self.error_counts = {
+            'retry_error': 0,
+            'http_error': 0,
+            'timeout': 0,
+            'connection_error': 0,
+            'json_error': 0,
+            'other_error': 0
         }
         
     def validate_config(self) -> bool:
@@ -183,20 +231,138 @@ class PolymarketNotifier:
     
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=8))
     def http_get(self, url: str, params: Optional[Dict[str, Any]] = None) -> Any:
-        """Make HTTP GET request with retry logic"""
+        """Make HTTP GET request with retry logic and optional authentication"""
         import requests
+        import time
+        import urllib3
         
-        response = requests.get(url, params=params, headers=self.headers, timeout=20)
-        response.raise_for_status()
-        return response
+        # Disable SSL warnings for proxy connections
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        
+        headers = self.headers.copy()
+        
+        # Get proxy if available
+        proxy = self.proxy_manager.get_proxy(rotate=True) if self.proxy_manager.proxy_enabled else None
+        
+        # Add proxy-specific headers for HTTP proxies with IP rotation
+        if proxy:
+            headers['Connection'] = 'close'  # Avoid connection reuse issues with rotating proxies
+            headers['Proxy-Connection'] = 'close'
+        
+        try:
+            # Use verify=False for proxies that might have SSL issues
+            response = requests.get(url, params=params, headers=headers, timeout=20, proxies=proxy, verify=False)
+            
+            # Log non-200 status codes for debugging
+            if response.status_code != 200:
+                logger.debug(f"HTTP {response.status_code} for {url[:80]}... params={params}")
+                
+                # Handle 429 Rate Limit specifically
+                if response.status_code == 429:
+                    retry_after = response.headers.get('Retry-After')
+                    if retry_after:
+                        try:
+                            wait_seconds = int(retry_after)
+                            if wait_seconds <= 0:
+                                wait_seconds = 5  # Minimum 5 seconds even if server says 0
+                            logger.warning(f"Rate limited (429), waiting {wait_seconds}s as requested by server for {url[:80]}...")
+                            time.sleep(wait_seconds)
+                            # Rotate proxy on retry if available
+                            if self.proxy_manager.proxy_enabled:
+                                proxy = self.proxy_manager.get_proxy(rotate=True)
+                                logger.debug(f"Rotating proxy for retry")
+                            # Retry once after waiting
+                            response = requests.get(url, params=params, headers=headers, timeout=20, proxies=proxy, verify=False)
+                            if response.status_code == 200:
+                                return response
+                            if response.status_code == 429:
+                                logger.warning(f"Still rate limited after waiting {wait_seconds}s, using exponential backoff")
+                        except (ValueError, TypeError):
+                            pass
+                    # Fallback: exponential backoff (minimum 5 seconds)
+                    logger.warning(f"Rate limited (429) for {url[:80]}..., using exponential backoff")
+                    self.error_counts['rate_limit'] = self.error_counts.get('rate_limit', 0) + 1
+                    raise requests.exceptions.HTTPError(f"429 Rate Limit: {response.text[:200]}")
+                
+                # Don't retry on 404 (not found) - just return response
+                if response.status_code == 404:
+                    return response
+            
+                # Success - raise for status to catch any other errors
+                response.raise_for_status()
+                return response
+            
+        except requests.exceptions.HTTPError as e:
+            status_code = e.response.status_code if hasattr(e, 'response') and e.response else 'unknown'
+            logger.debug(f"HTTPError {status_code} in http_get: {url[:80]}...")
+            self.error_counts['http_error'] += 1
+            raise
+        except requests.exceptions.Timeout as e:
+            logger.debug(f"Network error in http_get: {type(e).__name__} - {url[:80]}...")
+            self.error_counts['timeout'] += 1
+            raise
+        except requests.exceptions.ProxyError as e:
+            logger.debug(f"Proxy error in http_get: {type(e).__name__} - {url[:80]}...")
+            self.error_counts['proxy_error'] = self.error_counts.get('proxy_error', 0) + 1
+            # If proxy fails, try without proxy as fallback
+            if proxy and self.proxy_manager.proxy_enabled:
+                error_msg = str(e)
+                logger.warning(f"Proxy failed ({error_msg[:50]}...), retrying without proxy for {url[:80]}...")
+                try:
+                    # Remove proxy-specific headers for direct connection
+                    direct_headers = self.headers.copy()
+                    response = requests.get(url, params=params, headers=direct_headers, timeout=20, verify=False)
+                    if response.status_code == 200:
+                        logger.info(f"Fallback successful: direct connection worked for {url[:80]}...")
+                        return response
+                except Exception as fallback_error:
+                    logger.debug(f"Fallback request also failed: {fallback_error}")
+            raise
+        except requests.exceptions.Timeout as e:
+            # Check if this is a proxy-related timeout
+            error_msg = str(e).lower()
+            if proxy and self.proxy_manager.proxy_enabled and ("socks" in error_msg or "proxy" in error_msg):
+                logger.warning(f"Proxy timeout, retrying without proxy for {url[:80]}...")
+                try:
+                    direct_headers = self.headers.copy()
+                    response = requests.get(url, params=params, headers=direct_headers, timeout=20, verify=False)
+                    if response.status_code == 200:
+                        logger.info(f"Fallback successful: direct connection worked for {url[:80]}...")
+                        return response
+                except Exception as fallback_error:
+                    logger.debug(f"Fallback request also failed: {fallback_error}")
+            
+            logger.debug(f"Network error in http_get: {type(e).__name__} - {url[:80]}...")
+            self.error_counts['timeout'] += 1
+            raise
+        except requests.exceptions.ConnectionError as e:
+            # Check if this is a proxy-related connection error
+            error_msg = str(e).lower()
+            if proxy and self.proxy_manager.proxy_enabled and ("socks" in error_msg or "proxy" in error_msg or "connection not allowed" in error_msg):
+                logger.warning(f"Proxy connection failed, retrying without proxy for {url[:80]}...")
+                try:
+                    direct_headers = self.headers.copy()
+                    response = requests.get(url, params=params, headers=direct_headers, timeout=20, verify=False)
+                    if response.status_code == 200:
+                        logger.info(f"Fallback successful: direct connection worked for {url[:80]}...")
+                        return response
+                except Exception as fallback_error:
+                    logger.debug(f"Fallback request also failed: {fallback_error}")
+            
+            logger.debug(f"Network error in http_get: {type(e).__name__} - {url[:80]}...")
+            self.error_counts['connection_error'] += 1
+            raise
 
     def _get_current_price(self, condition_id: str, outcome_index: int) -> Optional[float]:
         """Get current price for market outcome. Returns None if unavailable, or 0.0 if market resolved."""
         try:
-            import requests
             url = f"https://clob.polymarket.com/markets/{condition_id}"
-            resp = requests.get(url, timeout=5)
-            if resp.status_code != 200:
+            resp = self.http_get(url)
+            if resp is None:
+                logger.error(f"[Price] HTTP call returned None for url={url}")
+                return None
+            if not hasattr(resp, 'status_code') or resp.status_code != 200:
+                logger.error(f"[Price] HTTP error {resp.status_code if hasattr(resp, 'status_code') else 'unknown'} for url={url}")
                 return None
             data = resp.json()
             tokens = data.get('tokens') or []
@@ -218,97 +384,316 @@ class PolymarketNotifier:
             logger.debug(f"Error getting current price: {e}")
             return None
     
-    async def collect_wallets_from_polymarket_analytics(self, limit: int = 2000) -> Dict[str, Dict[str, str]]:
-        """Collect wallet addresses from polymarketanalytics.com"""
+    async def collect_wallets_from_polymarket_analytics(self, limit: int = 2000) -> tuple[Dict[str, Dict[str, str]], Dict[str, int]]:
+        """
+        Collect wallet addresses from polymarketanalytics.com
+        
+        Returns:
+            Tuple of (wallets dict, stats dict)
+        """
         logger.info(f"Collecting wallets from polymarketanalytics.com (limit: {limit})...")
         wallets = {}
+        stats = {
+            "total_traders": 0,
+            "missing_stats": 0,
+            "below_trades": 0,
+            "below_winrate": 0,
+            "above_freq": 0,
+            "meets_all": 0
+        }
         
         try:
-            from fetch_polymarket_analytics_api import fetch_traders_from_api
+            from fetch_polymarket_analytics_api import fetch_traders_from_api, MIN_TRADES, MIN_WIN_RATE, MAX_DAILY_FREQ
             
-            # Fetch addresses from API
-            addresses = fetch_traders_from_api(target=limit)
+            # Fetch addresses from API with statistics
+            # fetch_traders_from_api always returns a list (never None), so unpacking is safe
+            result = fetch_traders_from_api(target=limit, return_stats=True)
+            if isinstance(result, tuple):
+                addresses, api_stats = result
+                stats.update(api_stats)
+            else:
+                # Fallback if return_stats=False (shouldn't happen, but be safe)
+                addresses = result if result else []
+                api_stats = {}
             
             if addresses:
                 logger.info(f"Got {len(addresses)} addresses from polymarketanalytics.com")
                 
-                # Convert to expected format
+                # Convert to expected format and log to raw_collected_wallets
                 for addr in addresses:
                     addr_lower = addr.lower()
                     wallets[addr_lower] = {
                         "display": addr_lower,
                         "source": "polymarket_analytics"
                     }
+                    # Log to raw_collected_wallets
+                    self.db.insert_raw_collected_wallet(addr_lower, "polymarket_analytics")
                 
                 logger.info(f"Collected {len(wallets)} unique wallets from polymarketanalytics.com")
+                
+                # Log detailed statistics
+                logger.info(
+                    "[Analytics] Filtering stats: total=%d, meets_all=%d, "
+                    "below_trades=%d, below_winrate=%d, above_freq=%d, missing_stats=%d "
+                    "(MIN_TRADES=%d, MIN_WIN_RATE=%.2f, MAX_DAILY_FREQ=%.1f)",
+                    stats["total_traders"], stats["meets_all"],
+                    stats["below_trades"], stats["below_winrate"], stats["above_freq"], stats["missing_stats"],
+                    MIN_TRADES, MIN_WIN_RATE, MAX_DAILY_FREQ
+                )
             else:
                 logger.warning("No addresses fetched from polymarketanalytics.com")
                 
         except Exception as e:
             logger.error(f"Error collecting wallets from polymarketanalytics.com: {e}")
         
+        return wallets, stats
+    
+    async def collect_wallets_from_hashdive_trader_explorer(self) -> Dict[str, Dict[str, str]]:
+        """Collect wallet addresses from HashiDive Trader Explorer page"""
+        wallets = {}
+        
+        try:
+            logger.info("[HashiDive] Collecting wallets from Trader Explorer...")
+            
+            # Import scraper
+            try:
+                from fetch_hashdive_trader_explorer import scrape_trader_explorer
+            except ImportError:
+                logger.warning("[HashiDive] Trader Explorer scraper not available (Playwright required)")
+                return wallets
+            
+            # Scrape addresses
+            # Get max_pages from environment or use default
+            max_pages = int(os.getenv("HASHDIVE_TRADER_EXPLORER_MAX_PAGES", "100"))
+            addresses = await scrape_trader_explorer(
+                url="https://hashdive.com/Trader_explorer",
+                max_pages=max_pages,
+                use_proxy=True,
+                headless=True,
+                delay_between_pages=2.0
+            )
+            
+            logger.info(f"[HashiDive] Found {len(addresses)} unique addresses from Trader Explorer")
+            
+            # Convert to wallets dict
+            for addr in addresses:
+                addr_lower = addr.lower()
+                wallets[addr_lower] = {
+                    "display": addr_lower,
+                    "source": "hashdive_trader_explorer"
+                }
+                self.db.insert_raw_collected_wallet(addr_lower, "hashdive_trader_explorer")
+            
+            logger.info(f"[HashiDive] Added {len(wallets)} wallets from Trader Explorer")
+            
+        except Exception as e:
+            logger.error(f"[HashiDive] Error collecting from Trader Explorer: {e}")
+        
+        return wallets
+    
+    async def collect_wallets_from_hashdive_whales(self, min_usd: int = 5000, limit: int = 200) -> Dict[str, Dict[str, str]]:
+        """Collect wallet addresses from HashiDive whale trades"""
+        wallets = {}
+        
+        if not self.hashdive_client:
+            logger.debug("HashiDive client not available, skipping whale trades collection")
+            return wallets
+        
+        try:
+            logger.info(f"[HashiDive] Collecting whale wallets (min ${min_usd:,}, limit {limit})...")
+            
+            # Check API usage first
+            try:
+                usage = self.hashdive_client.get_api_usage()
+                credits_used = usage.get('credits_used', 0)
+                credits_limit = usage.get('credits_limit', 1000)
+                remaining = credits_limit - credits_used
+                logger.info(f"[HashiDive] API credits: {credits_used}/{credits_limit} used, {remaining} remaining")
+                
+                if remaining < 10:
+                    logger.warning(f"[HashiDive] Low credits remaining ({remaining}), skipping whale trades collection")
+                    return wallets
+            except Exception as e:
+                logger.warning(f"[HashiDive] Could not check API usage: {e}, proceeding anyway...")
+            
+            # Get whale trades
+            hashdive_data = self.hashdive_client.get_latest_whale_trades(
+                min_usd=min_usd,
+                limit=limit
+            )
+            
+            # Parse response (can be dict with 'results' or list)
+            if isinstance(hashdive_data, dict):
+                results = hashdive_data.get('results', hashdive_data.get('data', []))
+            elif isinstance(hashdive_data, list):
+                results = hashdive_data
+            else:
+                results = []
+            
+            logger.info(f"[HashiDive] Found {len(results)} whale trades")
+            
+            # Extract unique wallet addresses
+            for trade in results:
+                user = trade.get('user_address') or trade.get('user') or trade.get('wallet')
+                if user:
+                    addr_lower = user.lower()
+                    if addr_lower not in wallets:
+                        wallets[addr_lower] = {
+                            "display": addr_lower,
+                            "source": "hashdive_whale"
+                        }
+                        self.db.insert_raw_collected_wallet(addr_lower, "hashdive_whale")
+            
+            logger.info(f"[HashiDive] Extracted {len(wallets)} unique whale wallets")
+            
+        except Exception as e:
+            logger.error(f"[HashiDive] Error collecting whale wallets: {e}")
+        
         return wallets
     
     async def collect_wallets_from_leaderboards(self) -> Dict[str, Dict[str, str]]:
-        """Collect wallet addresses from Polymarket APIs"""
-        logger.info("Starting wallet collection from Polymarket APIs...")
+        """Collect wallet addresses from multiple sources: polymarketanalytics.com, HTML leaderboards, HashiDive whales, and optional API scraper"""
+        logger.info("Starting wallet collection from all sources...")
         
         all_wallets = {}
+        analytics_stats = {
+            "total_traders": 0,
+            "missing_stats": 0,
+            "below_trades": 0,
+            "below_winrate": 0,
+            "above_freq": 0,
+            "meets_all": 0
+        }
         
-        # Also collect from polymarketanalytics.com
+        # Step 1: Collect from polymarketanalytics.com
+        analytics_wallets = {}
         try:
-            analytics_wallets = await self.collect_wallets_from_polymarket_analytics(limit=2000)
+            analytics_wallets, analytics_stats = await self.collect_wallets_from_polymarket_analytics(limit=2500)
             all_wallets.update(analytics_wallets)
-            logger.info(f"Added {len(analytics_wallets)} wallets from polymarketanalytics.com")
+            logger.info(f"[Analytics] wallets from polymarketanalytics.com: {len(analytics_wallets)}")
+            for addr_lower in analytics_wallets.keys():
+                self.db.insert_raw_collected_wallet(addr_lower, "polymarket_analytics")
         except Exception as e:
             logger.error(f"Error collecting from polymarketanalytics.com: {e}")
         
+        # Step 1.5: Collect from HashiDive whale trades (if enabled and API key available)
+        hashdive_wallets = {}
+        if self.hashdive_client and os.getenv("ENABLE_HASHDIVE_WHALES", "false").strip().lower() in ("true", "1", "yes", "on"):
+            try:
+                hashdive_wallets = await self.collect_wallets_from_hashdive_whales(min_usd=5000, limit=200)
+                all_wallets.update(hashdive_wallets)
+                logger.info(f"[HashiDive] Added {len(hashdive_wallets)} whale wallets")
+            except Exception as e:
+                logger.error(f"Error collecting from HashiDive whales: {e}")
+        
+        # Step 1.6: Collect from HashiDive Trader Explorer (if enabled)
+        hashdive_explorer_wallets = {}
+        if os.getenv("ENABLE_HASHDIVE_TRADER_EXPLORER", "false").strip().lower() in ("true", "1", "yes", "on"):
+            try:
+                hashdive_explorer_wallets = await self.collect_wallets_from_hashdive_trader_explorer()
+                all_wallets.update(hashdive_explorer_wallets)
+                logger.info(f"[HashiDive] Added {len(hashdive_explorer_wallets)} wallets from Trader Explorer")
+            except Exception as e:
+                logger.error(f"Error collecting from HashiDive Trader Explorer: {e}")
+        
+        # Step 2: ALWAYS parse HTML leaderboards (weekly + monthly, 20 pages each)
+        leaderboard_wallets = {}
         try:
-            # Use official API scraper for maximum wallet collection
-            logger.info("Using official Polymarket API scraper")
+            # Ensure leaderboard_urls are set (should be set by daily_wallet_analysis.py)
+            if not hasattr(self, 'leaderboard_urls') or not self.leaderboard_urls:
+                logger.warning("leaderboard_urls not set, using default weekly/monthly URLs")
+                self.leaderboard_urls = [
+                    "https://polymarket.com/leaderboard/overall/weekly/profit",
+                    "https://polymarket.com/leaderboard/overall/monthly/profit"
+                ]
+            
+            logger.info(f"[Leaderboards HTML] Starting to parse {len(self.leaderboard_urls)} leaderboard URLs (max 30 pages each)")
+            
+            # Always use Playwright scraper for HTML leaderboards
+            if PLAYWRIGHT_AVAILABLE:
+                leaderboard_wallets = await scrape_polymarket_leaderboards(
+                    self.leaderboard_urls,
+                    headless=True,
+                    max_pages_per_url=30,  # Up to 30 pages per URL (as configured in fetch_leaderboards.py)
+                    use_proxy=True
+                )
+            else:
+                # Fallback to enhanced requests scraper if Playwright not available
+                logger.warning("Playwright not available, using enhanced requests scraper for leaderboards")
+                try:
+                    from fetch_leaderboards_enhanced import scrape_polymarket_leaderboards_enhanced
+                    leaderboard_wallets = scrape_polymarket_leaderboards_enhanced(
+                        self.leaderboard_urls,
+                        max_pages_per_url=20
+                    )
+                except ImportError:
+                    logger.error("Neither Playwright nor enhanced scraper available for leaderboards")
+                    leaderboard_wallets = {}
+            
+            # Merge leaderboard wallets into all_wallets and log to raw_collected_wallets
+            for addr, info in leaderboard_wallets.items():
+                addr_lower = addr.lower()
+                # Log to raw_collected_wallets
+                self.db.insert_raw_collected_wallet(addr_lower, "leaderboards_html")
+                if addr_lower not in all_wallets:
+                    all_wallets[addr_lower] = {
+                        "display": info.get("display", addr_lower),
+                        "source": info.get("source", "leaderboards_html")
+                    }
+            
+            logger.info(f"[Leaderboards HTML] wallets collected from {len(self.leaderboard_urls)} URLs: {len(leaderboard_wallets)}")
+        except Exception as e:
+            logger.error(f"Error parsing HTML leaderboards: {e}", exc_info=True)
+            # Continue even if leaderboard parsing fails - we still have analytics wallets
+        
+        # Step 3: Optionally add wallets from Polymarket API scraper (additional source, not fallback)
+        api_wallet_addresses = []
+        try:
+            logger.info("[API Scraper] Attempting to collect wallets from Polymarket API scraper...")
             from api_scraper import PolymarketAPIScraper
             
             async with PolymarketAPIScraper() as scraper:
-                wallet_addresses = await scraper.scrape_all_wallets()
+                api_wallet_addresses = await scraper.scrape_all_wallets()
             
-            # Convert to expected format
-            for addr in wallet_addresses:
+            # Add API wallets to all_wallets (avoid duplicates) and log to raw_collected_wallets
+            api_added_count = 0
+            for addr in api_wallet_addresses:
                 addr_lower = addr.lower()
+                # Log to raw_collected_wallets
+                self.db.insert_raw_collected_wallet(addr_lower, "polymarket_api")
                 if addr_lower not in all_wallets:
                     all_wallets[addr_lower] = {
                         "display": addr_lower,
-                    "source": "polymarket_api"
-                }
+                        "source": "polymarket_api"
+                    }
+                    api_added_count += 1
             
-            logger.info(f"Collected {len(all_wallets)} total unique wallets from all sources")
-            return all_wallets
+            logger.info(f"[API Scraper] wallets collected from Polymarket API: {len(api_wallet_addresses)} (added {api_added_count} new)")
+        except ImportError:
+            logger.debug("[API Scraper] PolymarketAPIScraper not available, skipping")
         except Exception as e:
-            logger.error(f"Error collecting wallets from APIs: {e}")
-            # Fallback to Playwright if API fails
-            try:
-                if PLAYWRIGHT_AVAILABLE:
-                    logger.info("Falling back to Playwright scraper")
-                    wallets = await scrape_polymarket_leaderboards(
-                        self.leaderboard_urls,
-                        headless=True
-                    )
-                else:
-                    logger.info("Falling back to enhanced requests scraper")
-                    from fetch_leaderboards_enhanced import scrape_polymarket_leaderboards_enhanced
-                    wallets = scrape_polymarket_leaderboards_enhanced(
-                        self.leaderboard_urls,
-                        max_pages_per_url=40
-                    )
-                
-                logger.info(f"Fallback collected {len(wallets)} unique wallets")
-                return wallets
-            except Exception as fallback_error:
-                logger.error(f"Fallback also failed: {fallback_error}")
-                return {}
+            logger.warning(f"[API Scraper] Error collecting from Polymarket API scraper: {e}")
+            # Continue - HTML leaderboards already worked, so this is not critical
+        
+        # Final summary
+        logger.info(f"[Final] total unique wallets from all sources: {len(all_wallets)} (Analytics + Leaderboards HTML + API Scraper)")
+        logger.info(f"[Final] Breakdown: Analytics={len(analytics_wallets)}, Leaderboards HTML={len(leaderboard_wallets)}, API={len(api_wallet_addresses)}")
+        
+        # Store analytics_stats for later use in analyze_and_filter_wallets
+        self._last_analytics_stats = analytics_stats
+        
+        return all_wallets
     
     
-    def analyze_and_filter_wallets(self, wallets: Dict[str, Dict[str, str]]) -> int:
-        """Add wallets to analysis queue instead of analyzing directly"""
+    def analyze_and_filter_wallets(self, wallets: Dict[str, Dict[str, str]], 
+                                   analytics_stats: Optional[Dict[str, int]] = None) -> int:
+        """
+        Add wallets to analysis queue instead of analyzing directly
+        
+        Args:
+            wallets: Dictionary of wallets to add
+            analytics_stats: Optional statistics from analytics API filtering
+        """
         logger.info(f"Adding {len(wallets)} wallets to analysis queue...")
         
         # Add wallets to queue
@@ -317,11 +702,24 @@ class PolymarketNotifier:
         # Get queue status
         queue_status = self.wallet_analyzer.get_queue_status()
         
-        logger.info(f"Added {added_count} wallets to queue. Queue status: {queue_status}")
+        logger.info(f"[Queue] Added {added_count} new wallets to analysis queue (from all sources). Queue status: {queue_status}")
+        
+        # Prepare criteria for summary
+        from wallet_analyzer import MIN_TRADES, WIN_RATE_THRESHOLD, MAX_DAILY_FREQUENCY
+        criteria = {
+            "method": "queue_based",
+            "min_trades": MIN_TRADES,
+            "min_win_rate": WIN_RATE_THRESHOLD,
+            "max_daily_freq": MAX_DAILY_FREQUENCY
+        }
+        
+        # Add analytics stats if available
+        if analytics_stats:
+            criteria["analytics_stats"] = analytics_stats
         
         # Send summary notification
         self.notifier.send_wallet_collection_summary(
-            len(wallets), added_count, {"method": "queue_based"}
+            len(wallets), added_count, criteria
         )
         
         return added_count
@@ -331,10 +729,19 @@ class PolymarketNotifier:
         try:
             params = {"user": address, "side": side, "limit": 50}
             response = self.http_get(self.trades_endpoint, params=params)
-            trades = response.json() if response.ok else []
             
-            # Fallback to HashiDive API if Polymarket API fails or returns empty
-            if (not response.ok or not trades) and self.hashdive_client:
+            # Check if response is None or invalid - will fall through to HashiDive fallback below
+            if response is None:
+                logger.warning(f"[Trades] HTTP call returned None for address={address[:12]}... side={side}, trying HashiDive fallback")
+                trades = []  # Will trigger HashiDive fallback below
+            elif not hasattr(response, 'ok'):
+                logger.error(f"[Trades] Invalid response type for address={address[:12]}... side={side}, trying HashiDive fallback")
+                trades = []  # Will trigger HashiDive fallback below
+            else:
+                trades = response.json() if response.ok else []
+            
+            # Fallback to HashiDive API if Polymarket API fails, returns None, or returns empty
+            if (not trades and self.hashdive_client):
                 try:
                     logger.info(f"Polymarket API returned {len(trades)} trades, trying HashiDive fallback for {address[:12]}...")
                     
@@ -505,10 +912,9 @@ class PolymarketNotifier:
                 # If we don't have slug, fetch it from CLOB API
                 if not market_slug and condition_id:
                     try:
-                        import requests
                         slug_url = f"https://clob.polymarket.com/markets/{condition_id}"
-                        slug_resp = requests.get(slug_url, timeout=3)
-                        if slug_resp.status_code == 200:
+                        slug_resp = self.http_get(slug_url)
+                        if slug_resp is not None and hasattr(slug_resp, 'status_code') and slug_resp.status_code == 200:
                             slug_data = slug_resp.json()
                             market_slug = slug_data.get('market_slug') or slug_data.get('slug') or ""
                             if not market_title:
@@ -594,16 +1000,31 @@ class PolymarketNotifier:
             return new_events, newest_id
             
         except Exception as e:
-            logger.warning(f"Error getting new {side} trades for {address}: {e}")
+            error_type = type(e).__name__
+            error_msg = str(e)
+            # Log detailed error info for debugging
+            if "RetryError" in error_type or "RetryError" in error_msg:
+                # Extract underlying error from RetryError
+                underlying_error = error_msg
+                if hasattr(e, 'last_attempt') and hasattr(e.last_attempt, 'exception'):
+                    underlying_error = str(e.last_attempt.exception())
+                logger.warning(f"Error getting new {side} trades for {address[:12]}...: {error_type} - {underlying_error[:200]}")
+                self.error_counts['retry_error'] += 1
+            else:
+                logger.warning(f"Error getting new {side} trades for {address[:12]}...: {error_type} - {error_msg[:200]}")
+                self.error_counts['other_error'] += 1
             return [], last_seen_trade_id
 
     def get_market_info(self, condition_id: str) -> Dict[str, Any]:
         """Get market information including end date from CLOB API"""
         try:
-            import requests
             url = f"https://clob.polymarket.com/markets/{condition_id}"
-            resp = requests.get(url, timeout=4)
-            if resp.status_code != 200:
+            resp = self.http_get(url)
+            if resp is None:
+                logger.error(f"[MarketInfo] HTTP call returned None for url={url}")
+                return {}
+            if not hasattr(resp, 'status_code') or resp.status_code != 200:
+                logger.error(f"[MarketInfo] HTTP error {resp.status_code if hasattr(resp, 'status_code') else 'unknown'} for url={url}")
                 return {}
             data = resp.json() or {}
             if not isinstance(data, dict):
@@ -675,10 +1096,9 @@ class PolymarketNotifier:
             # Also check price as additional indicator if outcome_index provided
             if outcome_index is not None:
                 # Re-fetch to get tokens data (could be optimized to reuse market_info)
-                import requests
                 url = f"https://clob.polymarket.com/markets/{condition_id}"
-                resp = requests.get(url, timeout=4)
-                if resp.status_code == 200:
+                resp = self.http_get(url)
+                if resp is not None and hasattr(resp, 'status_code') and resp.status_code == 200:
                     data = resp.json() or {}
                     tokens = data.get('tokens') or []
                     if tokens and outcome_index < len(tokens):
@@ -714,25 +1134,28 @@ class PolymarketNotifier:
                                  usd_amount: float = 0.0, quantity: float = 0.0):
         """Check for consensus and send alert if threshold met"""
         try:
+            # Get unique wallets in window first to log candidate
+            key, window_data = self.db.update_rolling_window(
+                condition_id, outcome_index, wallet, trade_id, timestamp, 
+                self.alert_window_min, market_title, market_slug, price, side,
+                usd_amount=usd_amount, quantity=quantity
+            )
+            wallets_in_window = sorted({e["wallet"] for e in window_data.get("events", [])})
+            
+            # Log candidate
+            logger.info(
+                f"[Consensus] candidate condition={condition_id[:20]}... outcome={outcome_index} side={side} wallets={len(wallets_in_window)}"
+            )
+            
             # FIRST CHECK: Skip markets that are already closed/resolved (check at entry)
-            # Note: At this point we don't have wallets_in_window yet, so we'll send details later
+            # Don't send suppressed alert here - we'll send it later if consensus is reached
+            # This prevents duplicate alerts for the same closed market
             if not self.is_market_active(condition_id, outcome_index):
                 self.suppressed_counts['market_closed'] = self.suppressed_counts.get('market_closed', 0) + 1
-                logger.warning(f"[SUPPRESS] BLOCKING: market_closed (entry check) condition={condition_id} outcome={outcome_index}")
-                # Send details to reports (with minimal info since we don't have wallets yet)
-                try:
-                    self.notifier.send_suppressed_alert_details(
-                        reason="market_closed",
-                        condition_id=condition_id,
-                        outcome_index=outcome_index,
-                        wallets=[wallet],  # Just the current wallet
-                        wallet_prices={wallet: price},
-                        market_title=market_title,
-                        market_slug=market_slug,
-                        side=side
-                    )
-                except Exception as e:
-                    logger.debug(f"Failed to send suppressed alert details: {e}")
+                logger.debug(
+                    f"[Consensus] skipped: market_inactive (early check) condition={condition_id[:20]}... outcome={outcome_index} side={side}"
+                )
+                # Don't send suppressed alert here - will be sent in final check if consensus reached
                 return
             # Check if this is first entry for this wallet in this market direction
             if self.db.has_traded_market(wallet, condition_id, side):
@@ -753,6 +1176,19 @@ class PolymarketNotifier:
             wallets_in_window = sorted({e["wallet"] for e in window_data.get("events", [])})
             
             if len(wallets_in_window) < self.min_consensus:
+                return
+            
+            # EARLY CHECK: If market is already closed, skip processing events from rolling window
+            # This prevents delayed alerts for markets that closed while events were in the window
+            # IMPORTANT: Don't send suppressed alerts for old events from closed markets
+            # Suppressed alerts should only be sent in real-time when consensus is detected but market is closed
+            if not self.is_market_active(condition_id, outcome_index):
+                self.suppressed_counts['market_closed'] = self.suppressed_counts.get('market_closed', 0) + 1
+                logger.debug(
+                    f"[Consensus] skipped: market_inactive (rolling window check) condition={condition_id[:20]}... outcome={outcome_index} side={side} (events in window from closed market - NO suppressed alert for old events)"
+                )
+                # Don't send suppressed alert here - these are old events from closed markets
+                # Suppressed alerts should only be sent in real-time, not for historical events
                 return
             
             # Check if alert already sent for this direction
@@ -840,6 +1276,34 @@ class PolymarketNotifier:
                 logger.error(f"Error calculating total_usd: {e}", exc_info=True)
                 total_usd = 0.0
             
+            # CRITICAL: Check if market is still active BEFORE fetching price
+            # This prevents processing events from closed markets that are still in rolling window
+            if not self.is_market_active(condition_id, outcome_index):
+                self.suppressed_counts['market_closed'] = self.suppressed_counts.get('market_closed', 0) + 1
+                logger.info(
+                    f"[Consensus] skipped: market_inactive (before price check) condition={condition_id[:20]}... outcome={outcome_index} side={side}"
+                )
+                # Only send suppressed alert if we have consensus (multiple wallets)
+                if len(wallets_in_window) >= self.min_consensus:
+                    try:
+                        self.notifier.send_suppressed_alert_details(
+                            reason="market_closed",
+                            condition_id=condition_id,
+                            outcome_index=outcome_index,
+                            wallets=wallets_in_window,
+                            wallet_prices=wallet_prices,
+                            market_title=market_title,
+                            market_slug=market_slug,
+                            current_price=None,
+                            side=side,
+                            total_usd=total_usd
+                        )
+                    except Exception as e:
+                        logger.debug(f"Failed to send suppressed alert details: {e}")
+                else:
+                    logger.debug(f"Skipping suppressed alert for closed market: only {len(wallets_in_window)} wallet(s), below consensus threshold")
+                return
+            
             # Fetch current market price for outcome
             current_price = self._get_current_price(condition_id, outcome_index)
             now_iso = datetime.now(timezone.utc).isoformat()
@@ -853,68 +1317,239 @@ class PolymarketNotifier:
                     # Price = 1.0 or exactly 0.0 (or very close) means market is resolved - BLOCK ALERT
                     if price_val >= 0.999 or price_val <= 0.001:
                         self.suppressed_counts['resolved'] = self.suppressed_counts.get('resolved', 0) + 1
-                        logger.warning(f"[SUPPRESS] BLOCKING: resolved market condition={condition_id} outcome={outcome_index} price={price_val:.6f}")
-                        # Send suppressed alert details to reports
-                        try:
-                            self.notifier.send_suppressed_alert_details(
-                                reason="resolved",
-                                condition_id=condition_id,
-                                outcome_index=outcome_index,
-                                wallets=wallets_in_window,
-                                wallet_prices=wallet_prices,
-                                market_title=market_title,
-                                market_slug=market_slug,
-                                current_price=current_price,
-                                side=side,
-                                total_usd=total_usd
-                            )
-                        except Exception as e:
-                            logger.debug(f"Failed to send suppressed alert details: {e}")
+                        
+                        # Check if events are recent (within last hour) - only send suppressed alerts for recent events
+                        from datetime import datetime, timezone
+                        now_ts = datetime.now(timezone.utc).timestamp()
+                        last_event_age = now_ts - window_data.get("last_ts", 0)
+                        recent_threshold = 3600  # 1 hour in seconds
+                        is_recent = last_event_age <= recent_threshold
+                        
+                        logger.info(
+                            f"[Consensus] skipped: resolved condition={condition_id[:20]}... outcome={outcome_index} side={side} price={price_val:.6f} "
+                            f"(last event age: {last_event_age/60:.1f} min, recent: {is_recent})"
+                        )
+                        # Only send suppressed alert if events are recent (within last hour)
+                        # AND if we haven't already sent a suppressed alert for this market/outcome/side/reason recently
+                        if len(wallets_in_window) >= self.min_consensus and is_recent:
+                            if not self.db.is_suppressed_alert_sent(condition_id, outcome_index, side, "resolved", window_minutes=30.0):
+                                try:
+                                    self.notifier.send_suppressed_alert_details(
+                                        reason="resolved",
+                                        condition_id=condition_id,
+                                        outcome_index=outcome_index,
+                                        wallets=wallets_in_window,
+                                        wallet_prices=wallet_prices,
+                                        market_title=market_title,
+                                        market_slug=market_slug,
+                                        current_price=current_price,
+                                        side=side,
+                                        total_usd=total_usd
+                                    )
+                                    self.db.mark_suppressed_alert_sent(
+                                        condition_id, outcome_index, side, "resolved",
+                                        wallet_count=len(wallets_in_window)
+                                    )
+                                except Exception as e:
+                                    logger.debug(f"Failed to send suppressed alert details: {e}")
+                            else:
+                                logger.debug(f"Suppressed alert for resolved already sent recently for {condition_id[:20]}... outcome={outcome_index} side={side}")
+                        else:
+                            if not is_recent:
+                                logger.debug(f"Skipping suppressed alert for resolved market: events too old ({last_event_age/60:.1f} min ago)")
                         return
                     # Price >= 0.98 or <= 0.02 also indicates closed/almost resolved - BLOCK ALERT  
                     if price_val >= 0.98 or price_val <= 0.02:
                         self.suppressed_counts['price_high'] = self.suppressed_counts.get('price_high', 0) + 1
-                        logger.warning(f"[SUPPRESS] BLOCKING: price too high/low condition={condition_id} outcome={outcome_index} price={price_val:.6f}")
-                        # Send suppressed alert details to reports
-                        try:
-                            self.notifier.send_suppressed_alert_details(
-                                reason="price_high",
-                                condition_id=condition_id,
-                                outcome_index=outcome_index,
-                                wallets=wallets_in_window,
-                                wallet_prices=wallet_prices,
-                                market_title=market_title,
-                                market_slug=market_slug,
-                                current_price=current_price,
-                                side=side,
-                                total_usd=total_usd
-                            )
-                        except Exception as e:
-                            logger.debug(f"Failed to send suppressed alert details: {e}")
+                        
+                        # Check if events are recent (within last hour) - only send suppressed alerts for recent events
+                        from datetime import datetime, timezone
+                        now_ts = datetime.now(timezone.utc).timestamp()
+                        last_event_age = now_ts - window_data.get("last_ts", 0)
+                        recent_threshold = 3600  # 1 hour in seconds
+                        is_recent = last_event_age <= recent_threshold
+                        
+                        logger.info(
+                            f"[Consensus] skipped: price_filter condition={condition_id[:20]}... outcome={outcome_index} side={side} price={price_val:.6f} "
+                            f"(last event age: {last_event_age/60:.1f} min, recent: {is_recent})"
+                        )
+                        # Only send suppressed alert if events are recent (within last hour)
+                        # AND if we haven't already sent a suppressed alert for this market/outcome/side/reason recently
+                        if len(wallets_in_window) >= self.min_consensus and is_recent:
+                            if not self.db.is_suppressed_alert_sent(condition_id, outcome_index, side, "price_high", window_minutes=30.0):
+                                try:
+                                    self.notifier.send_suppressed_alert_details(
+                                        reason="price_high",
+                                        condition_id=condition_id,
+                                        outcome_index=outcome_index,
+                                        wallets=wallets_in_window,
+                                        wallet_prices=wallet_prices,
+                                        market_title=market_title,
+                                        market_slug=market_slug,
+                                        current_price=current_price,
+                                        side=side,
+                                        total_usd=total_usd
+                                    )
+                                    self.db.mark_suppressed_alert_sent(
+                                        condition_id, outcome_index, side, "price_high",
+                                        wallet_count=len(wallets_in_window)
+                                    )
+                                except Exception as e:
+                                    logger.debug(f"Failed to send suppressed alert details: {e}")
+                            else:
+                                logger.debug(f"Suppressed alert for price_high already sent recently for {condition_id[:20]}... outcome={outcome_index} side={side}")
+                        else:
+                            if not is_recent:
+                                logger.debug(f"Skipping suppressed alert for closed market: events too old ({last_event_age/60:.1f} min ago)")
                         return
                     logger.info(f"[PRICE CHECK] Price OK: {price_val:.6f}, allowing alert")
                 else:
-                    # Price is None - could mean API error or market not found
-                    # BLOCK if price cannot be verified (fail-safe)
-                    logger.warning(f"[SUPPRESS] BLOCKING: price is None for condition={condition_id} outcome={outcome_index} - cannot verify market status")
-                    self.suppressed_counts['price_none'] = self.suppressed_counts.get('price_none', 0) + 1
-                    # Send suppressed alert details to reports
-                    try:
-                        self.notifier.send_suppressed_alert_details(
-                            reason="price_none",
-                            condition_id=condition_id,
-                            outcome_index=outcome_index,
-                            wallets=wallets_in_window,
-                            wallet_prices=wallet_prices,
-                            market_title=market_title,
-                            market_slug=market_slug,
-                            current_price=None,
-                            side=side,
-                            total_usd=total_usd
+                    # Price is None - could mean API error, market not found, or market is closed
+                    # ALWAYS check if market is closed first (more reliable than price check)
+                    # Use get_market_info for comprehensive check
+                    market_info = self.get_market_info(condition_id)
+                    market_closed = False
+                    
+                    # Check multiple indicators of closed market
+                    if market_info.get("closed") is True:
+                        market_closed = True
+                        logger.debug(f"Market {condition_id[:20]}... closed (closed flag)")
+                    
+                    # Check end_date
+                    if market_info.get("end_date"):
+                        from datetime import datetime, timezone
+                        end_date = market_info["end_date"]
+                        if end_date.tzinfo is None:
+                            end_date = end_date.replace(tzinfo=timezone.utc)
+                        current_time = datetime.now(timezone.utc)
+                        if current_time > end_date:
+                            market_closed = True
+                            logger.debug(f"Market {condition_id[:20]}... closed (end_date passed)")
+                    
+                    # Check status
+                    status = str(market_info.get("status") or "").lower()
+                    if status in {"resolved", "finished", "closed", "ended", "finalized"}:
+                        market_closed = True
+                        logger.debug(f"Market {condition_id[:20]}... closed (status: {status})")
+                    
+                    # Check active flag
+                    if market_info.get("active") is False:
+                        market_closed = True
+                        logger.debug(f"Market {condition_id[:20]}... closed (active=False)")
+                    
+                    # Also try is_market_active as additional check
+                    if not market_closed:
+                        try:
+                            if not self.is_market_active(condition_id, outcome_index):
+                                market_closed = True
+                                logger.debug(f"Market {condition_id[:20]}... closed (is_market_active=False)")
+                        except Exception as e:
+                            logger.debug(f"is_market_active check failed: {e}, using market_info result")
+                    
+                    if market_closed:
+                        # Market is closed - use market_closed reason
+                        self.suppressed_counts['market_closed'] = self.suppressed_counts.get('market_closed', 0) + 1
+                        
+                        # Check if events are recent (within last hour) - only send suppressed alerts for recent events
+                        from datetime import datetime, timezone
+                        now_ts = datetime.now(timezone.utc).timestamp()
+                        last_event_age = now_ts - window_data.get("last_ts", 0)
+                        recent_threshold = 3600  # 1 hour in seconds
+                        is_recent = last_event_age <= recent_threshold
+                        
+                        logger.info(
+                            f"[Consensus] skipped: market_closed (price unavailable) condition={condition_id[:20]}... outcome={outcome_index} side={side} "
+                            f"(last event age: {last_event_age/60:.1f} min, recent: {is_recent})"
                         )
-                    except Exception as e:
-                        logger.debug(f"Failed to send suppressed alert details: {e}")
-                    return
+                        # Only send suppressed alert if:
+                        # 1. We have consensus (multiple wallets)
+                        # 2. Events are recent (within last hour) - don't send for old historical events
+                        # 3. We haven't already sent a suppressed alert for this market/outcome/side/reason recently
+                        if len(wallets_in_window) >= self.min_consensus and is_recent:
+                            if not self.db.is_suppressed_alert_sent(condition_id, outcome_index, side, "market_closed", window_minutes=30.0):
+                                try:
+                                    self.notifier.send_suppressed_alert_details(
+                                        reason="market_closed",
+                                        condition_id=condition_id,
+                                        outcome_index=outcome_index,
+                                        wallets=wallets_in_window,
+                                        wallet_prices=wallet_prices,
+                                        market_title=market_title,
+                                        market_slug=market_slug,
+                                        current_price=None,
+                                        side=side,
+                                        total_usd=total_usd
+                                    )
+                                    self.db.mark_suppressed_alert_sent(
+                                        condition_id, outcome_index, side, "market_closed",
+                                        wallet_count=len(wallets_in_window)
+                                    )
+                                except Exception as e:
+                                    logger.debug(f"Failed to send suppressed alert details: {e}")
+                            else:
+                                logger.debug(f"Suppressed alert for market_closed already sent recently for {condition_id[:20]}... outcome={outcome_index} side={side}")
+                        else:
+                            if len(wallets_in_window) < self.min_consensus:
+                                logger.debug(f"Skipping suppressed alert: only {len(wallets_in_window)} wallet(s), below consensus threshold")
+                            else:
+                                logger.debug(f"Skipping suppressed alert: events too old ({last_event_age/60:.1f} min ago), not recent enough")
+                        return
+                    
+                    # Price is None but market appears active - could be API error
+                    # IMPORTANT: If market is active, we should still allow the alert to be sent
+                    # (price might be temporarily unavailable, but market is still trading)
+                    # Only block if we're certain the market is closed
+                    
+                    # Double-check market status one more time
+                    market_still_active = self.is_market_active(condition_id, outcome_index)
+                    
+                    if not market_still_active:
+                        # Market is closed - block alert and send suppressed alert
+                        from datetime import datetime, timezone
+                        now_ts = datetime.now(timezone.utc).timestamp()
+                        last_event_age = now_ts - window_data.get("last_ts", 0)
+                        recent_threshold = 3600  # 1 hour in seconds
+                        is_recent = last_event_age <= recent_threshold
+                        
+                        logger.info(
+                            f"[Consensus] skipped: market_closed (price unavailable, confirmed closed) condition={condition_id[:20]}... outcome={outcome_index} side={side} "
+                            f"(last event age: {last_event_age/60:.1f} min, recent: {is_recent})"
+                        )
+                        self.suppressed_counts['market_closed'] = self.suppressed_counts.get('market_closed', 0) + 1
+                        # Only send suppressed alert if events are recent
+                        if len(wallets_in_window) >= self.min_consensus and is_recent:
+                            if not self.db.is_suppressed_alert_sent(condition_id, outcome_index, side, "market_closed", window_minutes=30.0):
+                                try:
+                                    self.notifier.send_suppressed_alert_details(
+                                        reason="market_closed",
+                                        condition_id=condition_id,
+                                        outcome_index=outcome_index,
+                                        wallets=wallets_in_window,
+                                        wallet_prices=wallet_prices,
+                                        market_title=market_title,
+                                        market_slug=market_slug,
+                                        current_price=None,
+                                        side=side,
+                                        total_usd=total_usd
+                                    )
+                                    self.db.mark_suppressed_alert_sent(
+                                        condition_id, outcome_index, side, "market_closed",
+                                        wallet_count=len(wallets_in_window)
+                                    )
+                                except Exception as e:
+                                    logger.debug(f"Failed to send suppressed alert details: {e}")
+                        return
+                    else:
+                        # Market is active but price is unavailable - allow alert to proceed
+                        # This could be a temporary API issue, but market is still trading
+                        logger.warning(
+                            f"[Consensus] Price unavailable but market is active - allowing alert to proceed "
+                            f"condition={condition_id[:20]}... outcome={outcome_index} side={side} "
+                            f"(price might be temporarily unavailable, but market is still active)"
+                        )
+                        # Continue to send real alert (price will be shown as "N/A" or similar)
+                        # Don't block real alerts for active markets just because price is temporarily unavailable
+                        # The alert will proceed to the next checks (deduplication, etc.)
             except (ValueError, TypeError) as e:
                 logger.error(f"[SUPPRESS] BLOCKING: Error parsing price {current_price}: {e}, condition={condition_id}")
                 # On parsing error, block to be safe
@@ -938,25 +1573,56 @@ class PolymarketNotifier:
                 return
             
             # Final check: Verify market is still active before sending alert
+            # IMPORTANT: Check if events are recent (within window) - don't send suppressed alerts for old events
             if not self.is_market_active(condition_id, outcome_index):
                 self.suppressed_counts['market_closed'] = self.suppressed_counts.get('market_closed', 0) + 1
-                logger.info(f"[SUPPRESS] market_closed (final check) condition={condition_id} outcome={outcome_index}")
-                # Send suppressed alert details to reports
-                try:
-                    self.notifier.send_suppressed_alert_details(
-                        reason="market_closed",
-                        condition_id=condition_id,
-                        outcome_index=outcome_index,
-                        wallets=wallets_in_window,
-                        wallet_prices=wallet_prices,
-                        market_title=market_title,
-                        market_slug=market_slug,
-                        current_price=current_price,
-                        side=side,
-                        total_usd=total_usd
-                    )
-                except Exception as e:
-                    logger.debug(f"Failed to send suppressed alert details: {e}")
+                
+                # Check if events are recent (within last hour) - only send suppressed alerts for recent events
+                from datetime import datetime, timezone
+                now_ts = datetime.now(timezone.utc).timestamp()
+                last_event_age = now_ts - window_data.get("last_ts", 0)
+                recent_threshold = 3600  # 1 hour in seconds
+                
+                is_recent = last_event_age <= recent_threshold
+                
+                logger.info(
+                    f"[Consensus] skipped: market_inactive (final check) condition={condition_id[:20]}... outcome={outcome_index} side={side} "
+                    f"(last event age: {last_event_age/60:.1f} min, recent: {is_recent})"
+                )
+                
+                # Only send suppressed alert if:
+                # 1. We have consensus (multiple wallets)
+                # 2. Events are recent (within last hour) - don't send for old historical events
+                # 3. We haven't already sent a suppressed alert for this market/outcome/side/reason recently
+                if len(wallets_in_window) >= self.min_consensus and is_recent:
+                    if not self.db.is_suppressed_alert_sent(condition_id, outcome_index, side, "market_closed", window_minutes=30.0):
+                        # Send suppressed alert details to reports (only for recent consensus-level events)
+                        try:
+                            self.notifier.send_suppressed_alert_details(
+                                reason="market_closed",
+                                condition_id=condition_id,
+                                outcome_index=outcome_index,
+                                wallets=wallets_in_window,
+                                wallet_prices=wallet_prices,
+                                market_title=market_title,
+                                market_slug=market_slug,
+                                current_price=current_price,
+                                side=side,
+                                total_usd=total_usd
+                            )
+                            self.db.mark_suppressed_alert_sent(
+                                condition_id, outcome_index, side, "market_closed",
+                                wallet_count=len(wallets_in_window)
+                            )
+                        except Exception as e:
+                            logger.debug(f"Failed to send suppressed alert details: {e}")
+                    else:
+                        logger.debug(f"Suppressed alert for market_closed already sent recently for {condition_id[:20]}... outcome={outcome_index} side={side}")
+                else:
+                    if len(wallets_in_window) < self.min_consensus:
+                        logger.debug(f"Skipping suppressed alert for closed market: only {len(wallets_in_window)} wallet(s), below consensus threshold")
+                    else:
+                        logger.debug(f"Skipping suppressed alert for closed market: events too old ({last_event_age/60:.1f} min ago), not recent enough")
                 return
 
             # Dedupe/trigger rules using recent alerts
@@ -994,7 +1660,9 @@ class PolymarketNotifier:
                 # Global ignore: within 30 minutes for the same market and same outcome
                 if same_outcome and minutes_since < 30.0:
                     self.suppressed_counts['ignore_30m_same_outcome'] += 1
-                    logger.info(f"[SUPPRESS] ignore_30m same outcome condition={condition_id} mins={minutes_since:.1f}")
+                    logger.info(
+                        f"[Consensus] skipped: ignore_30m_same_outcome condition={condition_id[:20]}... outcome={outcome_index} side={side} mins={minutes_since:.1f}"
+                    )
                     # Send suppressed alert details to reports
                     try:
                         self.notifier.send_suppressed_alert_details(
@@ -1015,7 +1683,9 @@ class PolymarketNotifier:
                 # Legacy ignore if within 10 min and none of the triggers met
                 if minutes_since < 10.0 and same_outcome and (not wallets_grew) and (price_change < 0.01):
                     self.suppressed_counts['dedupe_no_growth_10m'] += 1
-                    logger.info(f"[SUPPRESS] dedupe_no_growth_10m condition={condition_id}")
+                    logger.info(
+                        f"[Consensus] skipped: dedupe_no_growth_10m condition={condition_id[:20]}... outcome={outcome_index} side={side}"
+                    )
                     # Send suppressed alert details to reports
                     try:
                         self.notifier.send_suppressed_alert_details(
@@ -1036,7 +1706,9 @@ class PolymarketNotifier:
                 # Else proceed only if any trigger met
                 if not (outcome_changed or wallets_grew or has_new_wallet or price_change >= 0.01 or should_refresh_due_time):
                     self.suppressed_counts['no_trigger_matched'] += 1
-                    logger.info(f"[SUPPRESS] no_trigger_matched condition={condition_id}")
+                    logger.info(
+                        f"[Consensus] skipped: no_trigger_matched condition={condition_id[:20]}... outcome={outcome_index} side={side}"
+                    )
                     # Send suppressed alert details to reports
                     try:
                         self.notifier.send_suppressed_alert_details(
@@ -1055,13 +1727,19 @@ class PolymarketNotifier:
                         logger.debug(f"Failed to send suppressed alert details: {e}")
                     return
             
-            # Don't send if we recently alerted same market/side
+            # Don't send if we recently alerted same market/side (30-minute cooldown to prevent spam)
             if self.db.has_recent_alert(condition_id, outcome_index, side, self.alert_cooldown_min):
+                self.suppressed_counts['cooldown'] = self.suppressed_counts.get('cooldown', 0) + 1
+                logger.info(
+                    f"[Consensus] skipped: cooldown_30m condition={condition_id[:20]}... outcome={outcome_index} side={side}"
+                )
                 return
             # Don't send if there was an opposite-side alert recently (conflict avoidance)
             if self.db.has_recent_opposite_alert(condition_id, outcome_index, side, self.conflict_window_min):
                 self.suppressed_counts['opposite_recent'] += 1
-                logger.info(f"[SUPPRESS] opposite_recent condition={condition_id}")
+                logger.info(
+                    f"[Consensus] skipped: opposite_recent condition={condition_id[:20]}... outcome={outcome_index} side={side}"
+                )
                 # Send suppressed alert details to reports
                 try:
                     self.notifier.send_suppressed_alert_details(
@@ -1137,14 +1815,21 @@ class PolymarketNotifier:
                     wallet_details_json = ""
                 
                 # Mark alert as sent
-                self.db.mark_alert_sent(
+                alert_saved = self.db.mark_alert_sent(
                     condition_id, outcome_index, len(wallets_in_window),
                     window_data["first_ts"], window_data["last_ts"], alert_key, side,
                     price=(current_price or 0.0), wallets_csv=",".join(wallets_in_window),
                     wallet_details_json=wallet_details_json
                 )
-                logger.info(f"Sent consensus alert for {condition_id}:{outcome_index} "
-                           f"({len(wallets_in_window)} wallets)")
+                
+                if alert_saved:
+                    logger.info(
+                        f"[Consensus] ALERT condition={condition_id[:20]}... outcome={outcome_index} side={side} "
+                        f"wallets={len(wallets_in_window)} price={current_price or 0.0:.4f}"
+                    )
+                else:
+                    logger.error(f"❌ Failed to save alert to database for {condition_id}:{outcome_index} "
+                                f"(alert was sent to Telegram but not saved)")
             
         except Exception as e:
             logger.error(f"Error checking consensus: {e}")
@@ -1159,8 +1844,8 @@ class PolymarketNotifier:
                 # Get tracked wallets - strict criteria: 75%+ win rate
                 wallets = self.db.get_tracked_wallets(
                     min_trades=6, max_trades=self.max_predictions,
-                    min_win_rate=0.75, max_win_rate=1.0,  # Increased to 75%
-                    max_daily_freq=20.0, limit=self.max_wallets
+                    min_win_rate=WIN_RATE_THRESHOLD, max_win_rate=1.0,  # Win rate threshold (65% default)
+                    max_daily_freq=MAX_DAILY_FREQUENCY, limit=self.max_wallets
                 )
                 
                 if not wallets:
@@ -1183,12 +1868,18 @@ class PolymarketNotifier:
                 if self.loop_count % 514 == 0:
                     try:
                         self.notifier.send_suppression_report(self.suppressed_counts)
+                        # Also send errors report
+                        if hasattr(self.notifier, 'send_error_report'):
+                            self.notifier.send_error_report(self.error_counts)
                         # reset after sending
                         for k in list(self.suppressed_counts.keys()):
                             self.suppressed_counts[k] = 0
+                        for k in list(self.error_counts.keys()):
+                            self.error_counts[k] = 0
                     except Exception as e:
                         logger.warning(f"Failed to send suppression report: {e}")
                 
+                # Heartbeat log every 30 seconds (every ~4 loops with 7s poll interval)
                 # Heartbeat log every 30 seconds (every ~4 loops with 7s poll interval)
                 if self.loop_count % 4 == 0:
                     stats = self.db.get_wallet_stats()
@@ -1204,11 +1895,13 @@ class PolymarketNotifier:
                 
                 # Collect new wallets from leaderboard if needed (every 20 loops)
                 if self.loop_count % 20 == 0:
-                    current_wallets = self.db.get_tracked_wallets(min_trades=6, max_trades=1000, min_win_rate=0.75, max_win_rate=1.0, max_daily_freq=20.0, limit=self.max_wallets)
+                    current_wallets = self.db.get_tracked_wallets(min_trades=6, max_trades=self.max_predictions, min_win_rate=WIN_RATE_THRESHOLD, max_win_rate=1.0, max_daily_freq=MAX_DAILY_FREQUENCY, limit=self.max_wallets)
                     if len(current_wallets) < self.max_wallets:
                         logger.info(f"Only {len(current_wallets)} wallets, collecting more...")
                         wallets_dict = asyncio.run(self.collect_wallets_from_leaderboards())
-                        self.analyze_and_filter_wallets(wallets_dict)
+                        # Use stored analytics_stats if available
+                        analytics_stats = getattr(self, '_last_analytics_stats', None)
+                        self.analyze_and_filter_wallets(wallets_dict, analytics_stats=analytics_stats)
                 
                 # Clean up old wallets every 50 loops
                 if self.loop_count % 50 == 0:
@@ -1306,6 +1999,10 @@ class PolymarketNotifier:
     
     async def start_bet_monitoring(self):
         """Start bet monitoring in background"""
+        if not BET_MONITOR_AVAILABLE or not self.bet_detector:
+            logger.info("Bet monitoring not available, skipping...")
+            return None
+        
         logger.info("Starting bet monitoring...")
         
         # Get wallet addresses from database
@@ -1341,23 +2038,42 @@ class PolymarketNotifier:
         queue_stats = self.wallet_analyzer.get_queue_status()
         logger.info(f"Wallet analyzer workers started. Queue status: {queue_stats}")
         
-        # Start bet monitoring
+        # Start bet monitoring (if available)
         bet_monitoring_task = await self.start_bet_monitoring()
         
         # Send startup notification
         stats = self.db.get_wallet_stats()
         queue_stats = self.wallet_analyzer.get_queue_status()
+        
+        # Log database path and stats for debugging
+        logger.info(f"[DB] Database path: {self.db_path}")
+        logger.info(f"[DB] Total wallets in DB: {stats.get('total_wallets', 0)}")
+        logger.info(f"[DB] Actively tracked: {stats.get('tracked_wallets', 0)}")
+        logger.info(f"[DB] Queue status: {queue_stats}")
+        
         self.notifier.send_startup_notification(
             stats.get('total_wallets', 0),
             stats.get('tracked_wallets', 0)
         )
         
-        # Collect wallets from leaderboards
-        wallets = await self.collect_wallets_from_leaderboards()
-        if wallets:
-            self.analyze_and_filter_wallets(wallets)
+        # Collect wallets from leaderboards (non-blocking, with timeout)
+        try:
+            logger.info("Starting wallet collection from leaderboards...")
+            wallets = await asyncio.wait_for(self.collect_wallets_from_leaderboards(), timeout=300.0)  # 5 min timeout
+            if wallets:
+                logger.info(f"Collected {len(wallets)} wallets from leaderboards")
+                # Use stored analytics_stats if available
+                analytics_stats = getattr(self, '_last_analytics_stats', None)
+                self.analyze_and_filter_wallets(wallets, analytics_stats=analytics_stats)
+            else:
+                logger.info("No new wallets collected from leaderboards")
+        except asyncio.TimeoutError:
+            logger.warning("Wallet collection timed out after 5 minutes, continuing with monitoring...")
+        except Exception as e:
+            logger.error(f"Error collecting wallets from leaderboards: {e}, continuing with monitoring...")
         
         # Start monitoring
+        logger.info("Starting wallet monitoring loop...")
         try:
             self.monitor_wallets()
         except KeyboardInterrupt:
@@ -1370,7 +2086,8 @@ class PolymarketNotifier:
             # Stop wallet analyzer workers
             self.wallet_analyzer.stop_workers()
             # Cancel bet monitoring task
-            bet_monitoring_task.cancel()
+            if bet_monitoring_task:
+                bet_monitoring_task.cancel()
 
 def main():
     """Main entry point"""

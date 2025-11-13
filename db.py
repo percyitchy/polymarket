@@ -16,6 +16,10 @@ logger = logging.getLogger(__name__)
 class PolymarketDB:
     def __init__(self, db_path: str = "polymarket_notifier.db"):
         self.db_path = db_path
+        # Log absolute path to ensure we're using the correct database
+        import os
+        abs_path = os.path.abspath(self.db_path)
+        logger.info(f"Database initialized with path: {abs_path} (relative: {db_path})")
         self._init_database()
     
     def _init_database(self):
@@ -76,6 +80,8 @@ class PolymarketDB:
                 "ALTER TABLE alerts_sent ADD COLUMN price REAL",
                 "ALTER TABLE alerts_sent ADD COLUMN wallets_csv TEXT",
                 "ALTER TABLE alerts_sent ADD COLUMN wallet_details_json TEXT",
+                "ALTER TABLE wallets ADD COLUMN last_trade_at TEXT",
+                "ALTER TABLE wallets ADD COLUMN source TEXT",  # Ensure source column exists
             ):
                 try:
                     cursor.execute(alter)
@@ -131,9 +137,42 @@ class PolymarketDB:
                     daily_trading_frequency REAL,
                     analysis_result TEXT,
                     analyzed_at TEXT,
-                    expires_at TEXT
+                    expires_at TEXT,
+                    last_trade_at TEXT,
+                    source TEXT
                 )
             """)
+            
+            # Raw collected wallets - tracks all wallets collected from different sources
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS raw_collected_wallets(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    address TEXT NOT NULL,
+                    source TEXT NOT NULL,
+                    collected_at TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            
+            # Add new columns if they don't exist (for existing databases)
+            for alter in (
+                "ALTER TABLE wallet_analysis_cache ADD COLUMN last_trade_at TEXT",
+                "ALTER TABLE wallet_analysis_cache ADD COLUMN source TEXT",
+                "ALTER TABLE wallet_analysis_cache ADD COLUMN created_at TEXT",  # For legacy cleanup operations
+            ):
+                try:
+                    cursor.execute(alter)
+                except sqlite3.OperationalError:
+                    pass
+            
+            # Backfill created_at for existing records (use analyzed_at if created_at is NULL)
+            try:
+                cursor.execute("""
+                    UPDATE wallet_analysis_cache 
+                    SET created_at = analyzed_at 
+                    WHERE created_at IS NULL AND analyzed_at IS NOT NULL
+                """)
+            except sqlite3.OperationalError:
+                pass  # Column might not exist yet
             
             # Create indexes for better performance
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_wallets_traded ON wallets(traded_total)")
@@ -146,15 +185,27 @@ class PolymarketDB:
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_address ON wallet_analysis_jobs(address)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_cache_address ON wallet_analysis_cache(address)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_cache_expires ON wallet_analysis_cache(expires_at)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_raw_collected_address ON raw_collected_wallets(address)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_raw_collected_source ON raw_collected_wallets(source)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_raw_collected_at ON raw_collected_wallets(collected_at)")
             
             conn.commit()
             logger.info("Database initialized successfully")
     
     @contextmanager
     def get_connection(self):
-        """Context manager for database connections"""
-        conn = sqlite3.connect(self.db_path, check_same_thread=False)
+        """Context manager for database connections with improved concurrency settings"""
+        conn = sqlite3.connect(
+            self.db_path, 
+            check_same_thread=False,
+            timeout=5.0  # Wait up to 5 seconds for lock
+        )
         conn.row_factory = sqlite3.Row  # Enable dict-like access
+        
+        # Set pragmas for better concurrency
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA busy_timeout=5000")  # Wait 5 seconds on lock
+        
         try:
             yield conn
         finally:
@@ -170,7 +221,7 @@ class PolymarketDB:
     
     # Wallet operations
     def upsert_wallet(self, address: str, display: str, traded: int, win_rate: float, 
-                     pnl_total: float, daily_freq: float, source: str) -> bool:
+                     pnl_total: float, daily_freq: float, source: str, last_trade_at: Optional[str] = None) -> bool:
         """Insert or update wallet information"""
         try:
             with self.get_connection() as conn:
@@ -180,8 +231,8 @@ class PolymarketDB:
                 cursor.execute("""
                     INSERT INTO wallets(address, display, traded_total, win_rate, 
                                      realized_pnl_total, daily_trading_frequency, 
-                                     source, added_at, updated_at)
-                    VALUES(?,?,?,?,?,?,?,?,?)
+                                     source, added_at, updated_at, last_trade_at)
+                    VALUES(?,?,?,?,?,?,?,?,?,?)
                     ON CONFLICT(address) DO UPDATE SET
                         display=excluded.display,
                         traded_total=excluded.traded_total,
@@ -189,9 +240,10 @@ class PolymarketDB:
                         realized_pnl_total=excluded.realized_pnl_total,
                         daily_trading_frequency=excluded.daily_trading_frequency,
                         source=excluded.source,
-                        updated_at=excluded.updated_at
+                        updated_at=excluded.updated_at,
+                        last_trade_at=excluded.last_trade_at
                 """, (address.lower(), display, traded, win_rate, pnl_total, 
-                     daily_freq, source, now, now))
+                     daily_freq, source, now, now, last_trade_at))
                 
                 conn.commit()
                 return True
@@ -211,22 +263,27 @@ class PolymarketDB:
             logger.error(f"Error getting wallet {address}: {e}")
             return None
     
-    def get_tracked_wallets(self, min_trades: int = 20, max_trades: int = 1000,
+    def get_tracked_wallets(self, min_trades: int = 6, max_trades: int = 1200,
                           min_win_rate: float = 0.65, max_win_rate: float = 1.0,
-                          max_daily_freq: float = 100.0, limit: int = 200) -> List[str]:
-        """Get wallets that meet tracking criteria"""
+                          max_daily_freq: float = 35.0, limit: int = 200) -> List[str]:
+        """Get wallets that meet tracking criteria (excluding wallets with last trade > 3 months ago)"""
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
+                # Calculate 3 months ago threshold
+                three_months_ago = (datetime.now(timezone.utc) - timedelta(days=90)).isoformat()
+                
                 cursor.execute("""
                     SELECT address FROM wallets
                     WHERE traded_total >= ? AND traded_total <= ?
                     AND win_rate >= ? AND win_rate <= ?
-                    AND daily_trading_frequency <= ?
+                    AND (daily_trading_frequency IS NULL OR daily_trading_frequency <= ?)
+                    AND last_trade_at IS NOT NULL
+                    AND last_trade_at >= ?
                     ORDER BY realized_pnl_total DESC, traded_total DESC
                     LIMIT ?
                 """, (min_trades, max_trades, min_win_rate, max_win_rate, 
-                     max_daily_freq, limit))
+                     max_daily_freq, three_months_ago, limit))
                 
                 return [row[0] for row in cursor.fetchall()]
         except Exception as e:
@@ -246,12 +303,16 @@ class PolymarketDB:
                 stats['total_wallets'] = cursor.fetchone()[0]
                 
                 # Wallets meeting criteria (updated to match actual tracking criteria)
+                # Use same criteria as get_tracked_wallets() for consistency
+                three_months_ago = (datetime.now(timezone.utc) - timedelta(days=90)).isoformat()
                 cursor.execute("""
                     SELECT COUNT(*) FROM wallets
-                    WHERE traded_total >= 6 AND traded_total <= 1000
-                    AND win_rate >= 0.75 AND win_rate <= 1.0
-                    AND (daily_trading_frequency IS NULL OR daily_trading_frequency <= 20.0)
-                """)
+                    WHERE traded_total >= 6 AND traded_total <= 1200
+                    AND win_rate >= 0.65 AND win_rate <= 1.0
+                    AND (daily_trading_frequency IS NULL OR daily_trading_frequency <= 35.0)
+                    AND last_trade_at IS NOT NULL
+                    AND datetime(last_trade_at) >= datetime(?)
+                """, (three_months_ago,))
                 stats['tracked_wallets'] = cursor.fetchone()[0]
                 
                 # Win rate distribution
@@ -272,7 +333,7 @@ class PolymarketDB:
             logger.error(f"Error getting wallet stats: {e}")
             return {}
     
-    def cleanup_old_wallets(self, max_trades: int = 1000, max_wallets: int = 200):
+    def cleanup_old_wallets(self, max_trades: int = 1200, max_wallets: int = 200):
         """Remove wallets that exceed limits"""
         try:
             with self.get_connection() as conn:
@@ -288,7 +349,7 @@ class PolymarketDB:
                         SELECT address FROM wallets
                         WHERE traded_total >= 30 AND traded_total <= ?
                         AND win_rate > 0.65 AND win_rate < 0.99
-                        AND daily_trading_frequency <= 10.0
+                        AND (daily_trading_frequency IS NULL OR daily_trading_frequency <= 35.0)
                         ORDER BY realized_pnl_total DESC, traded_total DESC
                         LIMIT ?
                     )
@@ -464,19 +525,30 @@ class PolymarketDB:
             else:
                 key = self.sha(f"ALERT:{condition_id}:{outcome_index}:{int(first_ts)}:{int(last_ts)}")
             
+            alert_id = key[:8]
+            now_iso = self.now_iso()
+            
             with self.get_connection() as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
                     INSERT INTO alerts_sent(alert_key, sent_at, condition_id, 
                                           outcome_index, wallet_count, side, price, wallets_csv, wallet_details_json)
                     VALUES(?,?,?,?,?,?,?,?,?)
-                """, (key, self.now_iso(), condition_id, outcome_index, wallet_count, side, float(price or 0.0), wallets_csv, wallet_details_json))
+                """, (key, now_iso, condition_id, outcome_index, wallet_count, side, float(price or 0.0), wallets_csv, wallet_details_json))
                 
                 conn.commit()
+                
+                # Log successful save
+                wallet_addresses = wallets_csv.split(",") if wallets_csv else []
+                logger.info(
+                    f"[Alerts] Stored alert {alert_id} for market={condition_id[:20]}..., "
+                    f"outcome={outcome_index}, wallets={len(wallet_addresses)}, side={side}, price={price:.4f}"
+                )
+                
                 return True
                 
         except Exception as e:
-            logger.error(f"Error marking alert as sent: {e}")
+            logger.error(f"Error marking alert as sent for {condition_id}:{outcome_index}: {e}", exc_info=True)
             return False
 
     def has_recent_alert(self, condition_id: str, outcome_index: int, side: str, cooldown_min: float) -> bool:
@@ -580,6 +652,8 @@ class PolymarketDB:
                 cursor = conn.cursor()
                 now = self.now_iso()
                 
+                logger.debug(f"get_pending_jobs(limit={limit}) called, now={now}")
+                
                 cursor.execute("""
                     SELECT * FROM wallet_analysis_jobs
                     WHERE status = 'pending' 
@@ -590,6 +664,8 @@ class PolymarketDB:
                 
                 rows = cursor.fetchall()
                 result = [dict(row) for row in rows]
+                
+                logger.debug(f"get_pending_jobs(limit={limit}) returned {len(result)} jobs")
                 
                 # Debug logging if no results but jobs exist
                 if not result:
@@ -691,11 +767,16 @@ class PolymarketDB:
             return False
     
     def complete_job(self, job_id: int) -> bool:
-        """Mark job as completed and remove from queue"""
+        """Mark job as completed"""
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
-                cursor.execute("DELETE FROM wallet_analysis_jobs WHERE id = ?", (job_id,))
+                now = self.now_iso()
+                cursor.execute("""
+                    UPDATE wallet_analysis_jobs
+                    SET status = 'completed', updated_at = ?
+                    WHERE id = ?
+                """, (now, job_id))
                 conn.commit()
                 return cursor.rowcount > 0
         except Exception as e:
@@ -749,6 +830,46 @@ class PolymarketDB:
             logger.error(f"Error getting queue stats: {e}")
             return {}
     
+    def debug_queue(self):
+        """Debug utility to check queue status"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            # Status counts
+            cursor.execute("SELECT status, COUNT(*) FROM wallet_analysis_jobs GROUP BY status")
+            status_counts = dict(cursor.fetchall())
+            logger.info(f"Queue status counts: {status_counts}")
+            
+            # Ready jobs (pending with no retry delay or retry time passed)
+            now = self.now_iso()
+            cursor.execute("""
+                SELECT COUNT(*) FROM wallet_analysis_jobs 
+                WHERE status='pending' 
+                AND (next_retry_at IS NULL OR next_retry_at <= ?)
+            """, (now,))
+            ready_count = cursor.fetchone()[0]
+            logger.info(f"Ready jobs (can be processed now): {ready_count}")
+            
+            # Next retry range
+            cursor.execute("""
+                SELECT MIN(next_retry_at), MAX(next_retry_at) 
+                FROM wallet_analysis_jobs 
+                WHERE status='pending' AND next_retry_at IS NOT NULL
+            """)
+            retry_range = cursor.fetchone()
+            if retry_range and retry_range[0]:
+                logger.info(f"Next retry range: {retry_range[0]} to {retry_range[1]}")
+                retry_range_dict = {'min': retry_range[0], 'max': retry_range[1]}
+            else:
+                logger.info("No jobs with next_retry_at set")
+                retry_range_dict = None
+            
+            return {
+                'status_counts': status_counts,
+                'ready_jobs': ready_count,
+                'retry_range': retry_range_dict
+            }
+    
     # Wallet analysis cache operations
     def get_cached_analysis(self, address: str) -> Optional[Dict[str, Any]]:
         """Get cached analysis result for wallet"""
@@ -770,7 +891,8 @@ class PolymarketDB:
     
     def cache_analysis_result(self, address: str, traded_total: int, win_rate: float,
                              realized_pnl_total: float, daily_frequency: float,
-                             analysis_result: str, ttl_hours: int = 24) -> bool:
+                             analysis_result: str, ttl_hours: int = 24,
+                             last_trade_at: Optional[str] = None, source: Optional[str] = None) -> bool:
         """Cache analysis result for wallet"""
         try:
             with self.get_connection() as conn:
@@ -778,14 +900,47 @@ class PolymarketDB:
                 now = datetime.now(timezone.utc)
                 expires_at = now + timedelta(hours=ttl_hours)
                 
-                cursor.execute("""
-                    INSERT OR REPLACE INTO wallet_analysis_cache(
-                        address, traded_total, win_rate, realized_pnl_total,
-                        daily_trading_frequency, analysis_result, analyzed_at, expires_at
-                    )
-                    VALUES(?,?,?,?,?,?,?,?)
-                """, (address.lower(), traded_total, win_rate, realized_pnl_total,
-                     daily_frequency, analysis_result, now.isoformat(), expires_at.isoformat()))
+                # Check if created_at column exists
+                cursor.execute("PRAGMA table_info(wallet_analysis_cache)")
+                columns = [row[1] for row in cursor.fetchall()]
+                has_created_at = 'created_at' in columns
+                
+                if has_created_at:
+                    # Use INSERT OR REPLACE with created_at preservation
+                    # If record exists, preserve original created_at; if new, set to now
+                    cursor.execute("""
+                        INSERT INTO wallet_analysis_cache(
+                            address, traded_total, win_rate, realized_pnl_total,
+                            daily_trading_frequency, analysis_result, analyzed_at, expires_at,
+                            last_trade_at, source, created_at
+                        )
+                        VALUES(?,?,?,?,?,?,?,?,?,?,?)
+                        ON CONFLICT(address) DO UPDATE SET
+                            traded_total = excluded.traded_total,
+                            win_rate = excluded.win_rate,
+                            realized_pnl_total = excluded.realized_pnl_total,
+                            daily_trading_frequency = excluded.daily_trading_frequency,
+                            analysis_result = excluded.analysis_result,
+                            analyzed_at = excluded.analyzed_at,
+                            expires_at = excluded.expires_at,
+                            last_trade_at = excluded.last_trade_at,
+                            source = excluded.source
+                            -- created_at is preserved (not updated)
+                    """, (address.lower(), traded_total, win_rate, realized_pnl_total,
+                         daily_frequency, analysis_result, now.isoformat(), expires_at.isoformat(),
+                         last_trade_at, source, now.isoformat()))
+                else:
+                    # Fallback for databases without created_at column
+                    cursor.execute("""
+                        INSERT OR REPLACE INTO wallet_analysis_cache(
+                            address, traded_total, win_rate, realized_pnl_total,
+                            daily_trading_frequency, analysis_result, analyzed_at, expires_at,
+                            last_trade_at, source
+                        )
+                        VALUES(?,?,?,?,?,?,?,?,?,?)
+                    """, (address.lower(), traded_total, win_rate, realized_pnl_total,
+                         daily_frequency, analysis_result, now.isoformat(), expires_at.isoformat(),
+                         last_trade_at, source))
                 
                 conn.commit()
                 return True
@@ -812,6 +967,24 @@ class PolymarketDB:
         except Exception as e:
             logger.error(f"Error cleaning up expired cache: {e}")
             return 0
+    
+    def insert_raw_collected_wallet(self, address: str, source: str) -> None:
+        """Insert a raw collected wallet address with its source"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                now = self.now_iso()
+                
+                cursor.execute(
+                    """
+                    INSERT INTO raw_collected_wallets (address, source, collected_at)
+                    VALUES (?, ?, ?)
+                    """,
+                    (address.lower(), source, now)
+                )
+                conn.commit()
+        except Exception as e:
+            logger.error(f"Failed to insert raw collected wallet {address} from {source}: {e}")
 
 # Example usage and testing
     def get_tracked_wallet_addresses(self) -> List[str]:

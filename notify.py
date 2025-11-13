@@ -13,6 +13,13 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+# Import PolymarketAuth for authenticated requests
+try:
+    from polymarket_auth import PolymarketAuth
+    POLYMARKET_AUTH_AVAILABLE = True
+except ImportError:
+    POLYMARKET_AUTH_AVAILABLE = False
+
 logger = logging.getLogger(__name__)
 
 class TelegramNotifier:
@@ -21,14 +28,36 @@ class TelegramNotifier:
         self.chat_id = chat_id or os.getenv("TELEGRAM_CHAT_ID")  # public signals
         # admin/reports channel; default to provided id if env not set
         self.reports_chat_id = reports_chat_id or os.getenv("TELEGRAM_REPORTS_CHAT_ID", "-1002792658553")
+        # test reports channel (for experimental alerts)
+        self.reports_test_chat_id = os.getenv("TELEGRAM_REPORTS_TEST_CHAT_ID") or self.reports_chat_id
         # Topic ID for forum groups (optional)
         topic_id_str = os.getenv("TELEGRAM_TOPIC_ID")
         self.topic_id = int(topic_id_str) if topic_id_str and topic_id_str.isdigit() else None
         
+        # Initialize Polymarket authentication (optional)
+        self.polymarket_auth = None
+        if POLYMARKET_AUTH_AVAILABLE:
+            try:
+                self.polymarket_auth = PolymarketAuth()
+            except Exception as e:
+                logger.debug(f"Failed to initialize PolymarketAuth: {e}")
+        
         if not self.bot_token or not self.chat_id:
             logger.warning("Telegram credentials not configured. Notifications will be printed to console.")
     
-    def send_message(self, text: str, parse_mode: str = "Markdown", 
+    def _make_authenticated_get(self, url: str, timeout: int = 5) -> requests.Response:
+        """Make authenticated GET request to Polymarket API if auth is available"""
+        # TEMPORARILY DISABLED: Builder API authentication disabled (keys not visible on site)
+        headers = {}
+        # if self.polymarket_auth and self.polymarket_auth.has_auth:
+        #     from urllib.parse import urlparse
+        #     parsed = urlparse(url)
+        #     request_path = parsed.path
+        #     auth_headers = self.polymarket_auth.get_auth_headers("GET", request_path)
+        #     headers.update(auth_headers)
+        return requests.get(url, headers=headers, timeout=timeout)
+    
+    def send_message(self, text: str, parse_mode: Optional[str] = "Markdown", 
                     disable_web_page_preview: bool = True,
                     reply_markup: Optional[Dict[str, Any]] = None,
                     chat_id: Optional[str] = None,
@@ -38,7 +67,7 @@ class TelegramNotifier:
         
         Args:
             text: Message text
-            parse_mode: HTML or Markdown
+            parse_mode: HTML, Markdown, or None for plain text (default: "Markdown")
             disable_web_page_preview: Disable link previews
             reply_markup: Inline keyboard markup
             chat_id: Override default chat ID
@@ -56,9 +85,11 @@ class TelegramNotifier:
         payload = {
             "chat_id": target_chat,
             "text": text,
-            "parse_mode": parse_mode,
             "disable_web_page_preview": disable_web_page_preview
         }
+        # Only include parse_mode if it's not None (plain text mode)
+        if parse_mode is not None:
+            payload["parse_mode"] = parse_mode
         if reply_markup is not None:
             payload["reply_markup"] = reply_markup
         if message_thread_id is not None:
@@ -69,6 +100,13 @@ class TelegramNotifier:
             response.raise_for_status()
             logger.info("Telegram message sent successfully")
             return True
+        except requests.exceptions.HTTPError as e:
+            # Log response details for debugging
+            if hasattr(e.response, 'text'):
+                logger.error(f"Failed to send Telegram message: {e} - Response: {e.response.text[:200]}")
+            else:
+                logger.error(f"Failed to send Telegram message: {e}")
+            return False
         except requests.exceptions.RequestException as e:
             logger.error(f"Failed to send Telegram message: {e}")
             return False
@@ -192,42 +230,48 @@ class TelegramNotifier:
             # Block resolved markets (price >= 0.999 or <= 0.001)
             if price_val >= 0.999 or price_val <= 0.001:
                 logger.error(f"[NOTIFY] BLOCKING: resolved market price={price_val}, condition={condition_id}, outcome={outcome_index}")
-                # Send suppressed alert details to reports
-                try:
-                    self.send_suppressed_alert_details(
-                        reason="resolved",
-                        condition_id=condition_id,
-                        outcome_index=outcome_index,
-                        wallets=wallets,
-                        wallet_prices=wallet_prices,
-                        market_title=market_title,
-                        market_slug=market_slug,
-                        current_price=current_price,
-                        side=side,
-                        total_usd=total_usd
-                    )
-                except Exception as e:
-                    logger.debug(f"Failed to send suppressed alert details: {e}")
+                # Only send suppressed alert if we have consensus (multiple wallets)
+                if len(wallets) >= min_consensus:
+                    try:
+                        self.send_suppressed_alert_details(
+                            reason="resolved",
+                            condition_id=condition_id,
+                            outcome_index=outcome_index,
+                            wallets=wallets,
+                            wallet_prices=wallet_prices,
+                            market_title=market_title,
+                            market_slug=market_slug,
+                            current_price=current_price,
+                            side=side,
+                            total_usd=total_usd
+                        )
+                    except Exception as e:
+                        logger.debug(f"Failed to send suppressed alert details: {e}")
+                else:
+                    logger.debug(f"[NOTIFY] Skipping suppressed alert for resolved market: only {len(wallets)} wallet(s), below consensus threshold ({min_consensus})")
                 return False
             # Block closed markets (price >= 0.98 or <= 0.02)
             if price_val >= 0.98 or price_val <= 0.02:
                 logger.error(f"[NOTIFY] BLOCKING: closed market price={price_val}, condition={condition_id}, outcome={outcome_index}")
-                # Send suppressed alert details to reports
-                try:
-                    self.send_suppressed_alert_details(
-                        reason="price_high",
-                        condition_id=condition_id,
-                        outcome_index=outcome_index,
-                        wallets=wallets,
-                        wallet_prices=wallet_prices,
-                        market_title=market_title,
-                        market_slug=market_slug,
-                        current_price=current_price,
-                        side=side,
-                        total_usd=total_usd
-                    )
-                except Exception as e:
-                    logger.debug(f"Failed to send suppressed alert details: {e}")
+                # Only send suppressed alert if we have consensus (multiple wallets)
+                if len(wallets) >= min_consensus:
+                    try:
+                        self.send_suppressed_alert_details(
+                            reason="price_high",
+                            condition_id=condition_id,
+                            outcome_index=outcome_index,
+                            wallets=wallets,
+                            wallet_prices=wallet_prices,
+                            market_title=market_title,
+                            market_slug=market_slug,
+                            current_price=current_price,
+                            side=side,
+                            total_usd=total_usd
+                        )
+                    except Exception as e:
+                        logger.debug(f"Failed to send suppressed alert details: {e}")
+                else:
+                    logger.debug(f"[NOTIFY] Skipping suppressed alert for closed market: only {len(wallets)} wallet(s), below consensus threshold ({min_consensus})")
                 return False
             
             # For display: Avoid rounding up to 1.000 when price is extremely close to 1
@@ -239,24 +283,115 @@ class TelegramNotifier:
                 display_price = 0.0
             current_price_str = f"$\u2009{display_price:.3f}"
         else:
-            # Price is None - block to be safe
-            logger.error(f"[NOTIFY] BLOCKING: price is None, condition={condition_id}, outcome={outcome_index}")
-            # Send suppressed alert details to reports
+            # Price is None - could mean API error or market is closed
+            # ALWAYS check if market is closed first (more reliable than price check)
+            market_closed = False
             try:
-                self.send_suppressed_alert_details(
-                    reason="price_none",
-                    condition_id=condition_id,
-                    outcome_index=outcome_index,
-                    wallets=wallets,
-                    wallet_prices=wallet_prices,
-                    market_title=market_title,
-                    market_slug=market_slug,
-                    current_price=None,
-                    side=side,
-                    total_usd=total_usd
-                )
+                # Try to check market status via API (same logic as is_market_active)
+                url = f"https://clob.polymarket.com/markets/{condition_id}"
+                response = self._make_authenticated_get(url, timeout=10)
+                if response.status_code == 200:
+                    data = response.json()
+                    # Check if market is closed (multiple indicators)
+                    if data.get("closed") is True:
+                        market_closed = True
+                        logger.debug(f"Market {condition_id[:20]}... marked as closed (closed flag)")
+                    
+                    # Check end_date
+                    if data.get("end_date_iso"):
+                        from datetime import datetime, timezone
+                        try:
+                            end_date_str = data["end_date_iso"].replace("Z", "+00:00")
+                            end_date = datetime.fromisoformat(end_date_str)
+                            if end_date.tzinfo is None:
+                                end_date = end_date.replace(tzinfo=timezone.utc)
+                            current_time = datetime.now(timezone.utc)
+                            if current_time > end_date:
+                                market_closed = True
+                                logger.debug(f"Market {condition_id[:20]}... closed (end_date passed: {end_date.isoformat()})")
+                        except Exception as e:
+                            logger.debug(f"Failed to parse end_date: {e}")
+                    
+                    # Check status field
+                    status = str(data.get("status") or "").lower()
+                    if status in {"resolved", "finished", "closed", "ended", "finalized"}:
+                        market_closed = True
+                        logger.debug(f"Market {condition_id[:20]}... closed (status: {status})")
+                    
+                    # Check active flag
+                    if data.get("active") is False:
+                        market_closed = True
+                        logger.debug(f"Market {condition_id[:20]}... closed (active=False)")
+                    
+                    # Also check if tokens exist and have extreme prices (resolved market)
+                    tokens = data.get("tokens", [])
+                    if tokens and outcome_index < len(tokens):
+                        token = tokens[outcome_index]
+                        for price_key in ("last_price", "price", "mark_price"):
+                            price_val = token.get(price_key)
+                            if isinstance(price_val, (int, float)):
+                                price_float = float(price_val)
+                                # Extreme prices indicate resolved/closed market
+                                if price_float >= 0.999 or price_float <= 0.001:
+                                    market_closed = True
+                                    logger.debug(f"Market {condition_id[:20]}... closed (extreme price: {price_float})")
+                                    break
+                elif response.status_code == 404:
+                    # Market not found - likely closed/removed
+                    market_closed = True
+                    logger.debug(f"Market {condition_id[:20]}... not found (404), assuming closed")
             except Exception as e:
-                logger.debug(f"Failed to send suppressed alert details: {e}")
+                logger.debug(f"Failed to check market status: {e}")
+                # If we can't check, assume closed to be safe (fail-safe)
+                # But only if we have consensus (to avoid too many false positives)
+                if len(wallets) >= 2:
+                    market_closed = True
+                    logger.debug(f"Market status check failed, assuming closed (fail-safe)")
+            
+            if market_closed:
+                # Market is closed - use market_closed reason
+                # Only send suppressed alert if we have consensus (multiple wallets)
+                if len(wallets) >= min_consensus:
+                    logger.error(f"[NOTIFY] BLOCKING: market closed (price unavailable), condition={condition_id}, outcome={outcome_index}")
+                    try:
+                        self.send_suppressed_alert_details(
+                            reason="market_closed",
+                            condition_id=condition_id,
+                            outcome_index=outcome_index,
+                            wallets=wallets,
+                            wallet_prices=wallet_prices,
+                            market_title=market_title,
+                            market_slug=market_slug,
+                            current_price=None,
+                            side=side,
+                            total_usd=total_usd
+                        )
+                    except Exception as e:
+                        logger.debug(f"Failed to send suppressed alert details: {e}")
+                else:
+                    logger.debug(f"[NOTIFY] Skipping suppressed alert for closed market: only {len(wallets)} wallet(s), below consensus threshold ({min_consensus})")
+            else:
+                # Price is None but market appears active - could be API error
+                logger.error(f"[NOTIFY] BLOCKING: price is None (API error?), condition={condition_id}, outcome={outcome_index}")
+                # Only send suppressed alert if we have consensus (multiple wallets)
+                if len(wallets) >= min_consensus:
+                    try:
+                        self.send_suppressed_alert_details(
+                            reason="price_none",
+                            condition_id=condition_id,
+                            outcome_index=outcome_index,
+                            wallets=wallets,
+                            wallet_prices=wallet_prices,
+                            market_title=market_title,
+                            market_slug=market_slug,
+                            current_price=None,
+                            side=side,
+                            total_usd=total_usd
+                        )
+                    except Exception as e:
+                        logger.debug(f"Failed to send suppressed alert details: {e}")
+                else:
+                    logger.debug(f"[NOTIFY] Skipping suppressed alert for price_none: only {len(wallets)} wallet(s), below consensus threshold ({min_consensus})")
             return False
 
         # Build message in Markdown style per new template
@@ -324,7 +459,10 @@ Current price: *{current_price_str}*{end_time_info}
         else:
             logger.warning(f"Sending alert to chat_id={self.chat_id}, topic_id=None (may not be in forum)")
         
-        return self.send_message(message, reply_markup=reply_markup, chat_id=self.chat_id, message_thread_id=self.topic_id)
+        # Route ALL consensus alerts to reports channel (as requested)
+        target_chat = self.reports_chat_id
+        
+        return self.send_message(message, reply_markup=reply_markup, chat_id=target_chat, message_thread_id=self.topic_id)
     
     def send_startup_notification(self, wallet_count: int, tracked_count: int) -> bool:
         """Send startup notification with system status to reports channel"""
@@ -375,6 +513,16 @@ _{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_"""
 _{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_"""
         return self.send_message(message, chat_id=self.reports_chat_id)
     
+    def send_error_report(self, counters: Dict[str, int]) -> bool:
+        """Send aggregated error counters to reports channel"""
+        lines = [f"• {k}: {v}" for k, v in counters.items()]
+        message = f"""🧯 *Errors Report (last hour)*
+
+{chr(10).join(lines)}
+
+_{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_"""
+        return self.send_message(message, chat_id=self.reports_chat_id)
+    
     def send_suppressed_alert_details(self, reason: str, condition_id: str, outcome_index: int,
                                      wallets: List[str], wallet_prices: Dict[str, float] = {},
                                      market_title: str = "", market_slug: str = "",
@@ -395,11 +543,19 @@ _{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_"""
             side: Trade side (BUY/SELL)
             total_usd: Total USD position size
         """
-        # Build market URL
+        # Build market URL - try to get slug from API if not provided
+        if not market_slug:
+            market_slug = self._get_market_slug(condition_id)
+        
+        # Use /event/ format (correct for Polymarket)
         if market_slug:
-            market_url = f"https://polymarket.com/event/{market_slug}"
+            # Remove any leading/trailing slashes and ensure clean slug
+            slug_clean = market_slug.strip().strip('/')
+            market_url = f"https://polymarket.com/event/{slug_clean}"
         else:
-            market_url = f"https://polymarket.com/event/{condition_id}"
+            # Fallback: try to construct from condition_id or use search
+            # Note: condition_id URLs don't work well, so use search as last resort
+            market_url = f"https://polymarket.com/search?q={condition_id[:20]}"
         
         # Format wallets list
         wallets_list = []
@@ -454,33 +610,72 @@ _{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_"""
     def send_wallet_collection_summary(self, total_found: int, filtered_count: int, 
                                      criteria: Dict[str, Any]) -> bool:
         """Send summary of wallet collection process to reports channel"""
+        
+        # Get criteria values
+        min_trades = criteria.get('min_trades', 6)
+        min_win_rate = criteria.get('min_win_rate', 0.65)
+        max_daily_freq = criteria.get('max_daily_freq', 35.0)
+        
+        # Build message
         message = f"""📈 *Wallet Collection Complete*
 
 📊 *Collection Results:*
 • Wallets found: {total_found}
 • Wallets meeting criteria: {filtered_count}
-• Min trades: {criteria.get('min_trades', 50)}
-• Min win rate: {criteria.get('min_win_rate', 0.65):.1%}
-• Max daily frequency: {criteria.get('max_daily_freq', 10.0)}
+• Min trades: {min_trades}
+• Min win rate: {min_win_rate:.1%}
+• Max daily frequency: {max_daily_freq}"""
+        
+        # Add rejection breakdown if analytics_stats available
+        analytics_stats = criteria.get('analytics_stats')
+        if analytics_stats:
+            rejected_total = (
+                analytics_stats.get('below_trades', 0) +
+                analytics_stats.get('below_winrate', 0) +
+                analytics_stats.get('above_freq', 0) +
+                analytics_stats.get('missing_stats', 0)
+            )
+            
+            if rejected_total > 0:
+                message += f"""
 
-_{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_"""
+❌ *Rejected:*
+• Low trades: {analytics_stats.get('below_trades', 0)}
+• Low win rate: {analytics_stats.get('below_winrate', 0)}
+• High daily frequency: {analytics_stats.get('above_freq', 0)}
+• Missing stats: {analytics_stats.get('missing_stats', 0)}"""
+        
+        message += f"\n\n_{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')} UTC_"
         
         return self.send_message(message, chat_id=self.reports_chat_id)
     
     def _get_market_slug(self, condition_id: str) -> str:
         """Get market slug from API"""
         try:
-            import requests
-            
-            # Try CLOB API first (most reliable for markets)
+            # Try authenticated request first (if available)
             url = f"https://clob.polymarket.com/markets/{condition_id}"
-            response = requests.get(url, timeout=5)
+            response = self._make_authenticated_get(url, timeout=10)
             if response.status_code == 200:
                 data = response.json()
-                slug = data.get('market_slug') or data.get('slug')
+                # Try multiple possible slug fields (market_slug is the most common)
+                slug = (data.get('market_slug') or 
+                       data.get('slug') or 
+                       data.get('question_slug') or
+                       data.get('event_slug'))
                 if slug:
+                    # Clean slug (remove any URL parts if present)
+                    slug = str(slug).strip().strip('/')
+                    # Remove protocol and domain if present
+                    if 'polymarket.com' in slug:
+                        slug = slug.split('polymarket.com/')[-1].strip('/')
+                    # Remove /event/ or /market/ prefix if present
+                    if slug.startswith('event/'):
+                        slug = slug[6:]
+                    elif slug.startswith('market/'):
+                        slug = slug[7:]
                     return slug
-                    
+            elif response.status_code == 404:
+                logger.debug(f"Market {condition_id[:20]}... not found (404)")
         except Exception as e:
             logger.debug(f"Failed to get market slug from API: {e}")
         
@@ -489,11 +684,9 @@ _{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_"""
     def _get_outcome_name(self, condition_id: str, outcome_index: int) -> str:
         """Get outcome name (Yes/No/etc) from API"""
         try:
-            import requests
-            
             # Try CLOB API
             url = f"https://clob.polymarket.com/markets/{condition_id}"
-            response = requests.get(url, timeout=5)
+            response = self._make_authenticated_get(url, timeout=5)
             if response.status_code == 200:
                 data = response.json()
                 tokens = data.get('tokens', [])
@@ -510,11 +703,9 @@ _{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_"""
     def _get_market_title(self, condition_id: str) -> str:
         """Get market title and slug from API"""
         try:
-            import requests
-            
             # Try CLOB API first (most reliable for markets)
             url2 = f"https://clob.polymarket.com/markets/{condition_id}"
-            response2 = requests.get(url2, timeout=5)
+            response2 = self._make_authenticated_get(url2, timeout=5)
             if response2.status_code == 200:
                 data = response2.json()
                 # Try multiple possible title fields
@@ -524,7 +715,7 @@ _{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_"""
             
             # Try Data API as fallback
             url = f"https://data-api.polymarket.com/condition/{condition_id}"
-            response = requests.get(url, timeout=5)
+            response = self._make_authenticated_get(url, timeout=5)
             
             if response.status_code == 200:
                 data = response.json()
@@ -541,9 +732,8 @@ _{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_"""
     def _get_current_price(self, condition_id: str, outcome_index: int) -> Optional[float]:
         """Try to fetch current last price for the given market outcome from CLOB API"""
         try:
-            import requests
             url = f"https://clob.polymarket.com/markets/{condition_id}"
-            resp = requests.get(url, timeout=5)
+            resp = self._make_authenticated_get(url, timeout=5)
             if resp.status_code != 200:
                 return None
             data = resp.json()
