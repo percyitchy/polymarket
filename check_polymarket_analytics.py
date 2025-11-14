@@ -22,7 +22,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def check_new_wallets_from_analytics(limit: int = 2000):
+def check_new_wallets_from_analytics(limit: int = 2500):
     """Check for new wallets from polymarketanalytics.com and add to queue"""
     load_dotenv()
     
@@ -92,6 +92,6 @@ def check_new_wallets_from_analytics(limit: int = 2000):
 
 
 if __name__ == "__main__":
-    limit = int(os.getenv("POLYMARKET_ANALYTICS_CHECK_LIMIT", "2000"))
+    limit = int(os.getenv("POLYMARKET_ANALYTICS_CHECK_LIMIT", "2500"))
     check_new_wallets_from_analytics(limit=limit)
 

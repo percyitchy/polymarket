@@ -245,6 +245,24 @@ MIN_CONSENSUS=5              # Require 5+ wallets
 ALERT_WINDOW_MIN=15          # 15-minute window
 ```
 
+### Debug: All-Time Volume Leaderboard
+
+For debugging the problematic `overall/all/volume` leaderboard page, there's a separate robust extraction script:
+
+```bash
+python3 robust_all_volume_leaderboard.py \
+  --url "https://polymarket.com/leaderboard/overall/all/volume" \
+  --proxy "quality.proxywing.com:8888" \
+  --out-dir ./debug_all_volume_run
+```
+
+The script saves:
+- `debug_all_volume.html` - Full page HTML
+- `debug_all_volume.png` - Full page screenshot
+- `addresses.txt` - Extracted wallet addresses
+
+This script uses extended timeouts (90s), multiple retry attempts, scroll-based loading, and regex fallback extraction. It's designed as a standalone debugging tool and is not integrated into the main scraper.
+
 ## Security Notes
 
 - Bot token should be kept secret

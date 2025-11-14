@@ -33,6 +33,12 @@ ADDRESS_RE = re.compile(r'0x[a-fA-F0-9]{40}')
 def get_proxy_config():
     """Get proxy configuration from environment"""
     load_dotenv()
+    
+    # Check global proxy enable flag (default: False - proxies disabled)
+    enable_proxies = os.getenv("ENABLE_PROXIES", "false").lower() in ("true", "1", "yes")
+    if not enable_proxies:
+        return None
+    
     proxy_str = os.getenv("POLYMARKET_PROXIES", "")
     if proxy_str:
         proxies = [p.strip() for p in proxy_str.split(",") if p.strip()]

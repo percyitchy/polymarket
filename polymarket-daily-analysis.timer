@@ -1,0 +1,19 @@
+[Unit]
+Description=Run Polymarket Daily Wallet Analysis
+Requires=polymarket-daily-analysis.service
+
+[Timer]
+# Run daily at 03:00 UTC (after main bot has been running)
+# Adjust timezone as needed
+OnCalendar=daily
+OnCalendar=*-*-* 03:00:00
+# If system was off, run immediately on boot (within 1 hour)
+OnBootSec=1h
+# If missed, run as soon as possible
+Persistent=true
+# Randomize start time by up to 30 minutes to avoid thundering herd
+RandomizedDelaySec=30m
+
+[Install]
+WantedBy=timers.target
+

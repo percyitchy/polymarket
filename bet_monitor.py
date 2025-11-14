@@ -114,8 +114,21 @@ class BetDetector:
                 val = val.split('#')[0]
             return int(val.strip())
         
+        # Configuration - handle inline comments in env vars
+        def _get_int(key, default):
+            val = os.getenv(key, str(default))
+            if '#' in val:
+                val = val.split('#')[0]
+            return int(val.strip())
+        
+        def _get_float(key, default):
+            val = os.getenv(key, str(default))
+            if '#' in val:
+                val = val.split('#')[0]
+            return float(val.strip())
+        
         self.min_consensus = _get_int('MIN_CONSENSUS', 2)
-        self.alert_window_min = _get_int('ALERT_WINDOW_MIN', 15)
+        self.alert_window_min = _get_float('ALERT_WINDOW_MIN', 15.0)
         self.poll_interval = _get_int('POLL_INTERVAL_SEC', 7)
         
         # Polymarket API endpoints

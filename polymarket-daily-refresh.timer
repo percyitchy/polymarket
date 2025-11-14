@@ -1,0 +1,13 @@
+[Unit]
+Description=Run Polymarket Daily Wallet Refresh
+Requires=polymarket-daily-refresh.service
+
+[Timer]
+# Run daily at 02:00 UTC (adjust timezone as needed)
+OnCalendar=daily
+OnCalendar=*-*-* 02:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+

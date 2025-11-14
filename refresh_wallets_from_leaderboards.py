@@ -34,13 +34,13 @@ async def main():
     # Initialize notifier
     notifier = PolymarketNotifier()
     
-    # Configure to scan only week and month leaderboards
+    # Configure to scan only week and month leaderboards (first 20 pages each)
     notifier.leaderboard_urls = [
         "https://polymarket.com/leaderboard/overall/weekly/profit",
         "https://polymarket.com/leaderboard/overall/monthly/profit"
     ]
     
-    logger.info(f"Scanning leaderboards: {notifier.leaderboard_urls}")
+    logger.info(f"Scanning leaderboards (first 20 pages each): {notifier.leaderboard_urls}")
     
     # Start wallet analyzer workers
     notifier.wallet_analyzer.start_workers()

@@ -1,0 +1,25 @@
+[
+  {
+    "proxy_index": 1,
+    "proxy": "pkg-private2-country-de:nenbaisd31wsawmw@quality.proxywing.com:8888",
+    "attempts": [
+      {
+        "attempt": 1,
+        "duration_s": 12.15,
+        "status": "success",
+        "response_status": 200
+      }
+    ],
+    "final_status": "partial",
+    "response_status": 200,
+    "selectors_found": [],
+    "addresses_count": 49,
+    "addresses_file": "debug_all_volume_run/addresses_proxy_1.txt",
+    "html_file": "debug_all_volume_run/debug_proxy_1.html",
+    "screenshot_file": "debug_all_volume_run/debug_proxy_1.png",
+    "notes": [
+      "Extracted via regex fallback from HTML",
+      "Addresses extracted via fallback (no table selector found)"
+    ]
+  }
+]

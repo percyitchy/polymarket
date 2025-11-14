@@ -80,6 +80,7 @@ class PolymarketDB:
                 "ALTER TABLE alerts_sent ADD COLUMN price REAL",
                 "ALTER TABLE alerts_sent ADD COLUMN wallets_csv TEXT",
                 "ALTER TABLE alerts_sent ADD COLUMN wallet_details_json TEXT",
+                "ALTER TABLE alerts_sent ADD COLUMN first_total_usd REAL",
                 "ALTER TABLE wallets ADD COLUMN last_trade_at TEXT",
                 "ALTER TABLE wallets ADD COLUMN source TEXT",  # Ensure source column exists
             ):
@@ -263,10 +264,15 @@ class PolymarketDB:
             logger.error(f"Error getting wallet {address}: {e}")
             return None
     
-    def get_tracked_wallets(self, min_trades: int = 6, max_trades: int = 1200,
+    def get_tracked_wallets(self, min_trades: int = 6, max_trades: int = 1500,
                           min_win_rate: float = 0.65, max_win_rate: float = 1.0,
                           max_daily_freq: float = 35.0, limit: int = 200) -> List[str]:
-        """Get wallets that meet tracking criteria (excluding wallets with last trade > 3 months ago)"""
+        """Get wallets that meet tracking criteria.
+        
+        Activity filter logic (matching wallet_analyzer.py):
+        - If last_trade_at IS NULL: include wallet (activity unknown, decide by other criteria)
+        - If last_trade_at is not NULL: only include if last_trade_at >= 90 days ago
+        """
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
@@ -278,8 +284,7 @@ class PolymarketDB:
                     WHERE traded_total >= ? AND traded_total <= ?
                     AND win_rate >= ? AND win_rate <= ?
                     AND (daily_trading_frequency IS NULL OR daily_trading_frequency <= ?)
-                    AND last_trade_at IS NOT NULL
-                    AND last_trade_at >= ?
+                    AND (last_trade_at IS NULL OR last_trade_at >= ?)
                     ORDER BY realized_pnl_total DESC, traded_total DESC
                     LIMIT ?
                 """, (min_trades, max_trades, min_win_rate, max_win_rate, 
@@ -304,14 +309,14 @@ class PolymarketDB:
                 
                 # Wallets meeting criteria (updated to match actual tracking criteria)
                 # Use same criteria as get_tracked_wallets() for consistency
+                # Activity filter: include wallets with NULL last_trade_at OR recent last_trade_at
                 three_months_ago = (datetime.now(timezone.utc) - timedelta(days=90)).isoformat()
                 cursor.execute("""
                     SELECT COUNT(*) FROM wallets
-                    WHERE traded_total >= 6 AND traded_total <= 1200
+                    WHERE traded_total >= 6 AND traded_total <= 1500
                     AND win_rate >= 0.65 AND win_rate <= 1.0
                     AND (daily_trading_frequency IS NULL OR daily_trading_frequency <= 35.0)
-                    AND last_trade_at IS NOT NULL
-                    AND datetime(last_trade_at) >= datetime(?)
+                    AND (last_trade_at IS NULL OR datetime(last_trade_at) >= datetime(?))
                 """, (three_months_ago,))
                 stats['tracked_wallets'] = cursor.fetchone()[0]
                 
@@ -333,7 +338,7 @@ class PolymarketDB:
             logger.error(f"Error getting wallet stats: {e}")
             return {}
     
-    def cleanup_old_wallets(self, max_trades: int = 1200, max_wallets: int = 200):
+    def cleanup_old_wallets(self, max_trades: int = 1500, max_wallets: int = 200):
         """Remove wallets that exceed limits"""
         try:
             with self.get_connection() as conn:
@@ -511,13 +516,105 @@ class PolymarketDB:
             logger.error(f"Error checking alert status: {e}")
             return False
     
+    def is_suppressed_alert_sent(self, condition_id: str, outcome_index: int, 
+                                 side: str, reason: str, 
+                                 window_minutes: float = 30.0) -> bool:
+        """
+        Check if suppressed alert was already sent for this market/outcome/side/reason
+        within the last window_minutes minutes
+        
+        Args:
+            condition_id: Market condition ID
+            outcome_index: Outcome index
+            side: Trade side (BUY/SELL)
+            reason: Suppression reason (e.g., "price_none", "market_closed")
+            window_minutes: Time window in minutes to check for recent suppressed alerts
+        
+        Returns:
+            True if suppressed alert was sent recently, False otherwise
+        """
+        try:
+            from datetime import datetime, timezone, timedelta
+            
+            # Calculate time threshold
+            threshold_time = datetime.now(timezone.utc) - timedelta(minutes=window_minutes)
+            threshold_iso = threshold_time.isoformat()
+            
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                # Check if there's a suppressed alert for this market/outcome/side/reason
+                # in the last window_minutes minutes
+                # We'll use a simple key based on condition_id, outcome_index, side, and reason
+                suppressed_key = f"SUPPRESSED:{condition_id}:{outcome_index}:{side}:{reason}"
+                
+                # Check alerts_sent table for suppressed alerts
+                # We'll look for alerts with a specific pattern in the alert_key
+                cursor.execute("""
+                    SELECT 1 FROM alerts_sent
+                    WHERE condition_id = ? 
+                    AND outcome_index = ?
+                    AND sent_at >= ?
+                    AND alert_key LIKE ?
+                    LIMIT 1
+                """, (condition_id, outcome_index, threshold_iso, f"%{suppressed_key}%"))
+                
+                return cursor.fetchone() is not None
+                
+        except Exception as e:
+            logger.debug(f"Error checking suppressed alert status: {e}")
+            return False
+    
+    def mark_suppressed_alert_sent(self, condition_id: str, outcome_index: int,
+                                  side: str, reason: str, wallet_count: int = 0) -> bool:
+        """
+        Mark suppressed alert as sent
+        
+        Args:
+            condition_id: Market condition ID
+            outcome_index: Outcome index
+            side: Trade side (BUY/SELL)
+            reason: Suppression reason
+            wallet_count: Number of wallets in consensus
+        
+        Returns:
+            True if marked successfully, False otherwise
+        """
+        try:
+            suppressed_key = f"SUPPRESSED:{condition_id}:{outcome_index}:{side}:{reason}"
+            key_hash = self.sha(suppressed_key)
+            
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT INTO alerts_sent(
+                        condition_id, outcome_index, alert_key, 
+                        wallet_count, sent_at, side
+                    )
+                    VALUES(?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(alert_key) DO UPDATE SET
+                        sent_at = excluded.sent_at,
+                        wallet_count = excluded.wallet_count
+                """, (
+                    condition_id, outcome_index, key_hash,
+                    wallet_count, self.now_iso(), side
+                ))
+                conn.commit()
+                return True
+                
+        except Exception as e:
+            logger.error(f"Error marking suppressed alert as sent: {e}")
+            return False
+    
     def mark_alert_sent(self, condition_id: str, outcome_index: int, 
                        wallet_count: int, first_ts: float, last_ts: float, alert_key: str = "", side: str = "BUY",
-                       price: float = 0.0, wallets_csv: str = "", wallet_details_json: str = "") -> bool:
+                       price: float = 0.0, wallets_csv: str = "", wallet_details_json: str = "", 
+                       total_usd: float = 0.0, is_repeat: bool = False) -> bool:
         """Mark alert as sent
         
         Args:
             wallet_details_json: JSON string with wallet details: [{"wallet": "...", "usd_amount": 123.45, "price": 0.32}, ...]
+            total_usd: Total USD position size for this alert
+            is_repeat: If True, this is a repeat alert (position increased >2x), update first_total_usd
         """
         try:
             if alert_key:
@@ -530,11 +627,24 @@ class PolymarketDB:
             
             with self.get_connection() as conn:
                 cursor = conn.cursor()
+                
+                if is_repeat:
+                    # Update first_total_usd for the first alert of this (condition_id, outcome_index, side)
+                    cursor.execute("""
+                        UPDATE alerts_sent
+                        SET first_total_usd = ?
+                        WHERE condition_id = ? AND outcome_index = ? AND side = ?
+                        AND first_total_usd IS NULL
+                        ORDER BY sent_at ASC
+                        LIMIT 1
+                    """, (total_usd, condition_id, outcome_index, side))
+                    logger.info(f"[Alerts] Updated first_total_usd to ${total_usd:.2f} for repeat alert")
+                
                 cursor.execute("""
                     INSERT INTO alerts_sent(alert_key, sent_at, condition_id, 
-                                          outcome_index, wallet_count, side, price, wallets_csv, wallet_details_json)
-                    VALUES(?,?,?,?,?,?,?,?,?)
-                """, (key, now_iso, condition_id, outcome_index, wallet_count, side, float(price or 0.0), wallets_csv, wallet_details_json))
+                                          outcome_index, wallet_count, side, price, wallets_csv, wallet_details_json, first_total_usd)
+                    VALUES(?,?,?,?,?,?,?,?,?,?)
+                """, (key, now_iso, condition_id, outcome_index, wallet_count, side, float(price or 0.0), wallets_csv, wallet_details_json, total_usd if not is_repeat else None))
                 
                 conn.commit()
                 
@@ -542,13 +652,48 @@ class PolymarketDB:
                 wallet_addresses = wallets_csv.split(",") if wallets_csv else []
                 logger.info(
                     f"[Alerts] Stored alert {alert_id} for market={condition_id[:20]}..., "
-                    f"outcome={outcome_index}, wallets={len(wallet_addresses)}, side={side}, price={price:.4f}"
+                    f"outcome={outcome_index}, wallets={len(wallet_addresses)}, side={side}, price={price:.4f}, total_usd=${total_usd:.2f}"
                 )
                 
                 return True
                 
         except Exception as e:
             logger.error(f"Error marking alert as sent for {condition_id}:{outcome_index}: {e}", exc_info=True)
+            return False
+    
+    def get_first_total_usd(self, condition_id: str, outcome_index: int, side: str) -> Optional[float]:
+        """Get first total_usd for a given (condition_id, outcome_index, side) combination"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT first_total_usd FROM alerts_sent
+                    WHERE condition_id = ? AND outcome_index = ? AND side = ?
+                    AND first_total_usd IS NOT NULL
+                    ORDER BY sent_at ASC
+                    LIMIT 1
+                """, (condition_id, outcome_index, side))
+                row = cursor.fetchone()
+                if row and row[0] is not None:
+                    return float(row[0])
+                return None
+        except Exception as e:
+            logger.error(f"Error getting first_total_usd: {e}")
+            return None
+    
+    def has_alert_for_market(self, condition_id: str, outcome_index: int, side: str) -> bool:
+        """Check if any alert was sent for this (condition_id, outcome_index, side) combination"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT 1 FROM alerts_sent
+                    WHERE condition_id = ? AND outcome_index = ? AND side = ?
+                    LIMIT 1
+                """, (condition_id, outcome_index, side))
+                return cursor.fetchone() is not None
+        except Exception as e:
+            logger.error(f"Error checking alert for market: {e}")
             return False
 
     def has_recent_alert(self, condition_id: str, outcome_index: int, side: str, cooldown_min: float) -> bool:
@@ -595,6 +740,26 @@ class PolymarketDB:
         except Exception as e:
             logger.error(f"Error getting recent alerts: {e}")
             return []
+    
+    def get_recent_alerts_count(self, since: str = None) -> int:
+        """Get count of alerts sent since a given timestamp (ISO format)"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                if since:
+                    cursor.execute(
+                        """
+                        SELECT COUNT(*) FROM alerts_sent
+                        WHERE datetime(sent_at) >= datetime(?)
+                        """,
+                        (since,)
+                    )
+                else:
+                    cursor.execute("SELECT COUNT(*) FROM alerts_sent")
+                return cursor.fetchone()[0]
+        except Exception as e:
+            logger.error(f"Error getting recent alerts count: {e}")
+            return 0
     
     def cleanup_old_data(self, days_to_keep: int = 7):
         """Clean up old data to prevent database bloat"""

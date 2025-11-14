@@ -1,0 +1,47 @@
+# Файлы для предоставления ChatGPT
+
+## Обязательные файлы (критичные для проблемы):
+
+1. polymarket_notifier.py
+   - Строки 2543-2605: метод run() - запуск бота
+   - Строки 2300-2510: метод monitor_wallets() - цикл мониторинга
+   - Строки 664-808: метод collect_wallets_from_leaderboards() - сбор кошельков
+
+2. fetch_polymarket_analytics_api.py
+   - Весь файл - здесь происходят таймауты API
+
+3. CONTEXT_FOR_CHATGPT.md (этот файл)
+   - Описание проблемы и контекст
+
+## Дополнительные файлы (для полного контекста):
+
+4. db.py
+   - Методы работы с БД
+   - Особенно: get_tracked_wallets(), update_rolling_window()
+
+5. env.example
+   - Конфигурация переменных окружения
+
+6. utils/http_client.py (если используется)
+   - HTTP клиент с обработкой прокси
+
+## Команды для копирования файлов:
+
+```bash
+# Основные файлы
+cat polymarket_notifier.py
+cat fetch_polymarket_analytics_api.py
+cat CONTEXT_FOR_CHATGPT.md
+
+# Дополнительные (если нужен полный контекст)
+cat db.py
+cat env.example
+```
+
+## Краткое описание проблемы для ChatGPT:
+
+"Мой бот Polymarket Signal Bot зависает при запуске. 
+Проблема: сбор кошельков из API блокирует запуск мониторинга.
+В логах видно 'Starting wallet collection...' но нет 'Starting wallet monitoring loop...'.
+API запросы к polymarketanalytics.com падают с таймаутами.
+Нужно сделать так, чтобы мониторинг запускался независимо от успеха сбора кошельков."

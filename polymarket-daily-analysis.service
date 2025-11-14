@@ -1,0 +1,33 @@
+[Unit]
+Description=Polymarket Daily Wallet Analysis
+Description=Collects wallets from all sources and processes them through analysis queue
+After=network.target
+Requires=network.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/polymarket-bot
+Environment="PATH=/opt/polymarket-bot/venv/bin:/usr/local/bin:/usr/bin:/bin"
+EnvironmentFile=/opt/polymarket-bot/.env
+
+# Main execution
+ExecStart=/opt/polymarket-bot/venv/bin/python3 /opt/polymarket-bot/daily_wallet_analysis.py
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=polymarket-daily-analysis
+
+# Timeouts
+TimeoutStartSec=3600
+TimeoutStopSec=300
+
+# Restart policy (only on failure, not for oneshot)
+Restart=on-failure
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target
+

@@ -10,6 +10,9 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 from dotenv import load_dotenv
 
+# Import datetime module to avoid conflicts with datetime class
+import datetime as dt_module
+
 # Load environment variables
 load_dotenv()
 
@@ -23,7 +26,8 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 class TelegramNotifier:
-    def __init__(self, bot_token: Optional[str] = None, chat_id: Optional[str] = None, reports_chat_id: Optional[str] = None):
+    def __init__(self, bot_token: Optional[str] = None, chat_id: Optional[str] = None, 
+                 reports_chat_id: Optional[str] = None, hashdive_client: Optional[Any] = None):
         self.bot_token = bot_token or os.getenv("TELEGRAM_BOT_TOKEN")
         self.chat_id = chat_id or os.getenv("TELEGRAM_CHAT_ID")  # public signals
         # admin/reports channel; default to provided id if env not set
@@ -33,6 +37,9 @@ class TelegramNotifier:
         # Topic ID for forum groups (optional)
         topic_id_str = os.getenv("TELEGRAM_TOPIC_ID")
         self.topic_id = int(topic_id_str) if topic_id_str and topic_id_str.isdigit() else None
+        
+        # Store HashiDive client for price fallback
+        self.hashdive_client = hashdive_client
         
         # Initialize Polymarket authentication (optional)
         self.polymarket_auth = None
@@ -98,20 +105,20 @@ class TelegramNotifier:
         try:
             response = requests.post(url, json=payload, timeout=15)
             response.raise_for_status()
-            logger.info("Telegram message sent successfully")
+            logger.info(f"[NOTIFY] ✅ Telegram message sent successfully to chat_id={chat_id or self.chat_id}")
             return True
         except requests.exceptions.HTTPError as e:
             # Log response details for debugging
             if hasattr(e.response, 'text'):
-                logger.error(f"Failed to send Telegram message: {e} - Response: {e.response.text[:200]}")
+                logger.error(f"[NOTIFY] ❌ Failed to send Telegram message: {e} - Response: {e.response.text[:200]}")
             else:
-                logger.error(f"Failed to send Telegram message: {e}")
+                logger.error(f"[NOTIFY] ❌ Failed to send Telegram message: {e}")
             return False
         except requests.exceptions.RequestException as e:
-            logger.error(f"Failed to send Telegram message: {e}")
+            logger.error(f"[NOTIFY] ❌ Failed to send Telegram message (RequestException): {e}")
             return False
         except Exception as e:
-            logger.error(f"Unexpected error sending Telegram message: {e}")
+            logger.error(f"[NOTIFY] ❌ Unexpected error sending Telegram message: {e}", exc_info=True)
             return False
     
     def send_consensus_alert(self, condition_id: str, outcome_index: int, 
@@ -121,7 +128,8 @@ class TelegramNotifier:
                            market_slug: str = "", side: str = "BUY",
                            consensus_events: Optional[int] = None,
                            total_usd: Optional[float] = None,
-                           end_date: Optional[datetime] = None) -> bool:
+                           end_date: Optional[dt_module.datetime] = None,
+                           current_price: Optional[float] = None) -> bool:
         """
         Send a consensus buy signal alert
         
@@ -138,28 +146,60 @@ class TelegramNotifier:
             True if sent successfully
         """
         if len(wallets) < min_consensus:
-            logger.warning(f"Not enough wallets for consensus: {len(wallets)} < {min_consensus}")
+            logger.warning(f"[NOTIFY] ⚠️  Not enough wallets for consensus: {len(wallets)} < {min_consensus}")
             return False
+        
+        logger.info(f"[NOTIFY] 📨 Preparing to send consensus alert: {len(wallets)} wallets, condition={condition_id[:20]}... outcome={outcome_index} side={side}")
         
         # We will render specific trader lines below (Markdown)
         # Calculate consensus strength
         strength = self._calculate_consensus_strength(len(wallets), window_minutes)
+        logger.info(f"[NOTIFY] Consensus strength calculated: {strength}")
         
-        # Format market URL - Polymarket uses /market/{slug} (singular, not markets)
-        # This is the correct format that redirects to actual market page
-        if market_slug:
-            market_url = f"https://polymarket.com/market/{market_slug}"
+        # Format market URL - For sports markets, use event slug instead of market slug
+        # Try to get event slug first (for sports markets like NFL/NBA)
+        event_slug = self._get_event_slug(condition_id)
+        
+        if event_slug:
+            # Use event slug for sports markets (e.g., "nfl-nyj-ne-2025-11-13" instead of "nfl-nyj-ne-2025-11-13-total-42pt5-697")
+            slug_clean = event_slug.strip().strip('/')
+            market_url = f"https://polymarket.com/event/{slug_clean}"
+            logger.info(f"[URL] Using event slug for sports market: {slug_clean} (condition_id={condition_id[:20]}...)")
         else:
-            # Fallback: try to get slug from API
-            slug = self._get_market_slug(condition_id)
-            if slug:
-                market_url = f"https://polymarket.com/market/{slug}"
+            # Fallback: Use market slug (current behavior)
+            if not market_slug:
+                market_slug = self._get_market_slug(condition_id)
+            
+            # Use /event/ format (correct for Polymarket)
+            # Try to use slug from API first, then fallback to search
+            if market_slug:
+                # Remove any leading/trailing slashes and ensure clean slug
+                slug_clean = market_slug.strip().strip('/')
+                market_url = f"https://polymarket.com/event/{slug_clean}"
+                logger.info(f"[URL] Using market slug from API: {slug_clean} (fallback from event slug)")
             else:
-                # Last resort: use condition_id (might redirect to search)
-                market_url = f"https://polymarket.com/markets/{condition_id}"
+                # Fallback: use search with question or condition_id
+                try:
+                    url = f"https://clob.polymarket.com/markets/{condition_id}"
+                    response = self._make_authenticated_get(url, timeout=5)
+                    if response.status_code == 200:
+                        data = response.json()
+                        question = data.get('question') or data.get('title') or ""
+                        if question:
+                            # Use question for search (more reliable than condition_id)
+                            import urllib.parse
+                            search_query = urllib.parse.quote(question[:50])  # Limit length
+                            market_url = f"https://polymarket.com/search?q={search_query}"
+                        else:
+                            market_url = f"https://polymarket.com/search?q={condition_id[:20]}"
+                    else:
+                        market_url = f"https://polymarket.com/search?q={condition_id[:20]}"
+                except Exception:
+                    # If API call fails, use condition_id search
+                    market_url = f"https://polymarket.com/search?q={condition_id[:20]}"
         
-        # Current timestamp
-        timestamp_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        # Current timestamp - use dt_module to avoid conflicts
+        timestamp_utc = dt_module.datetime.now(dt_module.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
         
         # side is passed as parameter now
         position_side = side
@@ -220,16 +260,29 @@ class TelegramNotifier:
                 price_str = f" @ ${price:.3f}"
                 wallet_info.append(f"{i}. `{short_addr}`{price_str}")
         
-        # Fetch current price from orderbook/market data
-        current_price = self._get_current_price(condition_id, outcome_index)
+        # Fetch current price with multi-level fallback (if not provided)
+        if current_price is None:
+            logger.info(f"[NOTIFY] 🔍 Fetching current price for condition_id={condition_id[:20]}... outcome={outcome_index}, wallet_prices provided: {len(wallet_prices) if wallet_prices else 0} wallets")
+            current_price = self._get_current_price(
+                condition_id, 
+                outcome_index, 
+                wallet_prices=wallet_prices,
+                hashdive_client=self.hashdive_client,
+                slug=market_slug if market_slug else None
+            )
+            if current_price is None:
+                logger.warning(f"[NOTIFY] ⚠️  Price unavailable after all fallbacks for condition_id={condition_id[:20]}... outcome={outcome_index}, wallet_prices: {wallet_prices}")
+            else:
+                logger.info(f"[NOTIFY] ✅ Got current price: {current_price:.6f} for condition_id={condition_id[:20]}... outcome={outcome_index}")
         
         # CRITICAL FINAL CHECK: Don't send alerts for resolved markets (price = 1.0 or 0.0)
+        # But if price is None, check market status - if active, send alert with Price: N/A
         if current_price is not None:
             price_val = float(current_price)
-            logger.info(f"[NOTIFY PRICE CHECK] condition={condition_id}, outcome={outcome_index}, price={price_val}")
+            logger.info(f"[NOTIFY] Step 10/10: Final price check - condition={condition_id[:20]}... outcome={outcome_index}, price={price_val:.6f}")
             # Block resolved markets (price >= 0.999 or <= 0.001)
             if price_val >= 0.999 or price_val <= 0.001:
-                logger.error(f"[NOTIFY] BLOCKING: resolved market price={price_val}, condition={condition_id}, outcome={outcome_index}")
+                logger.info(f"[NOTIFY] ⏭️  BLOCKED: Market resolved (price={price_val:.6f} >= 0.999 or <= 0.001) condition={condition_id[:20]}... outcome={outcome_index} wallets={len(wallets)}")
                 # Only send suppressed alert if we have consensus (multiple wallets)
                 if len(wallets) >= min_consensus:
                     try:
@@ -243,7 +296,8 @@ class TelegramNotifier:
                             market_slug=market_slug,
                             current_price=current_price,
                             side=side,
-                            total_usd=total_usd
+                            total_usd=total_usd,
+                            market_active=False  # Market is resolved, not active
                         )
                     except Exception as e:
                         logger.debug(f"Failed to send suppressed alert details: {e}")
@@ -252,7 +306,7 @@ class TelegramNotifier:
                 return False
             # Block closed markets (price >= 0.98 or <= 0.02)
             if price_val >= 0.98 or price_val <= 0.02:
-                logger.error(f"[NOTIFY] BLOCKING: closed market price={price_val}, condition={condition_id}, outcome={outcome_index}")
+                logger.info(f"[NOTIFY] ⏭️  BLOCKED: Market closed (price={price_val:.6f} >= 0.98 or <= 0.02) condition={condition_id[:20]}... outcome={outcome_index} wallets={len(wallets)}")
                 # Only send suppressed alert if we have consensus (multiple wallets)
                 if len(wallets) >= min_consensus:
                     try:
@@ -283,14 +337,19 @@ class TelegramNotifier:
                 display_price = 0.0
             current_price_str = f"$\u2009{display_price:.3f}"
         else:
-            # Price is None - could mean API error or market is closed
-            # ALWAYS check if market is closed first (more reliable than price check)
+            # Price is None - check if market is closed
+            # If market is active, send alert with Price: N/A (fail-open approach)
             market_closed = False
             try:
-                # Try to check market status via API (same logic as is_market_active)
+                # Try to check market status via API
                 url = f"https://clob.polymarket.com/markets/{condition_id}"
                 response = self._make_authenticated_get(url, timeout=10)
-                if response.status_code == 200:
+                
+                # Handle 404 first - market not found means it's closed/removed
+                if response.status_code == 404:
+                    market_closed = True
+                    logger.warning(f"[Price] Market {condition_id[:20]}... not found (404) - market closed/removed")
+                elif response.status_code == 200:
                     data = response.json()
                     # Check if market is closed (multiple indicators)
                     if data.get("closed") is True:
@@ -299,13 +358,13 @@ class TelegramNotifier:
                     
                     # Check end_date
                     if data.get("end_date_iso"):
-                        from datetime import datetime, timezone
+                        # Use dt_module to avoid conflicts
                         try:
                             end_date_str = data["end_date_iso"].replace("Z", "+00:00")
-                            end_date = datetime.fromisoformat(end_date_str)
+                            end_date = dt_module.datetime.fromisoformat(end_date_str)
                             if end_date.tzinfo is None:
-                                end_date = end_date.replace(tzinfo=timezone.utc)
-                            current_time = datetime.now(timezone.utc)
+                                end_date = end_date.replace(tzinfo=dt_module.timezone.utc)
+                            current_time = dt_module.datetime.now(dt_module.timezone.utc)
                             if current_time > end_date:
                                 market_closed = True
                                 logger.debug(f"Market {condition_id[:20]}... closed (end_date passed: {end_date.isoformat()})")
@@ -336,23 +395,20 @@ class TelegramNotifier:
                                     market_closed = True
                                     logger.debug(f"Market {condition_id[:20]}... closed (extreme price: {price_float})")
                                     break
-                elif response.status_code == 404:
-                    # Market not found - likely closed/removed
-                    market_closed = True
-                    logger.debug(f"Market {condition_id[:20]}... not found (404), assuming closed")
+                else:
+                    # Other HTTP errors - log but don't assume closed
+                    logger.debug(f"[Price] Market status check returned status {response.status_code} for condition_id={condition_id[:20]}...")
             except Exception as e:
-                logger.debug(f"Failed to check market status: {e}")
-                # If we can't check, assume closed to be safe (fail-safe)
-                # But only if we have consensus (to avoid too many false positives)
-                if len(wallets) >= 2:
-                    market_closed = True
-                    logger.debug(f"Market status check failed, assuming closed (fail-safe)")
+                logger.debug(f"Failed to check market status: {type(e).__name__}: {e}")
+                # If we can't check market status, assume it's active (fail-open)
+                # This allows alerts to be sent even if price lookup failed
+                market_closed = False
+                logger.warning(f"[Price] Market status check failed for condition_id={condition_id}, assuming active (fail-open)")
             
             if market_closed:
-                # Market is closed - use market_closed reason
-                # Only send suppressed alert if we have consensus (multiple wallets)
+                # Market is confirmed closed - send suppressed alert
                 if len(wallets) >= min_consensus:
-                    logger.error(f"[NOTIFY] BLOCKING: market closed (price unavailable), condition={condition_id}, outcome={outcome_index}")
+                    logger.info(f"[NOTIFY] ⏭️  BLOCKED: Market closed (price unavailable) condition={condition_id[:20]}... outcome={outcome_index} wallets={len(wallets)}")
                     try:
                         self.send_suppressed_alert_details(
                             reason="market_closed",
@@ -364,35 +420,19 @@ class TelegramNotifier:
                             market_slug=market_slug,
                             current_price=None,
                             side=side,
-                            total_usd=total_usd
+                            total_usd=total_usd,
+                            market_active=False  # Market is closed, not active
                         )
                     except Exception as e:
                         logger.debug(f"Failed to send suppressed alert details: {e}")
                 else:
                     logger.debug(f"[NOTIFY] Skipping suppressed alert for closed market: only {len(wallets)} wallet(s), below consensus threshold ({min_consensus})")
+                return False
             else:
-                # Price is None but market appears active - could be API error
-                logger.error(f"[NOTIFY] BLOCKING: price is None (API error?), condition={condition_id}, outcome={outcome_index}")
-                # Only send suppressed alert if we have consensus (multiple wallets)
-                if len(wallets) >= min_consensus:
-                    try:
-                        self.send_suppressed_alert_details(
-                            reason="price_none",
-                            condition_id=condition_id,
-                            outcome_index=outcome_index,
-                            wallets=wallets,
-                            wallet_prices=wallet_prices,
-                            market_title=market_title,
-                            market_slug=market_slug,
-                            current_price=None,
-                            side=side,
-                            total_usd=total_usd
-                        )
-                    except Exception as e:
-                        logger.debug(f"Failed to send suppressed alert details: {e}")
-                else:
-                    logger.debug(f"[NOTIFY] Skipping suppressed alert for price_none: only {len(wallets)} wallet(s), below consensus threshold ({min_consensus})")
-            return False
+                # Price is None but market appears active - send alert with Price: N/A (fail-open)
+                logger.warning(f"[Price] Price lookup failed for condition_id={condition_id}, outcome={outcome_index}, sending alert with Price: N/A")
+                current_price_str = "N/A"
+                # Continue to send alert (don't block)
 
         # Build message in Markdown style per new template
         position_display = outcome_name if outcome_name else f"Index {outcome_index}"
@@ -410,9 +450,10 @@ class TelegramNotifier:
         end_time_info = ""
         if end_date:
             try:
-                current_time = datetime.now(timezone.utc)
+                # Use dt_module to avoid conflicts
+                current_time = dt_module.datetime.now(dt_module.timezone.utc)
                 if end_date.tzinfo is None:
-                    end_date = end_date.replace(tzinfo=timezone.utc)
+                    end_date = end_date.replace(tzinfo=dt_module.timezone.utc)
                 
                 # Calculate time remaining
                 time_diff = end_date - current_time
@@ -432,6 +473,9 @@ class TelegramNotifier:
             except Exception as e:
                 logger.debug(f"Error formatting end time: {e}")
 
+        # Format price display - show N/A if unavailable
+        price_display = f"Price: *{current_price_str}*" if current_price_str != "N/A" else "Price: *N/A* (unavailable)"
+
         message = f"""{header}
 
 🎯 *Market:* {market_title}
@@ -442,7 +486,7 @@ class TelegramNotifier:
 
 {chr(10).join(wallet_info)}
 
-Current price: *{current_price_str}*{end_time_info}
+{price_display}{end_time_info}
 
 📅 {timestamp_utc} UTC"""
         
@@ -462,7 +506,20 @@ Current price: *{current_price_str}*{end_time_info}
         # Route ALL consensus alerts to reports channel (as requested)
         target_chat = self.reports_chat_id
         
-        return self.send_message(message, reply_markup=reply_markup, chat_id=target_chat, message_thread_id=self.topic_id)
+        logger.info(f"[NOTIFY] 📤 Sending consensus alert to Telegram (chat_id={target_chat}, topic_id={self.topic_id})")
+        logger.info(f"[NOTIFY] 📤 Calling send_message() to Telegram for condition={condition_id[:20]}... outcome={outcome_index} side={side} wallets={len(wallets)}")
+        try:
+            result = self.send_message(message, reply_markup=reply_markup, chat_id=target_chat, message_thread_id=self.topic_id)
+        except Exception as e:
+            logger.error(f"[NOTIFY] ❌ Exception in send_message(): {e}", exc_info=True)
+            result = False
+        
+        if result:
+            logger.info(f"[NOTIFY] ✅ Consensus alert sent successfully to Telegram: condition={condition_id[:20]}... outcome={outcome_index} side={side} wallets={len(wallets)}")
+        else:
+            logger.error(f"[NOTIFY] ❌ Failed to send consensus alert to Telegram: condition={condition_id[:20]}... outcome={outcome_index} side={side} wallets={len(wallets)}")
+        
+        return result
     
     def send_startup_notification(self, wallet_count: int, tracked_count: int) -> bool:
         """Send startup notification with system status to reports channel"""
@@ -527,7 +584,8 @@ _{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_"""
                                      wallets: List[str], wallet_prices: Dict[str, float] = {},
                                      market_title: str = "", market_slug: str = "",
                                      current_price: Optional[float] = None,
-                                     side: str = "BUY", total_usd: Optional[float] = None) -> bool:
+                                     side: str = "BUY", total_usd: Optional[float] = None,
+                                     market_active: Optional[bool] = None) -> bool:
         """
         Send details of a suppressed alert to reports channel for review
         
@@ -542,20 +600,63 @@ _{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_"""
             current_price: Current market price
             side: Trade side (BUY/SELL)
             total_usd: Total USD position size
+            market_active: Whether market is active (if None, will check if reason indicates closed market)
         """
-        # Build market URL - try to get slug from API if not provided
-        if not market_slug:
-            market_slug = self._get_market_slug(condition_id)
+        # Check if this is a suppressed alert for closed/resolved market
+        # If so, only log to file, don't send to Telegram
+        # Suppressed alerts for closed/resolved markets should not be sent to Telegram
+        if reason in ("market_closed", "resolved"):
+            # If market is not active (False) or status is unknown (None), only log, don't send
+            if not market_active or market_active is None:
+                logger.info(
+                    f"[SUPPRESSED ALERT] Closed/Resolved market - logging only (not sending to Telegram): "
+                    f"condition_id={condition_id}, outcome={outcome_index}, reason={reason}"
+                )
+                return True  # Return True to indicate "handled", but no message sent
+        # Build market URL - For sports markets, use event slug instead of market slug
+        # Try to get event slug first (for sports markets like NFL/NBA)
+        event_slug = self._get_event_slug(condition_id)
         
-        # Use /event/ format (correct for Polymarket)
-        if market_slug:
-            # Remove any leading/trailing slashes and ensure clean slug
-            slug_clean = market_slug.strip().strip('/')
+        if event_slug:
+            # Use event slug for sports markets (e.g., "nfl-nyj-ne-2025-11-13" instead of "nfl-nyj-ne-2025-11-13-total-42pt5-697")
+            slug_clean = event_slug.strip().strip('/')
             market_url = f"https://polymarket.com/event/{slug_clean}"
+            logger.info(f"[URL] Using event slug for sports market: {slug_clean} (condition_id={condition_id[:20]}...)")
         else:
-            # Fallback: try to construct from condition_id or use search
-            # Note: condition_id URLs don't work well, so use search as last resort
-            market_url = f"https://polymarket.com/search?q={condition_id[:20]}"
+            # Fallback: Use market slug (current behavior)
+            if not market_slug:
+                market_slug = self._get_market_slug(condition_id)
+            
+            # Use /event/ format (correct for Polymarket)
+            # Try to use slug from API first, then fallback to search
+            if market_slug:
+                # Remove any leading/trailing slashes and ensure clean slug
+                slug_clean = market_slug.strip().strip('/')
+                market_url = f"https://polymarket.com/event/{slug_clean}"
+                logger.info(f"[URL] Using market slug from API: {slug_clean} (fallback from event slug)")
+            else:
+                # Fallback: use search with condition_id or question
+                # This is more reliable when API returns outcome-specific slug
+                # Note: condition_id URLs don't work well, so use search as last resort
+                # Try to get question from API for better search
+                try:
+                    url = f"https://clob.polymarket.com/markets/{condition_id}"
+                    response = self._make_authenticated_get(url, timeout=5)
+                    if response.status_code == 200:
+                        data = response.json()
+                        question = data.get('question') or data.get('title') or ""
+                        if question:
+                            # Use question for search (more reliable than condition_id)
+                            import urllib.parse
+                            search_query = urllib.parse.quote(question[:50])  # Limit length
+                            market_url = f"https://polymarket.com/search?q={search_query}"
+                        else:
+                            market_url = f"https://polymarket.com/search?q={condition_id[:20]}"
+                    else:
+                        market_url = f"https://polymarket.com/search?q={condition_id[:20]}"
+                except Exception:
+                    # If API call fails, use condition_id search
+                    market_url = f"https://polymarket.com/search?q={condition_id[:20]}"
         
         # Format wallets list
         wallets_list = []
@@ -649,36 +750,173 @@ _{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_"""
         
         return self.send_message(message, chat_id=self.reports_chat_id)
     
-    def _get_market_slug(self, condition_id: str) -> str:
-        """Get market slug from API"""
+    def _get_event_slug(self, condition_id: str) -> Optional[str]:
+        """
+        Get event slug from Gamma API for sports markets.
+        For sports markets, this returns the game/event slug (e.g., "nfl-nyj-ne-2025-11-13")
+        instead of the market-specific slug (e.g., "nfl-nyj-ne-2025-11-13-total-42pt5-697").
+        
+        Returns:
+            str: Event slug if found, None otherwise
+        """
         try:
-            # Try authenticated request first (if available)
+            from gamma_client import get_event_by_condition_id
+            event = get_event_by_condition_id(condition_id)
+            if event:
+                # Try to get event slug directly from event object
+                event_slug = (event.get("slug") or 
+                             event.get("eventSlug") or 
+                             event.get("event_slug"))
+                
+                if event_slug:
+                    # Clean slug
+                    event_slug = str(event_slug).strip().strip('/')
+                    if 'polymarket.com' in event_slug:
+                        event_slug = event_slug.split('polymarket.com/')[-1].strip('/')
+                    if event_slug.startswith('event/'):
+                        event_slug = event_slug[6:]
+                    elif event_slug.startswith('sports/'):
+                        # Extract slug from sports path
+                        parts = event_slug.split('/')
+                        if len(parts) > 0:
+                            event_slug = parts[-1]
+                    logger.info(f"[EVENT_SLUG] Got event slug from Gamma API: {event_slug} (condition_id={condition_id[:20]}...)")
+                    return event_slug
+                
+                # Fallback: Try to extract event slug from first market's slug
+                # For sports markets, market slug often contains event slug as prefix
+                markets = event.get("markets", [])
+                if markets:
+                    market_slug = markets[0].get("slug", "")
+                    if market_slug:
+                        # For sports markets like "nfl-nyj-ne-2025-11-13-total-42pt5-697"
+                        # Extract base event slug by removing market-specific suffixes
+                        market_slug_clean = str(market_slug).strip().strip('/')
+                        if 'polymarket.com' in market_slug_clean:
+                            market_slug_clean = market_slug_clean.split('polymarket.com/')[-1].strip('/')
+                        if market_slug_clean.startswith('event/'):
+                            market_slug_clean = market_slug_clean[6:]
+                        
+                        # Try to extract event slug by removing common market suffixes
+                        # Patterns: -total-*, -spread-*, -moneyline-*, etc.
+                        import re
+                        # Remove market-specific suffixes (total, spread, moneyline, etc.)
+                        # Pattern matches: nfl-nyj-ne-2025-11-13-total-42pt5-697 -> nfl-nyj-ne-2025-11-13
+                        # Also handles: nfl-nyj-ne-2025-11-13-spread-3-5 -> nfl-nyj-ne-2025-11-13
+                        event_slug_match = re.match(r'^([^-]+(?:-[^-]+)*?)(?:-(?:total|spread|moneyline|ou|o\/u|over-under|h2h|head-to-head)-[^-]+(?:-[^-]+)*)?$', market_slug_clean)
+                        if event_slug_match:
+                            potential_event_slug = event_slug_match.group(1)
+                            # Verify it looks like an event slug (has date pattern YYYY-MM-DD)
+                            if re.search(r'\d{4}-\d{2}-\d{2}', potential_event_slug):
+                                logger.info(f"[EVENT_SLUG] Extracted event slug from market slug: {potential_event_slug} (condition_id={condition_id[:20]}...)")
+                                return potential_event_slug
+                        
+                        # If extraction failed, return None to use fallback
+                        logger.debug(f"[EVENT_SLUG] Could not extract event slug from market slug: {market_slug_clean}")
+        except Exception as e:
+            logger.debug(f"[EVENT_SLUG] Failed to get event slug from Gamma API: {e}")
+        
+        return None
+    
+    def _get_market_slug(self, condition_id: str) -> str:
+        """
+        Get market slug from API
+        
+        IMPORTANT: We need market-level slug, not outcome-specific slug.
+        Strategy:
+        1. Try Gamma API first (most reliable for market-level slugs)
+        2. Try CLOB API question_slug or market_slug
+        3. Fallback to search
+        """
+        # Priority 1: Try Gamma API (returns market-level slug)
+        try:
+            from gamma_client import get_event_by_condition_id
+            event = get_event_by_condition_id(condition_id)
+            if event:
+                markets = event.get("markets", [])
+                # Find market matching condition_id
+                for market in markets:
+                    market_condition_id = market.get("conditionId") or market.get("condition_id", "")
+                    if market_condition_id and market_condition_id.lower() == condition_id.lower():
+                        slug = market.get("slug", "")
+                        if slug:
+                            # Clean slug
+                            slug = str(slug).strip().strip('/')
+                            if 'polymarket.com' in slug:
+                                slug = slug.split('polymarket.com/')[-1].strip('/')
+                            if slug.startswith('event/'):
+                                slug = slug[6:]
+                            elif slug.startswith('market/'):
+                                slug = slug[7:]
+                            logger.info(f"[SLUG] Got market slug from Gamma API: {slug} (condition_id={condition_id[:20]}...)")
+                            return slug
+                # If no exact match, use first market's slug (they should share the same event slug)
+                if markets:
+                    slug = markets[0].get("slug", "")
+                    if slug:
+                        slug = str(slug).strip().strip('/')
+                        if 'polymarket.com' in slug:
+                            slug = slug.split('polymarket.com/')[-1].strip('/')
+                        if slug.startswith('event/'):
+                            slug = slug[6:]
+                        elif slug.startswith('market/'):
+                            slug = slug[7:]
+                        logger.info(f"[SLUG] Got market slug from Gamma API (first market): {slug} (condition_id={condition_id[:20]}...)")
+                        return slug
+        except Exception as e:
+            logger.debug(f"Failed to get market slug from Gamma API: {e}")
+        
+        # Priority 2: Try CLOB API
+        try:
             url = f"https://clob.polymarket.com/markets/{condition_id}"
             response = self._make_authenticated_get(url, timeout=10)
             if response.status_code == 200:
                 data = response.json()
-                # Try multiple possible slug fields (market_slug is the most common)
-                slug = (data.get('market_slug') or 
+                # Prefer question_slug or market_slug (these are market-level)
+                slug = (data.get('question_slug') or 
+                       data.get('market_slug') or 
                        data.get('slug') or 
-                       data.get('question_slug') or
                        data.get('event_slug'))
+                
                 if slug:
-                    # Clean slug (remove any URL parts if present)
+                    # Clean slug
                     slug = str(slug).strip().strip('/')
-                    # Remove protocol and domain if present
                     if 'polymarket.com' in slug:
                         slug = slug.split('polymarket.com/')[-1].strip('/')
-                    # Remove /event/ or /market/ prefix if present
                     if slug.startswith('event/'):
                         slug = slug[6:]
                     elif slug.startswith('market/'):
                         slug = slug[7:]
+                    
+                    logger.info(f"[SLUG] Got market slug from CLOB API: {slug} (condition_id={condition_id[:20]}...)")
                     return slug
-            elif response.status_code == 404:
-                logger.debug(f"Market {condition_id[:20]}... not found (404)")
         except Exception as e:
-            logger.debug(f"Failed to get market slug from API: {e}")
+            logger.debug(f"Failed to get market slug from CLOB API: {e}")
         
+        # Priority 3: Try data-api.polymarket.com
+        try:
+            url = f"https://data-api.polymarket.com/condition/{condition_id}"
+            response = self._make_authenticated_get(url, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                slug = (data.get('question_slug') or 
+                       data.get('market_slug') or 
+                       data.get('slug') or 
+                       data.get('event_slug'))
+                if slug:
+                    slug = str(slug).strip().strip('/')
+                    if 'polymarket.com' in slug:
+                        slug = slug.split('polymarket.com/')[-1].strip('/')
+                    if slug.startswith('event/'):
+                        slug = slug[6:]
+                    elif slug.startswith('market/'):
+                        slug = slug[7:]
+                    logger.info(f"[SLUG] Got market slug from data-api: {slug} (condition_id={condition_id[:20]}...)")
+                    return slug
+        except Exception as e:
+            logger.debug(f"Failed to get market slug from data-api: {e}")
+        
+        logger.debug(f"[SLUG] No slug found for condition_id={condition_id[:20]}..., will use search fallback")
         return ""
     
     def _get_outcome_name(self, condition_id: str, outcome_index: int) -> str:
@@ -729,38 +967,137 @@ _{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_"""
         # Fallback to truncated condition ID
         return f"{condition_id[:10]}..."
 
-    def _get_current_price(self, condition_id: str, outcome_index: int) -> Optional[float]:
-        """Try to fetch current last price for the given market outcome from CLOB API"""
+    def _get_current_price(self, condition_id: str, outcome_index: int, 
+                          wallet_prices: Optional[Dict[str, float]] = None,
+                          hashdive_client: Optional[Any] = None,
+                          slug: Optional[str] = None) -> Optional[float]:
+        """
+        Try to fetch current last price with multi-level fallback:
+        1. New price_fetcher module (Polymarket CLOB /price, HashiDive, trades history, FinFeed)
+        2. Legacy CLOB API /markets endpoint
+        3. Average price from wallet_prices (if provided)
+        4. Polymarket data-api (last resort)
+        
+        Returns float on success, None on failure. Never raises exceptions.
+        """
+        # Step 0: Try new price_fetcher module (with all fallbacks, including wallet_prices)
+        try:
+            from price_fetcher import get_current_price as fetch_price
+            logger.info(f"[Price] Trying price_fetcher module with wallet_prices fallback (provided {len(wallet_prices) if wallet_prices else 0} wallets)")
+            result = fetch_price(condition_id=condition_id, outcome_index=outcome_index, wallet_prices=wallet_prices, slug=slug)
+            # Обработка tuple (цена, источник) или просто цена (для обратной совместимости)
+            if isinstance(result, tuple):
+                price, source = result
+            else:
+                price = result
+            if price is not None:
+                logger.info(f"[Price] ✅ Got price from price_fetcher module: {price:.6f}")
+                return price
+            else:
+                logger.debug(f"[Price] price_fetcher module returned None")
+        except ImportError:
+            logger.warning("[Price] ⚠️  price_fetcher module not available, using legacy methods")
+        except Exception as e:
+            logger.warning(f"[Price] ⚠️  price_fetcher failed: {type(e).__name__}: {e}")
+        
+        # Step 1: Try legacy CLOB API /markets endpoint (primary method)
         try:
             url = f"https://clob.polymarket.com/markets/{condition_id}"
             resp = self._make_authenticated_get(url, timeout=5)
-            if resp.status_code != 200:
+            
+            # Handle 404 - market not found (closed/removed)
+            if resp.status_code == 404:
+                logger.debug(f"[Price] CLOB API returned 404 for condition_id={condition_id[:20]}... (market not found - likely closed)")
+                # Don't try other methods if market doesn't exist
                 return None
-            data = resp.json()
-            # Try token-specific price fields
-            tokens = data.get('tokens') or []
-            if tokens and outcome_index < len(tokens):
-                token = tokens[outcome_index]
-                for key in ("last_price", "price", "mark_price"):  # best-effort
-                    val = token.get(key)
+            
+            if resp.status_code == 200:
+                data = resp.json()
+                # Try token-specific price fields (priority order: price, last_price, mark_price)
+                # Note: API может возвращать price даже когда last_price=None
+                tokens = data.get('tokens') or []
+                if tokens and outcome_index < len(tokens):
+                    token = tokens[outcome_index]
+                    # Сначала пробуем price (более надежное поле)
+                    for key in ("price", "last_price", "mark_price"):
+                        val = token.get(key)
+                        if val is not None:
+                            try:
+                                price = float(val)
+                                logger.debug(f"[Price] Got price from CLOB API token[{outcome_index}].{key}: {price}")
+                                return price
+                            except (ValueError, TypeError) as e:
+                                logger.debug(f"[Price] Failed to parse {key}={val}: {e}")
+                                continue
+                # Fallback to market-level fields if present
+                for key in ("price", "last_price", "mark_price"):
+                    val = data.get(key)
                     if val is not None:
                         try:
                             price = float(val)
-                            # Return 0.0 explicitly if price is 0 (not None)
+                            logger.debug(f"[Price] Got price from CLOB API market.{key}: {price}")
                             return price
-                        except (ValueError, TypeError):
+                        except (ValueError, TypeError) as e:
+                            logger.debug(f"[Price] Failed to parse market-level {key}={val}: {e}")
                             continue
-            # Fallback to market-level fields if present
-            for key in ("last_price", "price", "mark_price"):
-                val = data.get(key)
-                if val is not None:
-                    try:
-                        price = float(val)
-                        return price
-                    except (ValueError, TypeError):
-                        continue
+            else:
+                logger.debug(f"[Price] CLOB API returned status {resp.status_code} for condition_id={condition_id[:20]}...")
         except Exception as e:
-            logger.debug(f"Failed to get current price: {e}")
+            logger.debug(f"[Price] CLOB API failed: {type(e).__name__}: {e}")
+        
+        # Step 2: Try HashiDive API (if available, legacy method)
+        if hashdive_client:
+            try:
+                # HashiDive uses asset_id (token ID) format: condition_id:outcome_index
+                asset_id = f"{condition_id}:{outcome_index}"
+                price_data = hashdive_client.get_last_price(asset_id)
+                if price_data and isinstance(price_data, dict):
+                    price = price_data.get('price') or price_data.get('last_price')
+                    if price is not None:
+                        try:
+                            price_float = float(price)
+                            logger.debug(f"[Price] Got price from HashiDive (legacy): {price_float}")
+                            return price_float
+                        except (ValueError, TypeError):
+                            pass
+            except Exception as e:
+                logger.debug(f"[Price] HashiDive API failed: {e}")
+        
+        # Step 3: Try average price from wallet_prices (if provided)
+        if wallet_prices:
+            try:
+                prices = [p for p in wallet_prices.values() if isinstance(p, (int, float)) and p > 0]
+                if prices:
+                    avg_price = sum(prices) / len(prices)
+                    logger.debug(f"[Price] Using average price from wallet_prices: {avg_price:.3f} (from {len(prices)} wallets)")
+                    return avg_price
+            except Exception as e:
+                logger.debug(f"[Price] Failed to calculate average from wallet_prices: {e}")
+        
+        # Step 4: Try Polymarket data-api (last resort)
+        try:
+            url = f"https://data-api.polymarket.com/markets/{condition_id}"
+            resp = self._make_authenticated_get(url, timeout=5)
+            if resp and resp.status_code == 200:
+                data = resp.json()
+                # Try to find price in data-api response
+                tokens = data.get('tokens') or data.get('outcomes') or []
+                if tokens and outcome_index < len(tokens):
+                    token = tokens[outcome_index]
+                    for key in ("last_price", "price", "mark_price", "current_price"):
+                        val = token.get(key)
+                        if val is not None:
+                            try:
+                                price = float(val)
+                                logger.debug(f"[Price] Got price from data-api: {price}")
+                                return price
+                            except (ValueError, TypeError):
+                                continue
+        except Exception as e:
+            logger.debug(f"[Price] data-api failed: {e}")
+        
+        # All methods failed
+        logger.warning(f"[Price] All price lookup methods failed for condition_id={condition_id}, outcome={outcome_index}")
         return None
     
     def _calculate_consensus_strength(self, wallet_count: int, window_minutes: float) -> str:

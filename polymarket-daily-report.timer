@@ -1,0 +1,13 @@
+[Unit]
+Description=Run Polymarket Daily Report
+Requires=polymarket-daily-report.service
+
+[Timer]
+# Run daily at 23:00 UTC (end of day summary)
+OnCalendar=daily
+OnCalendar=*-*-* 23:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+
