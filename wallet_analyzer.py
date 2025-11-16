@@ -36,14 +36,22 @@ HTTP_SEMAPHORE = threading.Semaphore(6)  # Max 6 concurrent API requests
 WIN_RATE_THRESHOLD = float(os.getenv("WIN_RATE_THRESHOLD", "0.65"))  # Minimum win rate to accept wallet (65%, configurable via .env)
 MAX_DAILY_FREQUENCY = float(os.getenv("MAX_DAILY_FREQUENCY", "35.0"))  # Maximum daily trading frequency (configurable via .env)
 MIN_TRADES = 6  # Minimum number of trades required
-MAX_CLOSED_POSITIONS = 500  # Maximum closed positions to fetch for win rate calculation (most recent)
+MAX_CLOSED_POSITIONS = int(os.getenv("MAX_CLOSED_POSITIONS", "250"))  # Maximum closed positions to analyze (last 250 or 3 months, whichever is more)
+ANALYSIS_LOOKBACK_DAYS = int(os.getenv("ANALYSIS_LOOKBACK_DAYS", "90"))  # Days to look back for market analysis (default 90, configurable via .env)
 INACTIVITY_DAYS = int(os.getenv("INACTIVITY_DAYS", "150"))  # Days of inactivity threshold (default 150, configurable via .env)
+
+# New quality thresholds for wallet filtering
+MINIMUM_ROI = float(os.getenv("MINIMUM_ROI", "0.0025"))  # Minimum ROI = 0.25% (Total PnL / Total Volume)
+MINIMUM_AVG_PNL = float(os.getenv("MINIMUM_AVG_PNL", "50.0"))  # Minimum average PnL per market, $50
+MINIMUM_VOLUME = float(os.getenv("MINIMUM_VOLUME", "25000.0"))  # Minimum total trading volume, $25k
+MINIMUM_MARKETS = int(os.getenv("MINIMUM_MARKETS", "12"))  # Minimum number of closed markets in analysis window
+MINIMUM_AVG_STAKE = float(os.getenv("MINIMUM_AVG_STAKE", "100.0"))  # Minimum average stake per market, $100
 
 # Analysis result categories - all possible values for analysis_result field
 # This ensures consistent categorization and helps with Filter Breakdown statistics
 #
 # Complete list of analysis_result values:
-# - "accepted" - Wallet meets all criteria (MIN_TRADES+, WIN_RATE_THRESHOLD+)
+# - "accepted" - Wallet meets all criteria (MIN_TRADES+, WIN_RATE_THRESHOLD+, quality thresholds+)
 # - "rejected_low_trades" - Wallet has < MIN_TRADES trades
 # - "rejected_low_winrate" - Wallet has < WIN_RATE_THRESHOLD win rate
 # - "rejected_high_frequency" - Wallet has > MAX_DAILY_FREQUENCY daily trading frequency
@@ -51,6 +59,11 @@ INACTIVITY_DAYS = int(os.getenv("INACTIVITY_DAYS", "150"))  # Days of inactivity
 # - "rejected_no_stats" - No closed positions data available from API
 # - "rejected_api_error" - HTTP/API errors after retries (timeout, connection error, etc.)
 # - "rejected_invalid_data" - Invalid/unparseable data (None win_rate, etc.)
+# - "rejected_low_markets" - Wallet has < MINIMUM_MARKETS closed markets in analysis window
+# - "rejected_low_volume" - Wallet has < MINIMUM_VOLUME total trading volume
+# - "rejected_low_roi" - Wallet has < MINIMUM_ROI ROI
+# - "rejected_low_avg_pnl" - Wallet has < MINIMUM_AVG_PNL average PnL per market
+# - "rejected_low_avg_stake" - Wallet has < MINIMUM_AVG_STAKE average stake per market
 # - "rejected_legacy" - Old format values from previous code versions (mapped during aggregation)
 #
 # Note: Any values NOT in this list that exist in the database are automatically
@@ -65,6 +78,11 @@ ANALYSIS_RESULT_REJECTED_INACTIVE = "rejected_inactive"
 ANALYSIS_RESULT_REJECTED_NO_STATS = "rejected_no_stats"  # No data available from API
 ANALYSIS_RESULT_REJECTED_API_ERROR = "rejected_api_error"  # HTTP/API errors after retries
 ANALYSIS_RESULT_REJECTED_INVALID_DATA = "rejected_invalid_data"  # Invalid/unparseable data
+ANALYSIS_RESULT_REJECTED_LOW_MARKETS = "rejected_low_markets"  # < MINIMUM_MARKETS closed markets
+ANALYSIS_RESULT_REJECTED_LOW_VOLUME = "rejected_low_volume"  # < MINIMUM_VOLUME total volume
+ANALYSIS_RESULT_REJECTED_LOW_ROI = "rejected_low_roi"  # < MINIMUM_ROI ROI
+ANALYSIS_RESULT_REJECTED_LOW_AVG_PNL = "rejected_low_avg_pnl"  # < MINIMUM_AVG_PNL avg PnL per market
+ANALYSIS_RESULT_REJECTED_LOW_AVG_STAKE = "rejected_low_avg_stake"  # < MINIMUM_AVG_STAKE avg stake per market
 ANALYSIS_RESULT_REJECTED_LEGACY = "rejected_legacy"  # Old format values from previous versions
 
 @dataclass
@@ -428,20 +446,134 @@ class WalletAnalyzer:
                     )
                     return True  # Successfully filtered out
                 
+                # Calculate new quality metrics from filtered closed positions
+                num_markets = len(closed_positions)
+                total_volume, avg_stake = self._compute_volume_and_stake(closed_positions)
+                
+                # Calculate ROI and average PnL per market
+                roi = (pnl_total / total_volume) if total_volume > 0 else 0.0
+                avg_pnl_per_market = (pnl_total / num_markets) if num_markets > 0 else 0.0
+                
+                # Apply new quality filters (after old filters)
+                # Check minimum markets
+                if num_markets < MINIMUM_MARKETS:
+                    logger.info(f"[Quality] Rejecting {address}: markets {num_markets} < MINIMUM_MARKETS={MINIMUM_MARKETS}")
+                    analysis_result = ANALYSIS_RESULT_REJECTED_LOW_MARKETS
+                    self.db.cache_analysis_result(
+                        address=address,
+                        traded_total=traded,
+                        win_rate=win_rate,
+                        realized_pnl_total=pnl_total,
+                        daily_frequency=daily_freq,
+                        analysis_result=analysis_result,
+                        last_trade_at=last_trade_at,
+                        source=job.get("source", "queue")
+                    )
+                    return True  # Successfully filtered out
+                
+                # Check minimum volume
+                if total_volume < MINIMUM_VOLUME:
+                    logger.info(f"[Quality] Rejecting {address}: volume ${total_volume:.2f} < MINIMUM_VOLUME=${MINIMUM_VOLUME:.2f}")
+                    analysis_result = ANALYSIS_RESULT_REJECTED_LOW_VOLUME
+                    self.db.cache_analysis_result(
+                        address=address,
+                        traded_total=traded,
+                        win_rate=win_rate,
+                        realized_pnl_total=pnl_total,
+                        daily_frequency=daily_freq,
+                        analysis_result=analysis_result,
+                        last_trade_at=last_trade_at,
+                        source=job.get("source", "queue")
+                    )
+                    return True  # Successfully filtered out
+                
+                # Check minimum ROI
+                if roi < MINIMUM_ROI:
+                    logger.info(f"[Quality] Rejecting {address}: ROI {roi:.4f} ({roi*100:.2f}%) < MINIMUM_ROI={MINIMUM_ROI:.4f} ({MINIMUM_ROI*100:.2f}%)")
+                    analysis_result = ANALYSIS_RESULT_REJECTED_LOW_ROI
+                    self.db.cache_analysis_result(
+                        address=address,
+                        traded_total=traded,
+                        win_rate=win_rate,
+                        realized_pnl_total=pnl_total,
+                        daily_frequency=daily_freq,
+                        analysis_result=analysis_result,
+                        last_trade_at=last_trade_at,
+                        source=job.get("source", "queue")
+                    )
+                    return True  # Successfully filtered out
+                
+                # Check minimum average PnL per market
+                if avg_pnl_per_market < MINIMUM_AVG_PNL:
+                    logger.info(f"[Quality] Rejecting {address}: avg_pnl_per_market ${avg_pnl_per_market:.2f} < MINIMUM_AVG_PNL=${MINIMUM_AVG_PNL:.2f}")
+                    analysis_result = ANALYSIS_RESULT_REJECTED_LOW_AVG_PNL
+                    self.db.cache_analysis_result(
+                        address=address,
+                        traded_total=traded,
+                        win_rate=win_rate,
+                        realized_pnl_total=pnl_total,
+                        daily_frequency=daily_freq,
+                        analysis_result=analysis_result,
+                        last_trade_at=last_trade_at,
+                        source=job.get("source", "queue")
+                    )
+                    return True  # Successfully filtered out
+                
+                # Check minimum average stake
+                if avg_stake < MINIMUM_AVG_STAKE:
+                    logger.info(f"[Quality] Rejecting {address}: avg_stake ${avg_stake:.2f} < MINIMUM_AVG_STAKE=${MINIMUM_AVG_STAKE:.2f}")
+                    analysis_result = ANALYSIS_RESULT_REJECTED_LOW_AVG_STAKE
+                    self.db.cache_analysis_result(
+                        address=address,
+                        traded_total=traded,
+                        win_rate=win_rate,
+                        realized_pnl_total=pnl_total,
+                        daily_frequency=daily_freq,
+                        analysis_result=analysis_result,
+                        last_trade_at=last_trade_at,
+                        source=job.get("source", "queue")
+                    )
+                    return True  # Successfully filtered out
+                
             # Debug log before final filter
             # Format daily_freq safely (can be None)
             freq_str = f"{daily_freq:.2f}" if daily_freq is not None else "None"
-            logger.debug(
-                f"Analyze wallet {address}: traded={traded}, win_rate={win_rate:.3f}, "
-                f"pnl={pnl_total:.2f}, daily_freq={freq_str}, "
-                f"last_trade_at={last_trade_at}"
-            )
+            
+            # Calculate quality metrics if we have closed_positions (for logging)
+            # Note: closed_positions may not be defined in all code paths (e.g., cached results)
+            try:
+                if 'closed_positions' in locals() and closed_positions and len(closed_positions) > 0:
+                    num_markets = len(closed_positions)
+                    total_volume, avg_stake = self._compute_volume_and_stake(closed_positions)
+                    roi = (pnl_total / total_volume) if total_volume > 0 else 0.0
+                    avg_pnl_per_market = (pnl_total / num_markets) if num_markets > 0 else 0.0
+                    logger.debug(
+                        f"Analyze wallet {address}: traded={traded}, win_rate={win_rate:.3f}, "
+                        f"pnl={pnl_total:.2f}, daily_freq={freq_str}, "
+                        f"markets={num_markets}, volume=${total_volume:.2f}, "
+                        f"roi={roi:.4f} ({roi*100:.2f}%), avg_pnl=${avg_pnl_per_market:.2f}, "
+                        f"avg_stake=${avg_stake:.2f}, last_trade_at={last_trade_at}"
+                    )
+                else:
+                    logger.debug(
+                        f"Analyze wallet {address}: traded={traded}, win_rate={win_rate:.3f}, "
+                        f"pnl={pnl_total:.2f}, daily_freq={freq_str}, "
+                        f"last_trade_at={last_trade_at}"
+                    )
+            except (NameError, UnboundLocalError):
+                # closed_positions not defined in this code path (e.g., cached result)
+                logger.debug(
+                    f"Analyze wallet {address}: traded={traded}, win_rate={win_rate:.3f}, "
+                    f"pnl={pnl_total:.2f}, daily_freq={freq_str}, "
+                    f"last_trade_at={last_trade_at}"
+                )
             
             # Validate data before final decision
             if win_rate is None or not isinstance(win_rate, (int, float)):
                 logger.warning(f"Invalid win_rate for {address}: {win_rate}")
                 analysis_result = ANALYSIS_RESULT_REJECTED_INVALID_DATA
             elif traded >= MIN_TRADES and win_rate >= WIN_RATE_THRESHOLD:
+                # All filters passed (old + new quality filters)
                 analysis_result = ANALYSIS_RESULT_ACCEPTED
             else:
                 analysis_result = ANALYSIS_RESULT_REJECTED_LOW_WINRATE
@@ -459,6 +591,7 @@ class WalletAnalyzer:
             )
             
             # Apply criteria: traded >= MIN_TRADES and win_rate >= WIN_RATE_THRESHOLD
+            # Note: New quality filters (markets, volume, ROI, avg_pnl, avg_stake) are already checked above
             if traded >= MIN_TRADES and win_rate >= WIN_RATE_THRESHOLD:
                 # Store wallet in database with last_trade_at
                 success = self.db.upsert_wallet(
@@ -467,7 +600,25 @@ class WalletAnalyzer:
                 )
                 
                 if success:
-                    logger.info(f"[FILTER] ✅ ACCEPTED {address}: {traded} trades, {win_rate:.2%} win rate, {pnl_total:.2f} PnL")
+                    # Log acceptance with quality metrics if available
+                    # Try to get quality metrics from closed_positions if they were calculated
+                    try:
+                        # Check if we're in the branch where closed_positions exist
+                        if 'closed_positions' in locals() and closed_positions and len(closed_positions) > 0:
+                            num_markets = len(closed_positions)
+                            total_volume, avg_stake = self._compute_volume_and_stake(closed_positions)
+                            roi = (pnl_total / total_volume) if total_volume > 0 else 0.0
+                            avg_pnl_per_market = (pnl_total / num_markets) if num_markets > 0 else 0.0
+                            logger.info(
+                                f"[FILTER] ✅ ACCEPTED {address}: {traded} trades, {win_rate:.2%} win rate, "
+                                f"${pnl_total:.2f} PnL, {num_markets} markets, ${total_volume:.2f} volume, "
+                                f"{roi*100:.2f}% ROI, ${avg_pnl_per_market:.2f} avg PnL, ${avg_stake:.2f} avg stake"
+                            )
+                        else:
+                            logger.info(f"[FILTER] ✅ ACCEPTED {address}: {traded} trades, {win_rate:.2%} win rate, {pnl_total:.2f} PnL")
+                    except Exception as e:
+                        # Fallback if there's any error calculating metrics
+                        logger.info(f"[FILTER] ✅ ACCEPTED {address}: {traded} trades, {win_rate:.2%} win rate, {pnl_total:.2f} PnL")
                     return True
                 else:
                     logger.error(f"[FILTER] ❌ FAILED to save wallet {address} to database")
@@ -680,15 +831,18 @@ class WalletAnalyzer:
     
     def _get_closed_positions(self, address: str, max_positions: int = MAX_CLOSED_POSITIONS, page_limit: int = 500) -> List[Dict[str, Any]]:
         """Get closed positions for a wallet with pagination (up to max_positions).
-        Returns positions sorted by closed_at/timestamp descending (most recent first).
+        Returns positions filtered by ANALYSIS_LOOKBACK_DAYS and sorted by closed_at/timestamp descending (most recent first).
         """
         positions = []
         offset = 0
         
         try:
-            # Fetch more positions than needed to ensure we have enough after sorting
-            # We'll fetch up to max_positions * 2 to account for potential duplicates or ordering issues
-            fetch_limit = max_positions * 2  # Fetch extra to ensure we have enough recent positions
+            # Fetch more positions than needed to ensure we have enough after filtering by date
+            # We'll fetch up to max_positions * 3 to account for filtering by date
+            fetch_limit = max_positions * 3  # Fetch extra to ensure we have enough recent positions after date filtering
+            
+            # Calculate cutoff date for filtering
+            cutoff_date = datetime.now(timezone.utc) - timedelta(days=ANALYSIS_LOOKBACK_DAYS)
             
             while len(positions) < fetch_limit:
                 limit = min(page_limit, fetch_limit - len(positions))
@@ -743,14 +897,55 @@ class WalletAnalyzer:
                 
                 return 0.0
             
+            def get_datetime(pos: Dict[str, Any]) -> Optional[datetime]:
+                """Extract datetime from position for date filtering"""
+                timestamp = (
+                    pos.get("closed_at") or 
+                    pos.get("closedAt") or 
+                    pos.get("timestamp") or 
+                    pos.get("created_at") or 
+                    pos.get("createdAt") or
+                    None
+                )
+                
+                if timestamp is None:
+                    return None
+                
+                if isinstance(timestamp, str):
+                    try:
+                        return datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+                    except Exception:
+                        return None
+                
+                if isinstance(timestamp, (int, float)):
+                    if timestamp > 1e10:
+                        timestamp = timestamp / 1000.0
+                    return datetime.fromtimestamp(float(timestamp), tz=timezone.utc)
+                
+                return None
+            
             # Sort by timestamp descending (newest first)
             positions.sort(key=get_timestamp, reverse=True)
             
+            # Filter by date: only keep positions within ANALYSIS_LOOKBACK_DAYS
+            filtered_positions = []
+            for pos in positions:
+                pos_dt = get_datetime(pos)
+                if pos_dt is None:
+                    # If we can't determine date, include it (conservative approach)
+                    filtered_positions.append(pos)
+                elif pos_dt >= cutoff_date:
+                    filtered_positions.append(pos)
+                else:
+                    # Position is older than cutoff, stop here since positions are sorted by date descending
+                    break
+            
             # Take only the most recent max_positions
-            recent_positions = positions[:max_positions]
+            recent_positions = filtered_positions[:max_positions]
             
             logger.debug(
                 f"Fetched {len(positions)} total closed positions for {address}, "
+                f"filtered to {len(filtered_positions)} within {ANALYSIS_LOOKBACK_DAYS} days, "
                 f"using {len(recent_positions)} most recent (requested up to {max_positions})"
             )
             
@@ -849,6 +1044,48 @@ class WalletAnalyzer:
         
         win_rate = wins / len(closed_positions)
         return win_rate, pnl_sum
+    
+    def _compute_volume_and_stake(self, closed_positions: List[Dict[str, Any]]) -> Tuple[float, float]:
+        """Compute total volume and average stake from closed positions.
+        
+        Returns:
+            Tuple[float, float]: (total_volume, avg_stake)
+            - total_volume: Sum of all stakes (totalBought * avgPrice) across all positions
+            - avg_stake: Average stake per market (total_volume / num_markets)
+        """
+        if not closed_positions:
+            return 0.0, 0.0
+        
+        total_volume = 0.0
+        
+        for position in closed_positions:
+            # Try to get volume from position data
+            # Check for existing volume field first
+            volume = position.get("volume") or position.get("totalVolume") or position.get("total_volume")
+            
+            if volume is not None:
+                try:
+                    total_volume += float(volume)
+                    continue
+                except (ValueError, TypeError):
+                    pass
+            
+            # Calculate stake from totalBought and avgPrice
+            total_bought = float(position.get("totalBought", 0) or position.get("total_bought", 0) or 0)
+            avg_price = float(position.get("avgPrice", 0) or position.get("avg_price", 0) or 0)
+            
+            # If we have both values, calculate stake
+            if total_bought > 0 and avg_price > 0:
+                stake = total_bought * avg_price
+                total_volume += stake
+            elif total_bought > 0:
+                # Fallback: use totalBought as volume estimate if avgPrice is missing
+                total_volume += total_bought
+        
+        num_markets = len(closed_positions)
+        avg_stake = total_volume / num_markets if num_markets > 0 else 0.0
+        
+        return total_volume, avg_stake
     
     def add_wallets_to_queue(self, wallets: Dict[str, Dict[str, str]]) -> int:
         """Add multiple wallets to analysis queue"""

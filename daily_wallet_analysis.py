@@ -196,6 +196,11 @@ async def main():
                 'rejected_no_stats': 0,
                 'rejected_api_error': 0,
                 'rejected_invalid_data': 0,
+                'rejected_low_markets': 0,
+                'rejected_low_volume': 0,
+                'rejected_low_roi': 0,
+                'rejected_low_avg_pnl': 0,
+                'rejected_low_avg_stake': 0,
                 'rejected_legacy': 0,
                 'rejected_other': 0  # Only for truly unexpected values
             }
@@ -267,6 +272,11 @@ async def main():
         logger.info(f"  No stats: {filter_stats['rejected_no_stats']}")
         logger.info(f"  API errors: {filter_stats['rejected_api_error']}")
         logger.info(f"  Invalid data: {filter_stats['rejected_invalid_data']}")
+        logger.info(f"  Low markets: {filter_stats['rejected_low_markets']}")
+        logger.info(f"  Low volume: {filter_stats['rejected_low_volume']}")
+        logger.info(f"  Low ROI: {filter_stats['rejected_low_roi']}")
+        logger.info(f"  Low avg PnL: {filter_stats['rejected_low_avg_pnl']}")
+        logger.info(f"  Low avg stake: {filter_stats['rejected_low_avg_stake']}")
         logger.info(f"  Legacy other: {filter_stats['rejected_legacy']}")
         if filter_stats['rejected_other'] > 0:
             logger.info(f"  Other (unexpected): {filter_stats['rejected_other']}")
@@ -389,6 +399,11 @@ async def main():
 • No stats: {filter_stats['rejected_no_stats']}
 • API errors: {filter_stats['rejected_api_error']}
 • Invalid data: {filter_stats['rejected_invalid_data']}
+• Low markets: {filter_stats['rejected_low_markets']}
+• Low volume: {filter_stats['rejected_low_volume']}
+• Low ROI: {filter_stats['rejected_low_roi']}
+• Low avg PnL: {filter_stats['rejected_low_avg_pnl']}
+• Low avg stake: {filter_stats['rejected_low_avg_stake']}
 • Legacy other: {filter_stats['rejected_legacy']}"""
             
             if filter_stats['rejected_other'] > 0:
