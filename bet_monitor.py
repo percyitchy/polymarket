@@ -7,10 +7,40 @@ import asyncio
 import aiohttp
 import logging
 import os
-from typing import Dict, List, Set, Tuple, Optional
+from typing import Dict, List, Set, Tuple, Optional, Union
 from dataclasses import dataclass
 from datetime import datetime, timezone, timedelta
 import json
+
+
+def normalize_timestamp(timestamp_value: Union[int, float, str]) -> datetime:
+    """
+    Normalize timestamp to datetime, handling both seconds and milliseconds.
+    
+    This function ensures consistent timestamp parsing across the codebase.
+    It detects if a numeric timestamp is in milliseconds (values > 1e10) and
+    converts to seconds before creating the datetime object.
+    
+    Args:
+        timestamp_value: Timestamp as int, float, or ISO-8601 string
+        
+    Returns:
+        datetime: Normalized datetime object in UTC timezone
+    """
+    if isinstance(timestamp_value, (int, float)):
+        # Detect milliseconds: values > 1e10 are likely milliseconds
+        if timestamp_value > 1e10:
+            # Convert milliseconds to seconds
+            timestamp_value = timestamp_value / 1000
+        timestamp = datetime.fromtimestamp(timestamp_value, tz=timezone.utc)
+    elif isinstance(timestamp_value, str):
+        # ISO string - support trailing Z
+        timestamp = datetime.fromisoformat(timestamp_value.replace('Z', '+00:00'))
+    else:
+        # Fallback to current time
+        timestamp = datetime.now(timezone.utc)
+    
+    return timestamp
 
 # Configure logging
 logging.basicConfig(
@@ -39,6 +69,7 @@ class MatchingBet:
     market_title: str
     outcome: str
     outcome_index: int
+    side: str  # 'buy' or 'sell' - actual trade direction
     wallets: List[str]
     total_amount: float
     avg_price: float
@@ -62,41 +93,63 @@ class TelegramNotifier:
         if self.session:
             await self.session.close()
     
-    async def send_message(self, message: str, parse_mode: str = "HTML") -> bool:
-        """Send message to Telegram channel"""
-        try:
-            url = f"{self.api_url}/sendMessage"
-            data = {
-                "chat_id": self.chat_id,
-                "text": message,
-                "parse_mode": parse_mode,
-                "disable_web_page_preview": True
-            }
-            
-            async with self.session.post(url, json=data) as response:
-                if response.status == 200:
-                    logger.info("✅ Telegram message sent successfully")
-                    return True
-                elif response.status == 429:
-                    # Rate limited - get retry_after from response
-                    try:
-                        error_data = await response.json()
-                        retry_after = error_data.get("parameters", {}).get("retry_after", 60)
-                        logger.warning(f"⏳ Telegram rate limited, retry after {retry_after} seconds")
-                        await asyncio.sleep(retry_after)
+    async def send_message(self, message: str, parse_mode: str = "HTML", max_retries: int = 3) -> bool:
+        """Send message to Telegram channel with retry logic for rate limiting"""
+        url = f"{self.api_url}/sendMessage"
+        data = {
+            "chat_id": self.chat_id,
+            "text": message,
+            "parse_mode": parse_mode,
+            "disable_web_page_preview": True
+        }
+        
+        for attempt in range(max_retries):
+            try:
+                async with self.session.post(url, json=data) as response:
+                    if response.status == 200:
+                        logger.info("✅ Telegram message sent successfully")
+                        return True
+                    elif response.status == 429:
+                        # Rate limited - get retry_after from response
+                        try:
+                            error_data = await response.json()
+                            retry_after = error_data.get("parameters", {}).get("retry_after", 60)
+                            logger.warning(f"⏳ Telegram rate limited (attempt {attempt + 1}/{max_retries}), retry after {retry_after} seconds")
+                            
+                            # If this is not the last attempt, wait and retry
+                            if attempt < max_retries - 1:
+                                await asyncio.sleep(retry_after)
+                                continue  # Retry
+                            else:
+                                logger.error(f"❌ Telegram rate limit exceeded after {max_retries} attempts")
+                                return False
+                        except Exception as e:
+                            logger.warning(f"⏳ Telegram rate limited, but failed to parse retry_after: {e}")
+                            # Default wait time if we can't parse the response
+                            if attempt < max_retries - 1:
+                                await asyncio.sleep(60)
+                                continue  # Retry
+                            else:
+                                return False
+                    else:
+                        error_text = await response.text()
+                        logger.error(f"❌ Failed to send Telegram message: {response.status} - {error_text}")
+                        # Non-429 errors are not retryable
                         return False
-                    except:
-                        logger.warning("⏳ Telegram rate limited, waiting 60 seconds")
-                        await asyncio.sleep(60)
-                        return False
+                        
+            except Exception as e:
+                logger.error(f"❌ Error sending Telegram message (attempt {attempt + 1}/{max_retries}): {e}")
+                # For network errors, retry with exponential backoff
+                if attempt < max_retries - 1:
+                    wait_time = 2 ** attempt  # Exponential backoff: 1s, 2s, 4s
+                    await asyncio.sleep(wait_time)
+                    continue
                 else:
-                    error_text = await response.text()
-                    logger.error(f"❌ Failed to send Telegram message: {response.status} - {error_text}")
                     return False
-                    
-        except Exception as e:
-            logger.error(f"❌ Error sending Telegram message: {e}")
-            return False
+        
+        # All retries exhausted
+        logger.error(f"❌ Failed to send Telegram message after {max_retries} attempts")
+        return False
     
 class BetDetector:
     """Detects matching bets from multiple wallets"""
@@ -135,26 +188,25 @@ class BetDetector:
         self.data_api = "https://data-api.polymarket.com"
         self.trades_endpoint = f"{self.data_api}/trades"
         
-    async def get_recent_trades(self, wallet_address: str, limit: int = 50) -> List[Dict]:
-        """Get recent trades for a wallet"""
+    async def get_recent_trades(self, wallet_address: str, session: aiohttp.ClientSession, limit: int = 50) -> List[Dict]:
+        """Get recent trades for a wallet using a shared session"""
         try:
-            async with aiohttp.ClientSession() as session:
-                url = self.trades_endpoint
-                params = {
-                    "user": wallet_address,
-                    "limit": limit,
-                    "sort": "timestamp",
-                    "order": "desc"
-                }
-                
-                async with session.get(url, params=params, timeout=10) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        return data if isinstance(data, list) else []
-                    else:
-                        logger.warning(f"Failed to get trades for {wallet_address}: {response.status}")
-                        return []
-                        
+            url = self.trades_endpoint
+            params = {
+                "user": wallet_address,
+                "limit": limit,
+                "sort": "timestamp",
+                "order": "desc"
+            }
+            
+            async with session.get(url, params=params, timeout=10) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return data if isinstance(data, list) else []
+                else:
+                    logger.warning(f"Failed to get trades for {wallet_address}: {response.status}")
+                    return []
+                    
         except Exception as e:
             logger.warning(f"Error getting trades for {wallet_address}: {e}")
             return []
@@ -174,21 +226,21 @@ class BetDetector:
             amount = float(trade.get("amount", 0))
             price = float(trade.get("price", 0))
             
-            # Determine position type
+            # Determine position type - only treat explicit "buy" or "sell" as valid
             side = trade.get("side", "").lower()
-            position_type = "buy" if side == "buy" else "sell"
+            if side == "buy":
+                position_type = "buy"
+            elif side == "sell":
+                position_type = "sell"
+            else:
+                # Unknown or missing trade side - skip this trade
+                logger.debug(f"Skipping trade with unknown/missing side: {trade.get('side')}")
+                return None
             
-            # Parse timestamp
+            # Parse timestamp using normalized helper function
             timestamp_value = trade.get("timestamp", "")
             if timestamp_value:
-                if isinstance(timestamp_value, (int, float)):
-                    # Unix timestamp
-                    timestamp = datetime.fromtimestamp(timestamp_value, tz=timezone.utc)
-                elif isinstance(timestamp_value, str):
-                    # ISO string
-                    timestamp = datetime.fromisoformat(timestamp_value.replace('Z', '+00:00'))
-                else:
-                    timestamp = datetime.now(timezone.utc)
+                timestamp = normalize_timestamp(timestamp_value)
             else:
                 timestamp = datetime.now(timezone.utc)
             
@@ -212,11 +264,13 @@ class BetDetector:
         """Detect matching bets from positions"""
         matching_bets = []
         
-        # Group positions by market and outcome
-        market_groups: Dict[str, Dict[int, List[BetPosition]]] = {}
+        # Group positions by market, outcome, AND side (trade direction)
+        # This ensures buys and sells are not mixed into a single consensus group
+        market_groups: Dict[str, List[BetPosition]] = {}
         
         for position in positions:
-            key = f"{position.market_id}_{position.outcome_index}"
+            # Include side in the grouping key
+            key = f"{position.market_id}_{position.outcome_index}_{position.position_type}"
             if key not in market_groups:
                 market_groups[key] = []
             market_groups[key].append(position)
@@ -237,11 +291,15 @@ class BetDetector:
                     total_amount = sum(p.amount for p in recent_positions)
                     avg_price = sum(p.price for p in recent_positions) / len(recent_positions)
                     
+                    # Determine side from the actual trade direction (all positions in group have same side)
+                    side = recent_positions[0].position_type
+                    
                     matching_bet = MatchingBet(
                         market_id=recent_positions[0].market_id,
                         market_title=recent_positions[0].market_title,
                         outcome=recent_positions[0].outcome,
                         outcome_index=recent_positions[0].outcome_index,
+                        side=side,
                         wallets=wallets,
                         total_amount=total_amount,
                         avg_price=avg_price,
@@ -271,8 +329,9 @@ class BetDetector:
     def format_matching_bet_alert(self, matching_bet: MatchingBet) -> str:
         """Format matching bet alert message in Pro Signal style"""
         
-        # Determine position side
-        side = "BUY" if matching_bet.outcome_index == 0 else "SELL"
+        # Use the actual trade side from the aggregated MatchingBet instance
+        # This reflects what traders actually did (buy or sell)
+        side = matching_bet.side.upper() if matching_bet.side else "UNKNOWN"
         
         # Get wallet info with winrates
         wallet_info = []
@@ -315,9 +374,9 @@ class BetDetector:
         
         return message
     
-    async def check_wallet_positions(self, wallet_address: str) -> List[BetPosition]:
-        """Check recent positions for a wallet"""
-        trades = await self.get_recent_trades(wallet_address)
+    async def check_wallet_positions(self, wallet_address: str, session: aiohttp.ClientSession) -> List[BetPosition]:
+        """Check recent positions for a wallet using a shared session"""
+        trades = await self.get_recent_trades(wallet_address, session)
         positions = []
         
         for trade in trades:
@@ -328,42 +387,61 @@ class BetDetector:
         return positions
     
     async def monitor_wallets(self, wallet_addresses: List[str], telegram_notifier: TelegramNotifier):
-        """Monitor wallets for matching bets"""
+        """Monitor wallets for matching bets with concurrent requests"""
         logger.info(f"Starting monitoring of {len(wallet_addresses)} wallets...")
         
-        while True:
-            try:
-                all_positions = []
-                
-                # Get positions for all wallets
-                for wallet_address in wallet_addresses:
-                    positions = await self.check_wallet_positions(wallet_address)
-                    all_positions.extend(positions)
-                
-                # Detect matching bets
-                matching_bets = self.detect_matching_bets(all_positions)
-                
-                # Send alerts for new matching bets
-                for matching_bet in matching_bets:
-                    alert_key = f"{matching_bet.market_id}_{matching_bet.outcome_index}_{len(matching_bet.wallets)}"
+        # Concurrency limit to avoid overwhelming the API
+        MAX_CONCURRENT_REQUESTS = 10
+        
+        async with aiohttp.ClientSession() as session:
+            while True:
+                try:
+                    all_positions = []
                     
-                    if alert_key not in self.sent_alerts:
-                        message = self.format_matching_bet_alert(matching_bet)
-                        success = await telegram_notifier.send_message(message)
+                    # Create semaphore to limit concurrent requests
+                    semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
+                    
+                    async def fetch_wallet_positions(wallet_address: str) -> List[BetPosition]:
+                        """Fetch positions for a single wallet with concurrency control"""
+                        async with semaphore:
+                            return await self.check_wallet_positions(wallet_address, session)
+                    
+                    # Fetch positions for all wallets concurrently
+                    tasks = [fetch_wallet_positions(wallet) for wallet in wallet_addresses]
+                    results = await asyncio.gather(*tasks, return_exceptions=True)
+                    
+                    # Collect positions from all results
+                    for result in results:
+                        if isinstance(result, Exception):
+                            logger.warning(f"Error fetching wallet positions: {result}")
+                        elif isinstance(result, list):
+                            all_positions.extend(result)
+                    
+                    # Detect matching bets
+                    matching_bets = self.detect_matching_bets(all_positions)
+                    
+                    # Send alerts for new matching bets
+                    for matching_bet in matching_bets:
+                        # Include side in alert key so BUY and SELL consensus are treated as distinct alerts
+                        alert_key = f"{matching_bet.market_id}_{matching_bet.outcome_index}_{matching_bet.side}_{len(matching_bet.wallets)}"
                         
-                        if success:
-                            self.sent_alerts.add(alert_key)
-                            logger.info(f"🚨 Alert sent for {matching_bet.market_title} - {matching_bet.outcome}")
-                
-                # Clean old alerts (older than 1 hour)
-                self.cleanup_old_alerts()
-                
-                # Wait before next check
-                await asyncio.sleep(self.poll_interval)
-                
-            except Exception as e:
-                logger.error(f"Error in monitoring loop: {e}")
-                await asyncio.sleep(self.poll_interval)
+                        if alert_key not in self.sent_alerts:
+                            message = self.format_matching_bet_alert(matching_bet)
+                            success = await telegram_notifier.send_message(message)
+                            
+                            if success:
+                                self.sent_alerts.add(alert_key)
+                                logger.info(f"🚨 Alert sent for {matching_bet.market_title} - {matching_bet.outcome}")
+                    
+                    # Clean old alerts (older than 1 hour)
+                    self.cleanup_old_alerts()
+                    
+                    # Wait before next check
+                    await asyncio.sleep(self.poll_interval)
+                    
+                except Exception as e:
+                    logger.error(f"Error in monitoring loop: {e}")
+                    await asyncio.sleep(self.poll_interval)
     
     def cleanup_old_alerts(self):
         """Clean up old alerts to prevent memory leaks"""

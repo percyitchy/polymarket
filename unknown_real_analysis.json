@@ -1,0 +1,398 @@
+{
+  "total": 500,
+  "patterns": {
+    "dates": 402,
+    "prices": 127,
+    "updown": 80,
+    "vs": 23,
+    "nfl": 55,
+    "nba": 37,
+    "bitcoin": 95,
+    "ethereum": 68,
+    "short": 0,
+    "empty": 0
+  },
+  "top_keywords": {
+    "2025": 345,
+    "november": 192,
+    "october": 176,
+    "bitcoin": 173,
+    "win": 145,
+    "down": 127,
+    "above": 105,
+    "ethereum": 92,
+    "price": 64,
+    "nfl": 55,
+    "trump": 50,
+    "000": 46,
+    "nba": 43,
+    "updown": 33,
+    "election": 32,
+    "15m": 32,
+    "spread": 30,
+    "reach": 29,
+    "2026": 26,
+    "september": 26,
+    "top": 23,
+    "presidential": 22,
+    "after": 20,
+    "league": 20,
+    "december": 19,
+    "elon": 19,
+    "2028": 18,
+    "august": 18,
+    "musk": 18,
+    "eth": 18,
+    "tweets": 18,
+    "megaeth": 18,
+    "say": 17,
+    "during": 17,
+    "end": 17,
+    "russia": 16,
+    "released": 16,
+    "most": 16,
+    "btc": 16,
+    "launch": 16,
+    "finals": 16,
+    "uef": 16,
+    "lal": 15,
+    "fed": 14,
+    "searched": 14,
+    "market": 14,
+    "sale": 14,
+    "donald": 13,
+    "atp": 13,
+    "pardon": 12
+  },
+  "samples": {
+    "updown": [
+      {
+        "question": "Solana Up or Down - November 13, 2AM ET",
+        "slug": "solana-up-or-down-november-13-2am-et"
+      },
+      {
+        "question": "Ethereum Up or Down - November 11, 12PM ET",
+        "slug": "ethereum-up-or-down-november-11-12pm-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 11, 12PM ET",
+        "slug": "bitcoin-up-or-down-november-11-12pm-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 10, 2PM ET",
+        "slug": "bitcoin-up-or-down-november-10-2pm-et"
+      },
+      {
+        "question": "Ethereum Up or Down - November 10, 2PM ET",
+        "slug": "ethereum-up-or-down-november-10-2pm-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 10, 1PM ET",
+        "slug": "bitcoin-up-or-down-november-10-1pm-et"
+      },
+      {
+        "question": "Ethereum Up or Down - November 10, 11AM ET",
+        "slug": "ethereum-up-or-down-november-10-11am-et"
+      },
+      {
+        "question": "Ethereum Up or Down - November 10, 8AM ET",
+        "slug": "ethereum-up-or-down-november-10-8am-et"
+      },
+      {
+        "question": "Ethereum Up or Down - November 10, 5AM ET",
+        "slug": "ethereum-up-or-down-november-10-5am-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 10, 5AM ET",
+        "slug": "bitcoin-up-or-down-november-10-5am-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 9, 12PM ET",
+        "slug": "bitcoin-up-or-down-november-9-12pm-et"
+      },
+      {
+        "question": "Ethereum Up or Down - November 9, 11AM ET",
+        "slug": "ethereum-up-or-down-november-9-11am-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 9, 1PM ET",
+        "slug": "bitcoin-up-or-down-november-9-1pm-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 9, 5AM ET",
+        "slug": "bitcoin-up-or-down-november-9-5am-et"
+      },
+      {
+        "question": "Ethereum Up or Down - November 9, 6AM ET",
+        "slug": "ethereum-up-or-down-november-9-6am-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 8, 2PM ET",
+        "slug": "bitcoin-up-or-down-november-8-2pm-et"
+      },
+      {
+        "question": "Ethereum Up or Down - November 8, 10AM ET",
+        "slug": "ethereum-up-or-down-november-8-10am-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 7, 1PM ET",
+        "slug": "bitcoin-up-or-down-november-7-1pm-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 7, 8AM ET",
+        "slug": "bitcoin-up-or-down-november-7-8am-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 7, 7AM ET",
+        "slug": "bitcoin-up-or-down-november-7-7am-et"
+      }
+    ],
+    "vs": [
+      {
+        "question": "Netherlands Parliamentary Election: D66 vs VVD",
+        "slug": "netherlands-parliamentary-election-d66-vs-vvd"
+      },
+      {
+        "question": "LoL: T1 vs KT Rolster (BO5)",
+        "slug": "lol-t1-kt-2025-11-09"
+      },
+      {
+        "question": "LoL: T1 vs KT Rolster - Game 3 Winner",
+        "slug": "lol-t1-kt-2025-11-09-game3"
+      },
+      {
+        "question": "LoL: T1 vs KT Rolster - Game 1 Winner",
+        "slug": "lol-t1-kt-2025-11-09-game1"
+      },
+      {
+        "question": "LoL: T1 vs KT Rolster - Game 2 Winner",
+        "slug": "lol-t1-kt-2025-11-09-game2"
+      },
+      {
+        "question": "Rolex Paris Masters: Alexei Popyrin vs Alexander Bublik",
+        "slug": "atp-popyrin-bublik-2025-10-27"
+      },
+      {
+        "question": "ATP World Tour Finals, Final Stage: Jannik Sinner vs Alex de Minaur",
+        "slug": "atp-sinner-minaur-2025-11-15"
+      },
+      {
+        "question": "ATP World Tour Finals, Bjorn Borg Group: Jannik Sinner vs Alexander Zverev",
+        "slug": "atp-sinner-zverev-2025-11-09"
+      },
+      {
+        "question": "Open de Moselle: Cameron Norrie vs Lorenzo Sonego",
+        "slug": "atp-norrie-sonego-2025-11-07"
+      },
+      {
+        "question": "Hellenic Championship: Stan Wawrinka vs Lorenzo Musetti",
+        "slug": "atp-wawrink-musetti-2025-11-05"
+      },
+      {
+        "question": "Rolex Paris Masters: Felix Auger-Aliassime vs Alexandre Muller",
+        "slug": "atp-augeral-muller-2025-10-29"
+      },
+      {
+        "question": "Rolex Paris Masters: Taylor Fritz vs Alexander Bublik",
+        "slug": "atp-fritz-bublik-2025-10-30"
+      },
+      {
+        "question": "Rolex Paris Masters: Ben Shelton vs Andrey Rublev",
+        "slug": "atp-shelton-rublev-2025-10-30"
+      },
+      {
+        "question": "Rolex Paris Masters: Felix Auger-Aliassime vs Daniel Altmaier",
+        "slug": "atp-augeral-altmaie-2025-10-30"
+      },
+      {
+        "question": "Swiss Indoors Basel: Casper Ruud vs Alejandro Davidovich Fokina",
+        "slug": "atp-ruud-fokina-2025-10-24"
+      },
+      {
+        "question": "Swiss Indoors Basel: Joao Fonseca vs Denis Shapovalov",
+        "slug": "atp-fonseca-shapova-2025-10-24"
+      },
+      {
+        "question": "Counter-Strike: Sinners vs Monte (BO5)",
+        "slug": "cs2-sin2-mnte-2025-11-16"
+      },
+      {
+        "question": "Counter-Strike: FURIA vs Team Falcons (BO5)",
+        "slug": "cs2-furia-fal2-2025-11-16"
+      },
+      {
+        "question": "Counter-Strike: FURIA vs Team Falcons - Map 3 Winner",
+        "slug": "cs2-furia-fal2-2025-11-16-game3"
+      },
+      {
+        "question": "Counter-Strike: Team Falcons vs Vitality - Map 2 Winner",
+        "slug": "cs2-fal2-vit-2025-11-15-game2"
+      }
+    ],
+    "bitcoin": [
+      {
+        "question": "Will the price of Bitcoin be above $118,000 on October 29?",
+        "slug": "bitcoin-above-118k-on-october-29"
+      },
+      {
+        "question": "Will the price of Bitcoin be above $110,000 on October 25?",
+        "slug": "bitcoin-above-110k-on-october-25"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 11, 12PM ET",
+        "slug": "bitcoin-up-or-down-november-11-12pm-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 10, 2PM ET",
+        "slug": "bitcoin-up-or-down-november-10-2pm-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 10, 1PM ET",
+        "slug": "bitcoin-up-or-down-november-10-1pm-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 10, 5AM ET",
+        "slug": "bitcoin-up-or-down-november-10-5am-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 9, 12PM ET",
+        "slug": "bitcoin-up-or-down-november-9-12pm-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 9, 1PM ET",
+        "slug": "bitcoin-up-or-down-november-9-1pm-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 9, 5AM ET",
+        "slug": "bitcoin-up-or-down-november-9-5am-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 8, 2PM ET",
+        "slug": "bitcoin-up-or-down-november-8-2pm-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 7, 1PM ET",
+        "slug": "bitcoin-up-or-down-november-7-1pm-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 7, 8AM ET",
+        "slug": "bitcoin-up-or-down-november-7-8am-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 7, 7AM ET",
+        "slug": "bitcoin-up-or-down-november-7-7am-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 6, 1PM ET",
+        "slug": "bitcoin-up-or-down-november-6-1pm-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 5, 8AM ET",
+        "slug": "bitcoin-up-or-down-november-5-8am-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 5, 6AM ET",
+        "slug": "bitcoin-up-or-down-november-5-6am-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 5, 5AM ET",
+        "slug": "bitcoin-up-or-down-november-5-5am-et"
+      },
+      {
+        "question": "Bitcoin Up or Down - October 31, 5:15AM-5:30AM ET",
+        "slug": "btc-updown-15m-1761902100"
+      },
+      {
+        "question": "Bitcoin Up or Down - October 27, 3:15PM-3:30PM ET",
+        "slug": "btc-updown-15m-1761592500"
+      },
+      {
+        "question": "Bitcoin Up or Down - November 17, 1:30PM-1:45PM ET",
+        "slug": "btc-updown-15m-1763404200"
+      }
+    ],
+    "nfl": [
+      {
+        "question": "Ravens vs. Dolphins",
+        "slug": "nfl-bal-mia-2025-10-30"
+      },
+      {
+        "question": "Panthers vs. Falcons",
+        "slug": "nfl-car-atl-2025-11-16"
+      },
+      {
+        "question": "49ers vs. Cardinals",
+        "slug": "nfl-sf-ari-2025-11-16"
+      },
+      {
+        "question": "Eagles vs. Packers: O/U 45.5",
+        "slug": "nfl-phi-gb-2025-11-10-total-45pt5"
+      },
+      {
+        "question": "Jaguars vs. Texans",
+        "slug": "nfl-jax-hou-2025-11-09"
+      },
+      {
+        "question": "Patriots vs. Buccaneers: O/U 48.5",
+        "slug": "nfl-ne-tb-2025-11-09-total-48pt5"
+      },
+      {
+        "question": "Broncos vs. Texans",
+        "slug": "nfl-den-hou-2025-11-02"
+      },
+      {
+        "question": "Chiefs vs. Bills",
+        "slug": "nfl-kc-buf-2025-11-02"
+      },
+      {
+        "question": "Jaguars vs. Raiders",
+        "slug": "nfl-jax-lv-2025-11-02"
+      },
+      {
+        "question": "Spread: Ravens (-6.5)",
+        "slug": "nfl-bal-mia-2025-10-30-spread-away-6pt5"
+      },
+      {
+        "question": "Browns vs. Patriots: O/U 40.5",
+        "slug": "nfl-cle-ne-2025-10-26-total-40pt5"
+      },
+      {
+        "question": "49ers vs. Texans",
+        "slug": "nfl-sf-hou-2025-10-26"
+      },
+      {
+        "question": "Vikings vs. Chargers: O/U 44.5",
+        "slug": "nfl-min-lac-2025-10-23-total-44pt5"
+      },
+      {
+        "question": "Vikings vs. Chargers",
+        "slug": "nfl-min-lac-2025-10-23"
+      },
+      {
+        "question": "Spread: Broncos (-7.5)",
+        "slug": "nfl-nyg-den-2025-10-19-spread-home-7pt5"
+      },
+      {
+        "question": "Saints vs. Bears",
+        "slug": "nfl-no-chi-2025-10-19"
+      },
+      {
+        "question": "Bears vs. Commanders",
+        "slug": "nfl-chi-was-2025-10-13"
+      },
+      {
+        "question": "Spread: Patriots (-3.5)",
+        "slug": "nfl-ne-no-2025-10-12-spread-away-3pt5"
+      },
+      {
+        "question": "Spread: Packers (-14.5)",
+        "slug": "nfl-cin-gb-2025-10-12-spread-home-14pt5"
+      },
+      {
+        "question": "Spread: Broncos (-7.5)",
+        "slug": "nfl-den-nyj-2025-10-12-spread-away-7pt5"
+      }
+    ],
+    "short": []
+  }
+}

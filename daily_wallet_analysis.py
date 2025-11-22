@@ -358,6 +358,20 @@ async def main():
         logger.info(f"  API trades: total {source_stats['api_trades']['total']}, accepted {source_stats['api_trades']['accepted']}")
         logger.info(f"  HashiDive whales: total {source_stats['hashdive_whale']['total']}, accepted {source_stats['hashdive_whale']['accepted']}")
         logger.info(f"  HashiDive Trader Explorer: total {source_stats['hashdive_trader_explorer']['total']}, accepted {source_stats['hashdive_trader_explorer']['accepted']}")
+        
+        # Get category statistics
+        category_stats_summary = db.get_category_stats_summary()
+        wallets_with_a_list = category_stats_summary.get('wallets_with_a_list', 0)
+        category_counts = category_stats_summary.get('category_counts', {})
+        
+        logger.info("")
+        logger.info(f"[Category] Category Statistics:")
+        logger.info(f"  Wallets with at least one A List category: {wallets_with_a_list}")
+        if category_counts:
+            logger.info(f"  Category breakdown:")
+            for category, counts in sorted(category_counts.items(), key=lambda x: x[1]['total'], reverse=True):
+                logger.info(f"    {category}: {counts['total']} wallets, {counts['a_list']} A List traders")
+        
         logger.info("=" * 80)
         
         # Send summary to Telegram
@@ -417,6 +431,17 @@ async def main():
 • API trades: total {source_stats['api_trades']['total']}, accepted {source_stats['api_trades']['accepted']}
 • HashiDive whales: total {source_stats['hashdive_whale']['total']}, accepted {source_stats['hashdive_whale']['accepted']}
 • HashiDive Trader Explorer: total {source_stats['hashdive_trader_explorer']['total']}, accepted {source_stats['hashdive_trader_explorer']['accepted']}
+
+📈 Category Statistics:
+• Wallets with A List status: {wallets_with_a_list}"""
+            
+            # Add category breakdown to message
+            if category_counts:
+                summary_message += "\n• Category breakdown:"
+                for category, counts in sorted(category_counts.items(), key=lambda x: x[1]['total'], reverse=True)[:10]:  # Top 10
+                    summary_message += f"\n  {category}: {counts['total']} wallets, {counts['a_list']} A List"
+            
+            summary_message += """
 """
             
             summary_message += """
@@ -464,13 +489,194 @@ async def main():
         analyzer.stop_workers()
         logger.info("Daily wallet analysis complete")
 
+async def recompute_all_categories():
+    """Recompute category statistics for all existing wallets"""
+    load_dotenv()
+    
+    start_time = datetime.now(timezone.utc)
+    logger.info("=" * 80)
+    logger.info(f"Starting category recomputation for all wallets - {start_time.strftime('%Y-%m-%d %H:%M:%S UTC')}")
+    logger.info("=" * 80)
+    
+    # Initialize components
+    db_path = os.getenv("DB_PATH", "polymarket_notifier.db")
+    if not os.path.isabs(db_path):
+        db_path = os.path.abspath(db_path)
+    logger.info(f"[DB] Using database at {db_path}")
+    db = PolymarketDB(db_path)
+    
+    # Initialize wallet analyzer
+    analysis_config = AnalysisConfig(
+        api_max_workers=int(os.getenv("API_MAX_WORKERS", "4")),
+        api_timeout_sec=int(os.getenv("API_TIMEOUT_SEC", "10"))
+    )
+    analyzer = WalletAnalyzer(db, analysis_config)
+    
+    # Get ALL wallets from database (not just tracked ones)
+    # Check multiple sources: wallets table, wallet_analysis_cache, and raw_collected_wallets
+    with db.get_connection() as conn:
+        cursor = conn.cursor()
+        
+        # Get from wallets table
+        cursor.execute("SELECT address FROM wallets")
+        wallets_from_table = set(row[0] for row in cursor.fetchall())
+        
+        # Get from wallet_analysis_cache (all analyzed wallets)
+        cursor.execute("SELECT DISTINCT address FROM wallet_analysis_cache")
+        wallets_from_cache = set(row[0] for row in cursor.fetchall())
+        
+        # Get from raw_collected_wallets (all collected wallets)
+        cursor.execute("SELECT DISTINCT address FROM raw_collected_wallets")
+        wallets_from_raw = set(row[0] for row in cursor.fetchall())
+        
+        # Combine all unique addresses
+        all_wallets_set = wallets_from_table | wallets_from_cache | wallets_from_raw
+        all_wallets = sorted(list(all_wallets_set))
+        
+        logger.info(f"Found wallets from different sources:")
+        logger.info(f"  - wallets table: {len(wallets_from_table)}")
+        logger.info(f"  - wallet_analysis_cache: {len(wallets_from_cache)}")
+        logger.info(f"  - raw_collected_wallets: {len(wallets_from_raw)}")
+        logger.info(f"  - Total unique wallets: {len(all_wallets)}")
+    
+    # Start workers
+    logger.info("Starting wallet analyzer workers...")
+    analyzer.start_workers()
+    
+    try:
+        # Clear ALL existing jobs for these wallets first (to force recomputation)
+        logger.info("Clearing ALL existing jobs for recomputation...")
+        with db.get_connection() as conn:
+            cursor = conn.cursor()
+            # Get count before deletion
+            cursor.execute("SELECT COUNT(*) FROM wallet_analysis_jobs")
+            total_before = cursor.fetchone()[0]
+            
+            # Delete ALL jobs for wallets we want to recompute
+            cursor.execute("""
+                DELETE FROM wallet_analysis_jobs 
+                WHERE address IN (
+                    SELECT DISTINCT address FROM (
+                        SELECT address FROM wallets
+                        UNION
+                        SELECT address FROM wallet_analysis_cache
+                        UNION
+                        SELECT address FROM raw_collected_wallets
+                    )
+                )
+            """)
+            cleared = cursor.rowcount
+            conn.commit()
+            logger.info(f"Cleared {cleared} existing jobs (total before: {total_before})")
+        
+        # Add all wallets to queue
+        logger.info(f"Adding {len(all_wallets)} wallets to recomputation queue...")
+        added_count = 0
+        batch_size = 100
+        for i in range(0, len(all_wallets), batch_size):
+            batch = all_wallets[i:i+batch_size]
+            for wallet_address in batch:
+                if db.add_wallet_to_queue(wallet_address, None, "recompute"):
+                    added_count += 1
+            if (i + batch_size) % 500 == 0 or i + batch_size >= len(all_wallets):
+                logger.info(f"Progress: added {added_count}/{len(all_wallets)} wallets to queue...")
+        
+        logger.info(f"Added {added_count} wallets to recomputation queue (out of {len(all_wallets)} total)")
+        
+        if added_count == 0:
+            logger.error("No wallets were added to queue! This should not happen after clearing all jobs.")
+            logger.error("Aborting recomputation.")
+            return
+        
+        # Wait for workers to process (with progress updates)
+        import time
+        last_status_time = time.time()
+        last_completed = 0
+        start_processing_time = time.time()
+        
+        logger.info("=" * 80)
+        logger.info("Starting to process wallets...")
+        logger.info("=" * 80)
+        
+        while True:
+            stats = analyzer.get_queue_status()
+            pending = stats.get('pending_jobs', 0)
+            processing = stats.get('processing_jobs', 0)
+            completed = stats.get('completed_jobs', 0)
+            failed = stats.get('failed_jobs', 0)
+            total = pending + processing + completed + failed
+            
+            # Calculate progress percentage
+            if total > 0:
+                progress_pct = (completed / total) * 100
+            else:
+                progress_pct = 0.0
+            
+            # Calculate processing rate
+            elapsed = time.time() - start_processing_time
+            if elapsed > 0:
+                rate = completed / elapsed  # wallets per second
+                eta_seconds = pending / rate if rate > 0 else 0
+                eta_minutes = eta_seconds / 60
+            else:
+                rate = 0
+                eta_minutes = 0
+            
+            # Log status every 10 seconds (more frequent updates)
+            if time.time() - last_status_time > 10:
+                completed_since_last = completed - last_completed
+                logger.info(
+                    f"[Recompute] Progress: {completed}/{total} ({progress_pct:.1f}%) | "
+                    f"pending={pending}, processing={processing}, failed={failed} | "
+                    f"rate={rate:.2f} wallets/sec | ETA: {eta_minutes:.1f} min"
+                )
+                if completed_since_last > 0:
+                    logger.info(f"[Recompute] Processed {completed_since_last} wallets in last 10 seconds")
+                last_status_time = time.time()
+                last_completed = completed
+            
+            # Check if done
+            if pending == 0 and processing == 0:
+                logger.info("=" * 80)
+                logger.info("All wallets processed!")
+                logger.info(f"Final stats: completed={completed}, failed={failed}, total={total}")
+                logger.info("=" * 80)
+                break
+            
+            await asyncio.sleep(5)
+        
+        # Final stats
+        end_time = datetime.now(timezone.utc)
+        duration = (end_time - start_time).total_seconds()
+        
+        category_stats = db.get_category_stats_summary()
+        wallets_with_a_list = category_stats.get('wallets_with_a_list', 0)
+        
+        logger.info("=" * 80)
+        logger.info("Category recomputation complete:")
+        logger.info(f"  Duration: {duration:.1f} seconds ({duration/60:.1f} minutes)")
+        logger.info(f"  Wallets in database: {len(all_wallets)}")
+        logger.info(f"  Wallets added to queue: {added_count}")
+        logger.info(f"  Wallets with A List status: {wallets_with_a_list}")
+        logger.info("=" * 80)
+        
+    except Exception as e:
+        logger.error(f"Error during category recomputation: {e}", exc_info=True)
+        raise
+    finally:
+        analyzer.stop_workers()
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Daily wallet analysis runner")
     parser.add_argument("--dry-run", action="store_true", help="Dry run mode (not implemented, kept for compatibility)")
+    parser.add_argument("--recompute-all-categories", action="store_true", help="Recompute category statistics for all existing wallets")
     args = parser.parse_args()
     
     if args.dry_run:
         logger.warning("Dry-run mode requested but not implemented. Running normally.")
     
-    asyncio.run(main())
+    if args.recompute_all_categories:
+        asyncio.run(recompute_all_categories())
+    else:
+        asyncio.run(main())
 

@@ -1,0 +1,569 @@
+==========================================
+Local Code Checksums - Tue Nov 18 12:28:56 MSK 2025
+==========================================
+
+File: add_csv_wallets_direct.py
+SHA256: c53c804445a351de509d30f64bb0ec2a73ad6c8626841ba250cd49c8c94010e2
+Size: 4207 bytes
+Lines: 112
+
+File: analyze_csv_wallets.py
+SHA256: 50b85702bb9da7b04f17d6741c1d7917b7711ab71e24e9f9da830456a657588a
+Size: 21503 bytes
+Lines: 501
+
+File: archive_20251106_153931/aggressive_scraper.py
+SHA256: ca730a59719c37562aaae8d1b2e2d58a19c3fcf7338f2fa57fc2ae161a67200f
+Size: 12338 bytes
+Lines: 309
+
+File: archive_20251106_153931/api_scraper.py
+SHA256: 77f65a7f8ec8d15dbb1e57a5ef0e2518cf3904ee899bf74fc5484f5a7ca5d23d
+Size: 11086 bytes
+Lines: 308
+
+File: archive_20251106_153931/collect_100_percent_wallets.py
+SHA256: 097ed9cb215fe53e7d8c4c37b32b2f8a60e663749a7a0e1906f46060cebca43b
+Size: 7036 bytes
+Lines: 187
+
+File: archive_20251106_153931/collect_250_all_best.py
+SHA256: 8bf784bf65031caef58f6d9455c0549a9be4998acdddd4280b5ad1e3acc3e07a
+Size: 15369 bytes
+Lines: 323
+
+File: archive_20251106_153931/collect_250_complete.py
+SHA256: e93595ac7c327c92eab19f8115a0aa16078da3df4d54392e18b578a6938023f7
+Size: 12953 bytes
+Lines: 313
+
+File: archive_20251106_153931/collect_250_expanded.py
+SHA256: 3cb85ff0524cb7c532cfb5867fa9ede7663d16569db9fc720596cb9d591c5697
+Size: 11119 bytes
+Lines: 261
+
+File: archive_20251106_153931/comprehensive_scraper.py
+SHA256: 4b10985feba8ea3839b9cf46da19945f2b39be8c3610704538b42b25c9af4698
+Size: 10416 bytes
+Lines: 250
+
+File: archive_20251106_153931/fetch_leaderboards_enhanced.py
+SHA256: 19ae7d523c7f8a1372dc85d03313d4b4c3c0e4d42bc18cf00a5d5cd60145e5b3
+Size: 7741 bytes
+Lines: 191
+
+File: archive_20251106_153931/filter_top_winrate.py
+SHA256: 8ef603b25a6f56308d7cacc8415c6a2f8ce399e3ae89911d218c5d01da9b409f
+Size: 9151 bytes
+Lines: 239
+
+File: archive_20251106_153931/generate_report.py
+SHA256: 403be9ac8d742da0ccfce7422848254c7db31e8f9c626ac1e5fe97a8b83176ab
+Size: 1425 bytes
+Lines: 44
+
+File: archive_20251106_153931/generate_tracked_wallets.py
+SHA256: f5a655d854fe1977ebb1a719ae0244feee051a56252066e58b88288597ad1734
+Size: 1831 bytes
+Lines: 53
+
+File: archive_20251106_153931/get_signal_summary.py
+SHA256: e7eb0fe14b287504ac39d5fc3da7bdea8dff19697b8a2509a45ec9a71cd03638
+Size: 4070 bytes
+Lines: 100
+
+File: archive_20251106_153931/hashdive_insiders_authenticated.py
+SHA256: 635963b5482cb5ae7fbf7946c907b0339421e28e1345d305014de30e8e104748
+Size: 10116 bytes
+Lines: 259
+
+File: archive_20251106_153931/hashdive_insiders_scraper.py
+SHA256: 74590aa017cea2f5301c1c12dd30c001b2be8d674f94a211907b7d527f088073
+Size: 6980 bytes
+Lines: 184
+
+File: archive_20251106_153931/hashdive_monitor.py
+SHA256: 456b73af25049014796e790bc95fb92a727418798b97ab1deede6e1747293967
+Size: 8616 bytes
+Lines: 240
+
+File: archive_20251106_153931/hashdive_scraper.py
+SHA256: 551fbf094ce4227d25564b3908e2f657cd102778d8d5f1727231dd9fbbf117d6
+Size: 6559 bytes
+Lines: 173
+
+File: archive_20251106_153931/hashdive_scraper_firefox.py
+SHA256: 28c2d603ff9914582941483cf65a15ae74fa68d60e9f28ced624eb9baac26e3f
+Size: 9301 bytes
+Lines: 209
+
+File: archive_20251106_153931/hashdive_scraper_interactive.py
+SHA256: ef87d15599f0f9ae4fe18bd23aa9abd3f695b2277fe2639dffdb0a8ebd3fe370
+Size: 8383 bytes
+Lines: 219
+
+File: archive_20251106_153931/hashdive_scraper_oauth.py
+SHA256: 884c9efce331964ac77416dda96ef1f3e7d89c542975e9646d74832dab2e9b2c
+Size: 10262 bytes
+Lines: 229
+
+File: archive_20251106_153931/hashdive_telegram.py
+SHA256: b1e97885025d76c41619960e3c84ea2676f09353dcb27d3b9b0c14b9a7a6bede
+Size: 9183 bytes
+Lines: 250
+
+File: archive_20251106_153931/hashdive_telegram_persistent.py
+SHA256: 2147d42b63e51e2e206ff0a598c2f1f3beb92336dd110d14a44b85b21437617f
+Size: 9380 bytes
+Lines: 271
+
+File: archive_20251106_153931/hashdive_telegram_server.py
+SHA256: cd1876f18b5a01358728e6531e699ee3bc66ee1e7952579124d38e3e6ccbbcba
+Size: 9817 bytes
+Lines: 279
+
+File: archive_20251106_153931/hashdive_undetected.py
+SHA256: 8032a20c1592113a29126390bcaff2e4198f4f3ea7b449c663316cf5fd90e6f7
+Size: 9838 bytes
+Lines: 247
+
+File: archive_20251106_153931/hashdive_whale_finder.py
+SHA256: dbf765dd7b167cc38b36a072aa58d633ca63a8510f51c75c085f03f0bec76a33
+Size: 3881 bytes
+Lines: 116
+
+File: archive_20251106_153931/polymarket_notifier_basic.py
+SHA256: 78f2498c3c9542343f0c67fb4bf23ad7d5637013f557639d3c3b7f200085e548
+Size: 19651 bytes
+Lines: 499
+
+File: archive_20251106_153931/scrape_all_wallets.py
+SHA256: a3faf3062dc04b1a9ada704795387d74654f70f9eaeb76052d196850701feec7
+Size: 2865 bytes
+Lines: 77
+
+File: archive_20251106_153931/scrape_polymarket_analytics.py
+SHA256: dcf3e05240c251bac04579c33601b560c9d030f94318ec3adecf00844bad556b
+Size: 24885 bytes
+Lines: 518
+
+File: archive_20251106_153931/show_last_signal.py
+SHA256: 0f332a7f56e228db4bf7226ffe335f33a4b4eac3a86843ff1f7b2ce9d0d9497b
+Size: 4075 bytes
+Lines: 112
+
+File: archive_20251106_153931/show_signal_details.py
+SHA256: f13c27f56d7ec78fe4d776bbda295139712058ea34137d6ada7c989dc0684c4a
+Size: 4300 bytes
+Lines: 113
+
+File: archive_20251106_153931/show_signal_wallets.py
+SHA256: 5115f373e76c7b7d90861ef29aa9c00fefb36ac810d32bcb56cc9e0a0dde2b01
+Size: 2857 bytes
+Lines: 74
+
+File: archive_20251106_153931/test_bet_monitoring.py
+SHA256: a7343a19146611b403c294b8250ac473fcee6ed5254fa876918b5bb3f5c98b12
+Size: 4068 bytes
+Lines: 122
+
+File: archive_20251106_153931/test_bet_monitoring_simple.py
+SHA256: 88655fd983c6324744c8d93361325985c6cca1a82395eedad00a8e3a6a7772ad
+Size: 2963 bytes
+Lines: 86
+
+File: archive_20251106_153931/test_installation.py
+SHA256: 33cd532d2527498a83d591ae064e7815f06ff4795869fd24de543b039a376cf1
+Size: 6545 bytes
+Lines: 251
+
+File: archive_20251106_153931/test_new_format.py
+SHA256: d19833488e7d74de4af2c8da55a7c45f1522e91232f75a7ba05c61bbe75d22f3
+Size: 995 bytes
+Lines: 43
+
+File: archive_20251106_153931/tmp_count.py
+SHA256: 678975febee7f3d970abe88064bb0682a209625b05fc51629f88b2f6cecb263b
+Size: 728 bytes
+Lines: 28
+
+File: archive_20251106_153931/top_winrate_scraper.py
+SHA256: 19fbc3b786d4637ef13aa9f8abdc0cb97b503f026a5f80e6b974240ba156e281
+Size: 12161 bytes
+Lines: 318
+
+File: archive_20251106_153931/update_wallets.py
+SHA256: fb24c9562227e4500194c19bd980fbd13c580fc94c44daf531dfd081d2643ef0
+Size: 1977 bytes
+Lines: 59
+
+File: archive_20251106_153931/weekly_profit_scraper.py
+SHA256: b39a2f9aba3626a527961bee38f6be8557935a1b230e2a9e24a1ca395bb1471c
+Size: 12704 bytes
+Lines: 316
+
+File: batch_analyze_wallets.py
+SHA256: 2b88e5fa3c7ec15aacbb91c5e0988638eb0016406bbbceece0bd74b25c1c4c8d
+Size: 5650 bytes
+Lines: 174
+
+File: bet_monitor.py
+SHA256: 877eaa8747d1a8c8c058c4c1a01c0c6860f5ab1b91e8bd608a7017c7f2ebca55
+Size: 20847 bytes
+Lines: 502
+
+File: check_active_consensus.py
+SHA256: 8dc2095eede02fa86b30249193bef94c7c6e66deb5cea3435ff8585cc082d81b
+Size: 4135 bytes
+Lines: 96
+
+File: check_consensus_6h.py
+SHA256: 7e8934aa39ec86119208e24d42744240b02c878e55a4a228f368e6a4209e4d5d
+Size: 6617 bytes
+Lines: 143
+
+File: check_consensus_details.py
+SHA256: 1b64ab367059081cfbd6fac57aa8a32ead68d95adca7b9db7a1b8e47313318af
+Size: 3466 bytes
+Lines: 85
+
+File: check_consensus_wallets.py
+SHA256: 35391cb7f46b35dbbe4aa4de22450ad652962052a33d2555f796bbbb7510869d
+Size: 2840 bytes
+Lines: 80
+
+File: check_db_sync.py
+SHA256: 761137a664a2055885202b014d33d1769bc5af9aaadd9fed51aa76928bf24e73
+Size: 4607 bytes
+Lines: 105
+
+File: check_last_signal_details.py
+SHA256: 6f08190daa7c34d840fe58e4b543e4948ecc0620005237b1d8aa4cfd679c872c
+Size: 2470 bytes
+Lines: 62
+
+File: check_missing_last_trade.py
+SHA256: 59a49080953dc198fc8827edc160634608f6d1b73e76865349982dd029764a1d
+Size: 5197 bytes
+Lines: 130
+
+File: check_polymarket_analytics.py
+SHA256: 71391265a23ca97f1780b2e4a71b7da682b60c8f7b5296981e489fa6f342f14e
+Size: 3233 bytes
+Lines: 97
+
+File: check_progress.py
+SHA256: 7bd351d0d07f08b46f248f6d06a58cf86c04e38edabc4f697ffeb2ceb62b7470
+Size: 5108 bytes
+Lines: 129
+
+File: check_real_consensus.py
+SHA256: 51c58f1379f759ce4ca58ea08ab87685b81b5557b88a7bc77e79ced5101927c1
+Size: 5868 bytes
+Lines: 138
+
+File: check_status.py
+SHA256: afaf2435f422c96e7e2b250fb7e3e10553fb69efc8e77b008abd762f3fb8887d
+Size: 1356 bytes
+Lines: 38
+
+File: check_tracked_consensus.py
+SHA256: b7bc5673d0c6fd89f7e55f960fb9f7d3cf139a5d76a342999e0aeaf42718aec4
+Size: 5925 bytes
+Lines: 134
+
+File: check_tracked_wallets.py
+SHA256: b66a9a69a6545162feff8ec4fb0c72eba5ea3d9b858b34893c6dfe30eda47280
+Size: 1353 bytes
+Lines: 37
+
+File: check_wallet_status.py
+SHA256: 0d20399ea6fa560243c1aaf78a785e0c6d3e708e8fae0dbf46935b9f06d4564c
+Size: 2260 bytes
+Lines: 78
+
+File: cleanup_inactive_wallets.py
+SHA256: bba985d43abedfc9840c079ae4835ddc8d849d03b9d4a8578796685ceff1a639
+Size: 4788 bytes
+Lines: 118
+
+File: cleanup_legacy_cache.py
+SHA256: 043d4eb071f3a6436c1f9b18ea114371cc5d88a9d38c55f1ac0086631335a492
+Size: 5062 bytes
+Lines: 133
+
+File: daily_report.py
+SHA256: 3a3393bef982c52beb84df80ab89849501c02a3130cb31b4b92c5b94f1930a37
+Size: 14990 bytes
+Lines: 377
+
+File: daily_wallet_analysis.py
+SHA256: 3623c059fa44d2615fa160881f9292bf5020c3afcd94a7b338d5c603927a3d88
+Size: 31856 bytes
+Lines: 682
+
+File: daily_wallet_refresh.py
+SHA256: 2b38af3cfe301f132e788f81a0c5540174822091d50f06e13df5508f48b08bc0
+Size: 6870 bytes
+Lines: 178
+
+File: db.py
+SHA256: 13a5e5a03610eba51dbede80b933b3258a57e979d2fa0d94e1604e2a4912e14c
+Size: 61859 bytes
+Lines: 1340
+
+File: debug_all_volume_leaderboard.py
+SHA256: 6416c6bcff18212616a971468ac81b06c544ce2b33c51ea29a08b74e3a414442
+Size: 10046 bytes
+Lines: 245
+
+File: diagnose_alerts.py
+SHA256: 4d3380fd713978d507279e43aaf73cdf497b19a8c14ffdb9cbb00b852cb55ffb
+Size: 4884 bytes
+Lines: 114
+
+File: diagnose_workers.py
+SHA256: 091429d2f2646b3eb62c23585de349eac1bbe76fb79c5d7b124129f6dc89cbef
+Size: 5294 bytes
+Lines: 131
+
+File: do_count_tracked.py
+SHA256: 038eb2fc689681c142d706454cdbfd66bd2c1f90a56df19245852839cb1835ce
+Size: 1121 bytes
+Lines: 40
+
+File: env.example
+SHA256: b183d2fc57a1038bf8b43a53e51b1b316bfd79d8359df4446934ccc67241641b
+Size: 6795 bytes
+Lines: 116
+
+File: export_tracked_wallets.py
+SHA256: 4bfdfcd8c30d47ac4db3d232f5151cf6d89553e3127650554af664813bc5a20a
+Size: 2660 bytes
+Lines: 67
+
+File: export_tracked_wallets_list.py
+SHA256: 34aca9d1c600adfd24393ba6e1f51e32437aa9820dc692842090d4929e6f65a1
+Size: 3581 bytes
+Lines: 85
+
+File: export_wallets.py
+SHA256: 2051addb497ac319a96f1d8ea404b2e291699da7a2dd97a73cfd7410441c8351
+Size: 1716 bytes
+Lines: 42
+
+File: export_wallets_to_excel.py
+SHA256: 5d2ffaecbfab5220563e6fc783f5b3d927b67cc021d24b44ac6f15ce64a2ba74
+Size: 2591 bytes
+Lines: 100
+
+File: fetch_hashdive_trader_explorer.py
+SHA256: 743ee28955ab5fc43b91020282dc3e0d0c478cf263d8499d281fa2064d9c96c3
+Size: 22772 bytes
+Lines: 579
+
+File: fetch_leaderboards.py
+SHA256: f7cc30e2be70df35a1e8dc7d1a8e02af8b8ecae8c347cb1e16732d044159a3ba
+Size: 12535 bytes
+Lines: 312
+
+File: fetch_polymarket_analytics_api.py
+SHA256: b501130291fbe0e7dcad750b4d378c2ca5db718ed286c2f785a36f21aacceb32
+Size: 9742 bytes
+Lines: 256
+
+File: fetch_polymarket_trades_api.py
+SHA256: a08c61c2455f6c32bff8a4e0bed8e6c4bb8d27703d5e842628e36ac1d7a582b8
+Size: 10796 bytes
+Lines: 302
+
+File: gamma_client.py
+SHA256: 1d551aca50b1e6c15e8bc1b45058b80f494d1072b171655f3481becaaace99b9
+Size: 13553 bytes
+Lines: 276
+
+File: get_daily_stats.py
+SHA256: 2cceba8f6586c559ae2ac31a4d0e83414ebb1d8a6827cb1826ae298f5777db4a
+Size: 3005 bytes
+Lines: 89
+
+File: hashdive_client.py
+SHA256: ad5b33044927acf16028f1dea4b290f1011f793cea01cfe3befc57f0b7f2967e
+Size: 7306 bytes
+Lines: 240
+
+File: import_csv_traders.py
+SHA256: 390a109c14a3d502616fb418deac2fb36f1bca339f20d0e4adbe4d6521f2b834
+Size: 7219 bytes
+Lines: 174
+
+File: inspect_analysis_results.py
+SHA256: b4849dec3dcaff745e6c98f814cb912d2ffbc82c909e7ee09f31f913ca58ef56
+Size: 5590 bytes
+Lines: 155
+
+File: maintain_wallets.py
+SHA256: 53d849e76378f1b7b958df828655b47a296f67400cc117cb885252284e4c7876
+Size: 6859 bytes
+Lines: 188
+
+File: notify.py
+SHA256: 75efcd93cf829ffb2db3f0282b7e55ec27870b2faf206272cf56d64d275f4f8a
+Size: 146779 bytes
+Lines: 2351
+
+File: polymarket-daily-analysis.service
+SHA256: 01e849a5e00c1173f24c128c4283162215e824634dc8f33d081764d8c602367c
+Size: 775 bytes
+Lines: 33
+
+File: polymarket-daily-analysis.timer
+SHA256: cdd13247ea37f9bb1aba58eef87288a6d9754fec76563cd372f721d9a3e46d18
+Size: 491 bytes
+Lines: 19
+
+File: polymarket-daily-refresh.service
+SHA256: c9cc2eea775e68874bba53c50991013fdb93978273f39caecfc1375615dd7704
+Size: 400 bytes
+Lines: 14
+
+File: polymarket-daily-refresh.timer
+SHA256: be94c0660cba3bef02686511d79f909f1821fb1a8a022bd84a38c0f4b280cec8
+Size: 253 bytes
+Lines: 13
+
+File: polymarket-daily-report.service
+SHA256: 2ddd8ddbd8384edbd6e53baf1214478df9d266423e2c97c52ea5e8476f02ab02
+Size: 394 bytes
+Lines: 14
+
+File: polymarket-daily-report.timer
+SHA256: 57cce425dc04316b3241cbd81ad3e5ad64249323369b3f7bc6d8f05562d01fa1
+Size: 237 bytes
+Lines: 13
+
+File: polymarket_auth.py
+SHA256: 0ff6a1513947142c5f29ab05ca437248cf874e3810182e13f1a617210a17dc5c
+Size: 5126 bytes
+Lines: 152
+
+File: polymarket_notifier.py
+SHA256: 0a74c796956bc902d929f43e0e2d0b743db2710361289701721af37cde7a4b5d
+Size: 166905 bytes
+Lines: 2890
+
+File: price_fetcher.py
+SHA256: 25231dcb4b38e52828b1f24920970c5c065db6d55210211704b6c1c87464e639
+Size: 42278 bytes
+Lines: 858
+
+File: process_queue_overnight.py
+SHA256: b5641302b254e2962484c4c501f62c16c0978cce6add8ffeb6182cd8d83e430f
+Size: 4766 bytes
+Lines: 147
+
+File: proxy_manager.py
+SHA256: 83f9e008531fb05cd01590205d51221754ad16b86570730ed041f5e55852b617
+Size: 4740 bytes
+Lines: 132
+
+File: refresh_wallets_from_leaderboards.py
+SHA256: c0b9b3839b0a990b47732a6df1174dcf0adfa67bdc292a219ebe2557ce9f56fa
+Size: 2407 bytes
+Lines: 79
+
+File: requirements.txt
+SHA256: 317d5d521c1830f2861dfbd53b3a587fc8950eaf4d44ffd2e5175bc9e6f0936e
+Size: 518 bytes
+Lines: 27
+
+File: restore_accepted_wallets.py
+SHA256: 97774bb03b3a7be42f85b7106d9b7abad48fca0e083738dc865e6dca7496bb45
+Size: 2772 bytes
+Lines: 77
+
+File: restore_rejected_wallets.py
+SHA256: b956b982943d8cb1f9a72158da383aaaec76ae35d7353caee247f2d54061ad86
+Size: 11843 bytes
+Lines: 242
+
+File: restore_wallets_from_backup.py
+SHA256: 539e6dcff00ab5dd6fb3fa9ff283e85b31c9a3d2e246a1bdcbd788586f3e961a
+Size: 4674 bytes
+Lines: 126
+
+File: robust_all_volume_leaderboard.py
+SHA256: affcfd4dab9666b96d61df087c6ac829a73e360fe1daf43331864c7ac2c4f7af
+Size: 25342 bytes
+Lines: 591
+
+File: send_test_alert.py
+SHA256: 6e1b6089e6d5da48cf7fa70cf395bd838b1ef0596049462629b373e2e87cab83
+Size: 3954 bytes
+Lines: 126
+
+File: test_eagles_packers_price.py
+SHA256: 393e674f0d9883db815b902621814bc2e901cbebbe0f75887198823064863af5
+Size: 2078 bytes
+Lines: 66
+
+File: test_gamma_prices.py
+SHA256: 7ec78ca8e00f148236100853f682c430b7188367e7ad9893a883d7451da9f36d
+Size: 13127 bytes
+Lines: 407
+
+File: test_hashdive_correct.py
+SHA256: 3b52befe1b369df9e40bcb99102e3254bea38ead258fc080a1bf8bd8143997bb
+Size: 3998 bytes
+Lines: 141
+
+File: test_http_fallback.py
+SHA256: ae3d00c620a09e1801d1fb5f4ef2426a745c86ab475fdf328ba73489edd9356d
+Size: 2720 bytes
+Lines: 83
+
+File: test_microstrategy_case.py
+SHA256: fb010e22eab2fdc63053dba1273a6d807228753f27c8f58f3a9132072405c59d
+Size: 2947 bytes
+Lines: 98
+
+File: test_price_fetcher.py
+SHA256: 639ab108b458c0b518748b9d6db61f401c70dbf9571e7285b14c6014ce6f1d1b
+Size: 3040 bytes
+Lines: 81
+
+File: test_price_lookup.py
+SHA256: 0b8c9c5bbe8b38057df5779d5a79dfb01128dac9589465670b97c329d5455a73
+Size: 2298 bytes
+Lines: 67
+
+File: test_proxy_connection.py
+SHA256: fc0846857e628a52b34277df8f84b1f915dff9b65de523c260986191307dc6ea
+Size: 4556 bytes
+Lines: 115
+
+File: test_random_market_prices.py
+SHA256: bb789141d95410f1ad8f3e3289c9dfdaccbe4d0a0226d64a6ef6663e046c9640
+Size: 15497 bytes
+Lines: 383
+
+File: test_single_market_price.py
+SHA256: 4af86d8316bb30da3ee336148889e63386132993dd1b4d9e742a46c0e93d405a
+Size: 2770 bytes
+Lines: 88
+
+File: utils/__init__.py
+SHA256: 35f86d7b68b8ad7d8d9eb65b769fa88b81e53244896198158df6ed3ad14a4c52
+Size: 108 bytes
+Lines: 8
+
+File: utils/http_client.py
+SHA256: a585e86a5dcaae13502381110a23d2e98ee12f07220bb90ffe08f4785c0f8a3d
+Size: 7936 bytes
+Lines: 213
+
+File: wallet_analyzer.py
+SHA256: fd309148a8b61e1c4038178fc705abfb4313901444fcf111a6f90f781b2b7d32
+Size: 64115 bytes
+Lines: 1297
+

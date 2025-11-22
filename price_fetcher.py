@@ -5,7 +5,8 @@
 import os
 import logging
 import requests
-from typing import Optional, Dict, Any
+import time
+from typing import Optional, Dict, Any, Callable
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -20,9 +21,65 @@ except ImportError:
     GAMMA_CLIENT_AVAILABLE = False
     logger.debug("[PRICE_FETCH] gamma_client module not available")
 
+# Попытка импортировать clickhouse_client
+try:
+    from clickhouse_client import ClickHouseClient, RateLimitExceeded
+    CLICKHOUSE_CLIENT_AVAILABLE = True
+except ImportError:
+    CLICKHOUSE_CLIENT_AVAILABLE = False
+    logger.debug("[PRICE_FETCH] clickhouse_client module not available")
+
 # Конфигурация таймаутов
 REQUEST_TIMEOUT = 5  # секунды
 MAX_RETRIES = 2  # количество попыток для каждого источника
+OVERALL_TIME_BUDGET = 30  # общий таймаут для всей цепочки fallback (секунды)
+
+
+def _retry_with_backoff(func: Callable, *args, max_retries: int = MAX_RETRIES, **kwargs) -> Optional[Any]:
+    """
+    Retry a function with exponential backoff.
+    
+    Args:
+        func: Function to retry
+        *args: Positional arguments for func
+        max_retries: Maximum number of retry attempts
+        **kwargs: Keyword arguments for func
+        
+    Returns:
+        Result of func if successful, None if all retries exhausted
+    """
+    for attempt in range(max_retries):
+        try:
+            result = func(*args, **kwargs)
+            if result is not None:
+                if attempt > 0:
+                    logger.info(f"[PRICE_FETCH] Retry succeeded on attempt {attempt + 1}")
+                return result
+            # If result is None and not last attempt, retry
+            if attempt < max_retries - 1:
+                wait_time = 0.5 * (2 ** attempt)  # Exponential backoff: 0.5s, 1s, 2s
+                logger.debug(f"[PRICE_FETCH] Retrying in {wait_time:.1f}s (attempt {attempt + 1}/{max_retries})")
+                time.sleep(wait_time)
+        except requests.exceptions.Timeout:
+            if attempt < max_retries - 1:
+                wait_time = 0.5 * (2 ** attempt)
+                logger.warning(f"[PRICE_FETCH] Timeout, retrying in {wait_time:.1f}s (attempt {attempt + 1}/{max_retries})")
+                time.sleep(wait_time)
+            else:
+                logger.warning(f"[PRICE_FETCH] Timeout after {max_retries} attempts")
+        except requests.exceptions.RequestException as e:
+            if attempt < max_retries - 1:
+                wait_time = 0.5 * (2 ** attempt)
+                logger.warning(f"[PRICE_FETCH] Request error ({type(e).__name__}), retrying in {wait_time:.1f}s (attempt {attempt + 1}/{max_retries})")
+                time.sleep(wait_time)
+            else:
+                logger.warning(f"[PRICE_FETCH] Request error after {max_retries} attempts: {type(e).__name__}")
+        except Exception as e:
+            # Unexpected errors - don't retry
+            logger.warning(f"[PRICE_FETCH] Unexpected error: {type(e).__name__}: {e}")
+            return None
+    
+    return None
 
 
 def condition_id_to_token_id(condition_id: str, outcome_index: int) -> str:
@@ -100,9 +157,32 @@ def get_price_from_polymarket_clob(token_id: str) -> Optional[float]:
             "side": "BUY"
         }
         
-        logger.info(f"[PRICE_FETCH] Step 1/6: CLOB /price")
-        logger.info(f"[PRICE_FETCH] [1/6] Requesting Polymarket CLOB API /price: token_id={token_id[:30]}...")
-        response = requests.get(url, headers=headers, params=params, timeout=REQUEST_TIMEOUT)
+        logger.info(f"[PRICE_FETCH] Step 1/7: CLOB /price")
+        logger.info(f"[PRICE_FETCH] [1/7] Requesting Polymarket CLOB API /price: token_id={token_id[:30]}...")
+        
+        # Retry logic with backoff
+        response = None
+        for attempt in range(MAX_RETRIES):
+            try:
+                response = requests.get(url, headers=headers, params=params, timeout=REQUEST_TIMEOUT)
+                if response.status_code == 200:
+                    break  # Success
+                elif attempt < MAX_RETRIES - 1:
+                    wait_time = 0.5 * (2 ** attempt)
+                    logger.debug(f"[PRICE_FETCH] [CLOB] Status {response.status_code}, retrying in {wait_time:.1f}s")
+                    time.sleep(wait_time)
+            except (requests.exceptions.Timeout, requests.exceptions.RequestException) as e:
+                if attempt < MAX_RETRIES - 1:
+                    wait_time = 0.5 * (2 ** attempt)
+                    logger.warning(f"[PRICE_FETCH] [CLOB] Error ({type(e).__name__}), retrying in {wait_time:.1f}s")
+                    time.sleep(wait_time)
+                else:
+                    logger.warning(f"[PRICE_FETCH] [CLOB] Failed after {MAX_RETRIES} attempts: {type(e).__name__}")
+                    return None
+        
+        if response is None:
+            logger.warning(f"[PRICE_FETCH] [CLOB] Failed after {MAX_RETRIES} attempts")
+            return None
         
         logger.info(f"[PRICE_FETCH] [1/6] Response status: {response.status_code}")
         
@@ -164,15 +244,38 @@ def get_price_from_hashdive(token_id: str) -> Optional[float]:
             "asset_id": token_id
         }
         
-        logger.info(f"[PRICE_FETCH] Step 2/5: HashiDive API")
-        logger.info(f"[PRICE_FETCH] [2/5] Requesting HashiDive API: asset_id={token_id[:30]}...")
-        response = requests.get(url, headers=headers, params=params, timeout=REQUEST_TIMEOUT)
+        logger.info(f"[PRICE_FETCH] Step 4/7: HashiDive API")
+        logger.info(f"[PRICE_FETCH] [4/7] Requesting HashiDive API: asset_id={token_id[:30]}...")
         
-        logger.info(f"[PRICE_FETCH] [2/5] Response status: {response.status_code}")
+        # Retry logic with backoff
+        response = None
+        for attempt in range(MAX_RETRIES):
+            try:
+                response = requests.get(url, headers=headers, params=params, timeout=REQUEST_TIMEOUT)
+                if response.status_code == 200:
+                    break  # Success
+                elif attempt < MAX_RETRIES - 1:
+                    wait_time = 0.5 * (2 ** attempt)
+                    logger.debug(f"[PRICE_FETCH] [HashiDive] Status {response.status_code}, retrying in {wait_time:.1f}s")
+                    time.sleep(wait_time)
+            except (requests.exceptions.Timeout, requests.exceptions.RequestException) as e:
+                if attempt < MAX_RETRIES - 1:
+                    wait_time = 0.5 * (2 ** attempt)
+                    logger.warning(f"[PRICE_FETCH] [HashiDive] Error ({type(e).__name__}), retrying in {wait_time:.1f}s")
+                    time.sleep(wait_time)
+                else:
+                    logger.warning(f"[PRICE_FETCH] [HashiDive] Failed after {MAX_RETRIES} attempts: {type(e).__name__}")
+                    return None
+        
+        if response is None:
+            logger.warning(f"[PRICE_FETCH] [HashiDive] Failed after {MAX_RETRIES} attempts")
+            return None
+        
+        logger.info(f"[PRICE_FETCH] [4/7] Response status: {response.status_code}")
         
         if response.status_code == 200:
             data = response.json()
-            logger.debug(f"[PRICE_FETCH] [2/5] Response data keys: {list(data.keys()) if isinstance(data, dict) else 'not a dict'}")
+            logger.debug(f"[PRICE_FETCH] [4/7] Response data keys: {list(data.keys()) if isinstance(data, dict) else 'not a dict'}")
             price = data.get("last_price") or data.get("price")
             if price is not None:
                 try:
@@ -227,9 +330,32 @@ def get_price_from_trades_history(token_id: str, condition_id: Optional[str] = N
         if condition_id:
             params["market"] = condition_id
         
-        logger.info(f"[PRICE_FETCH] Step 3/5: Trades History")
-        logger.debug(f"[PRICE_FETCH] [3/5] Trying trades history for token_id={token_id[:20]}...")
-        response = requests.get(url, params=params, timeout=REQUEST_TIMEOUT)
+        logger.info(f"[PRICE_FETCH] Step 3/7: Trades History")
+        logger.debug(f"[PRICE_FETCH] [3/7] Trying trades history for token_id={token_id[:20]}...")
+        
+        # Retry logic with backoff
+        response = None
+        for attempt in range(MAX_RETRIES):
+            try:
+                response = requests.get(url, params=params, timeout=REQUEST_TIMEOUT)
+                if response.status_code == 200:
+                    break  # Success
+                elif attempt < MAX_RETRIES - 1:
+                    wait_time = 0.5 * (2 ** attempt)
+                    logger.debug(f"[PRICE_FETCH] [Trades] Status {response.status_code}, retrying in {wait_time:.1f}s")
+                    time.sleep(wait_time)
+            except (requests.exceptions.Timeout, requests.exceptions.RequestException) as e:
+                if attempt < MAX_RETRIES - 1:
+                    wait_time = 0.5 * (2 ** attempt)
+                    logger.warning(f"[PRICE_FETCH] [Trades] Error ({type(e).__name__}), retrying in {wait_time:.1f}s")
+                    time.sleep(wait_time)
+                else:
+                    logger.warning(f"[PRICE_FETCH] [Trades] Failed after {MAX_RETRIES} attempts: {type(e).__name__}")
+                    return None
+        
+        if response is None:
+            logger.warning(f"[PRICE_FETCH] [Trades] Failed after {MAX_RETRIES} attempts")
+            return None
         
         if response.status_code == 200:
             data = response.json()
@@ -253,10 +379,19 @@ def get_price_from_trades_history(token_id: str, condition_id: Optional[str] = N
                         trade_timestamp = trade.get("timestamp") or trade.get("created_at") or trade.get("time")
                         if trade_timestamp:
                             try:
-                                # Если timestamp в миллисекундах
-                                if isinstance(trade_timestamp, (int, float)) and trade_timestamp > 1e10:
-                                    trade_timestamp = trade_timestamp / 1000
-                                trade_age = current_time - float(trade_timestamp)
+                                # Normalize timestamp (handle milliseconds)
+                                if isinstance(trade_timestamp, (int, float)):
+                                    # Если timestamp в миллисекундах
+                                    if trade_timestamp > 1e10:
+                                        trade_timestamp = trade_timestamp / 1000
+                                    trade_age = current_time - float(trade_timestamp)
+                                elif isinstance(trade_timestamp, str):
+                                    # ISO string - parse and convert to seconds
+                                    from datetime import datetime, timezone
+                                    dt = datetime.fromisoformat(trade_timestamp.replace('Z', '+00:00'))
+                                    trade_age = current_time - dt.timestamp()
+                                else:
+                                    continue
                                 if trade_age > max_age_seconds:
                                     logger.debug(f"[PRICE_FETCH] Skipping old trade (age: {trade_age/60:.1f} min, price: {price})")
                                     continue
@@ -286,11 +421,11 @@ def get_price_from_trades_history(token_id: str, condition_id: Optional[str] = N
                         logger.warning(f"[PRICE_FETCH] ⚠️  Price from trades history ({avg_price:.3f}) seems high - trades may be outdated or incorrect")
                     return avg_price
                 else:
-                    logger.debug(f"[PRICE_FETCH] [3/5] No valid prices found in trades")
+                    logger.debug(f"[PRICE_FETCH] [3/7] No valid prices found in trades")
             else:
-                logger.debug(f"[PRICE_FETCH] [3/5] No trades found for token_id={token_id[:20]}...")
+                logger.debug(f"[PRICE_FETCH] [3/7] No trades found for token_id={token_id[:20]}...")
         else:
-            logger.debug(f"[PRICE_FETCH] [3/5] Trades API returned status {response.status_code}")
+            logger.debug(f"[PRICE_FETCH] [3/7] Trades API returned status {response.status_code}")
             
     except requests.exceptions.Timeout:
         logger.warning(f"[PRICE_FETCH] ❌ Failed at Trades History (timeout {REQUEST_TIMEOUT}s)")
@@ -346,6 +481,52 @@ def get_price_from_trades_history(token_id: str, condition_id: Optional[str] = N
     return None
 
 
+def get_price_from_clickhouse(token_id: str) -> Optional[float]:
+    """
+    Получить цену через ClickHouse database
+    
+    Args:
+        token_id: ID токена (asset_id в ClickHouse)
+        
+    Returns:
+        float: цена токена или None при ошибке
+    """
+    if not CLICKHOUSE_CLIENT_AVAILABLE:
+        logger.debug("[PRICE_FETCH] [ClickHouse] clickhouse_client module not available")
+        return None
+    
+    try:
+        logger.info(f"[PRICE_FETCH] Step 5/7: ClickHouse")
+        logger.info(f"[PRICE_FETCH] [5/7] Requesting ClickHouse: token_id={token_id[:30]}...")
+        
+        # Initialize client
+        client = ClickHouseClient()
+        
+        # Get latest price with retry logic
+        def _get_price():
+            return client.get_latest_price(token_id)
+        
+        price = _retry_with_backoff(_get_price, max_retries=MAX_RETRIES)
+        
+        if price is not None:
+            try:
+                price_float = float(price)
+                logger.info(f"[PRICE_FETCH] ✅ Got price=0.{str(price_float).split('.')[1][:6]} from ClickHouse")
+                return price_float
+            except (ValueError, TypeError) as e:
+                logger.warning(f"[PRICE_FETCH] ❌ Failed at ClickHouse (parse error): price={price}, error={e}")
+        else:
+            logger.debug(f"[PRICE_FETCH] [5/7] ClickHouse returned None")
+            
+    except RateLimitExceeded as e:
+        logger.warning(f"[PRICE_FETCH] ⚠️ ClickHouse rate limit exceeded, skipping: {e}")
+        return None
+    except Exception as e:
+        logger.warning(f"[PRICE_FETCH] ❌ Failed at ClickHouse (unexpected error): {type(e).__name__}: {e}")
+    
+    return None
+
+
 def get_price_from_finfeed(token_id: str) -> Optional[float]:
     """
     Получить цену через FinFeed API
@@ -373,9 +554,32 @@ def get_price_from_finfeed(token_id: str) -> Optional[float]:
             "market": token_id
         }
         
-        logger.info(f"[PRICE_FETCH] Step 4/5: FinFeed API")
-        logger.debug(f"[PRICE_FETCH] [4/5] Trying FinFeed API for token_id={token_id[:20]}...")
-        response = requests.get(url, headers=headers, params=params, timeout=REQUEST_TIMEOUT)
+        logger.info(f"[PRICE_FETCH] Step 6/7: FinFeed API")
+        logger.debug(f"[PRICE_FETCH] [6/7] Trying FinFeed API for token_id={token_id[:20]}...")
+        
+        # Retry logic with backoff
+        response = None
+        for attempt in range(MAX_RETRIES):
+            try:
+                response = requests.get(url, headers=headers, params=params, timeout=REQUEST_TIMEOUT)
+                if response.status_code == 200:
+                    break  # Success
+                elif attempt < MAX_RETRIES - 1:
+                    wait_time = 0.5 * (2 ** attempt)
+                    logger.debug(f"[PRICE_FETCH] [FinFeed] Status {response.status_code}, retrying in {wait_time:.1f}s")
+                    time.sleep(wait_time)
+            except (requests.exceptions.Timeout, requests.exceptions.RequestException) as e:
+                if attempt < MAX_RETRIES - 1:
+                    wait_time = 0.5 * (2 ** attempt)
+                    logger.warning(f"[PRICE_FETCH] [FinFeed] Error ({type(e).__name__}), retrying in {wait_time:.1f}s")
+                    time.sleep(wait_time)
+                else:
+                    logger.warning(f"[PRICE_FETCH] [FinFeed] Failed after {MAX_RETRIES} attempts: {type(e).__name__}")
+                    return None
+        
+        if response is None:
+            logger.warning(f"[PRICE_FETCH] [FinFeed] Failed after {MAX_RETRIES} attempts")
+            return None
         
         if response.status_code == 200:
             data = response.json()
@@ -550,8 +754,9 @@ def get_current_price(token_id: Optional[str] = None,
     2. Gamma API (/slug или /events)
     3. История сделок (среднее значение)
     4. HashiDive API
-    5. FinFeed API
-    6. Средняя цена из wallet_prices (если предоставлена)
+    5. ClickHouse database
+    6. FinFeed API
+    7. Средняя цена из wallet_prices (если предоставлена)
     
     Args:
         token_id: ID токена-маркета Polymarket (если известен напрямую)
@@ -559,6 +764,10 @@ def get_current_price(token_id: Optional[str] = None,
         outcome_index: Индекс исхода (если известен condition_id)
         wallet_prices: Словарь wallet -> price для fallback (опционально)
         slug: Slug рынка для Gamma API (опционально, ускоряет запрос)
+            IMPORTANT: Should be market-level event slug (not market-specific slug with dates/prices).
+            Must be cleaned and normalized (no 'event/' prefix, no domain, normalized dashes).
+            If uncertain about slug type or if slug is market-specific, pass None and price_fetcher
+            will use condition_id fallback chain instead.
         
     Returns:
         float: актуальная цена токена или None при полной неудаче
@@ -590,21 +799,36 @@ def get_current_price(token_id: Optional[str] = None,
     
     logger.info(f"[PRICE_FETCH] 🔍 Starting price lookup for token_id={token_id[:30]}... condition_id={condition_id[:20] if condition_id else 'N/A'}... outcome={outcome_index}")
     
+    # Track overall time budget
+    start_time = time.time()
+    
     # Шаг 1: Polymarket CLOB API /price
-    logger.info(f"[PRICE_FETCH] Step 1/6: CLOB /price")
+    logger.info(f"[PRICE_FETCH] Step 1/7: CLOB /price")
+    elapsed = time.time() - start_time
+    if elapsed >= OVERALL_TIME_BUDGET:
+        logger.warning(f"[PRICE_FETCH] ⏱️ Time budget exceeded ({elapsed:.1f}s >= {OVERALL_TIME_BUDGET}s), aborting")
+        return None, None
     price = get_price_from_polymarket_clob(token_id)
     if price is not None:
         source = "CLOB"
+        elapsed = time.time() - start_time
+        logger.info(f"[PRICE_FETCH] ✅ Got price from {source} in {elapsed:.2f}s")
         if debug:
             logger.info(f"[PRICE_FETCH] [DEBUG] Source: {source}")
         return price, source
     
     # Шаг 2: Gamma API
-    logger.info(f"[PRICE_FETCH] Step 2/6: Gamma API")
+    logger.info(f"[PRICE_FETCH] Step 2/7: Gamma API")
+    elapsed = time.time() - start_time
+    if elapsed >= OVERALL_TIME_BUDGET:
+        logger.warning(f"[PRICE_FETCH] ⏱️ Time budget exceeded ({elapsed:.1f}s >= {OVERALL_TIME_BUDGET}s), aborting")
+        return None, None
     if condition_id and outcome_index is not None:
         price = _get_price_from_gamma(condition_id, outcome_index, slug=slug)
         if price is not None:
             source = "gamma"
+            elapsed = time.time() - start_time
+            logger.info(f"[PRICE_FETCH] ✅ Got price from {source} in {elapsed:.2f}s")
             if debug:
                 logger.info(f"[PRICE_FETCH] [DEBUG] Source: {source}")
             return price, source
@@ -612,34 +836,75 @@ def get_current_price(token_id: Optional[str] = None,
         logger.debug(f"[PRICE_FETCH] [GAMMA] Skipped: condition_id or outcome_index not provided")
     
     # Шаг 3: История сделок
-    logger.info(f"[PRICE_FETCH] Step 3/6: Trades History")
+    logger.info(f"[PRICE_FETCH] Step 3/7: Trades History")
+    elapsed = time.time() - start_time
+    if elapsed >= OVERALL_TIME_BUDGET:
+        logger.warning(f"[PRICE_FETCH] ⏱️ Time budget exceeded ({elapsed:.1f}s >= {OVERALL_TIME_BUDGET}s), aborting")
+        return None, None
     price = get_price_from_trades_history(token_id, condition_id=condition_id)
     if price is not None:
         source = "trades"
+        elapsed = time.time() - start_time
+        logger.info(f"[PRICE_FETCH] ✅ Got price from {source} in {elapsed:.2f}s")
         if debug:
             logger.info(f"[PRICE_FETCH] [DEBUG] Source: {source}")
         return price, source
     
     # Шаг 4: HashiDive API
-    logger.info(f"[PRICE_FETCH] Step 4/6: HashiDive API")
+    logger.info(f"[PRICE_FETCH] Step 4/7: HashiDive API")
+    elapsed = time.time() - start_time
+    if elapsed >= OVERALL_TIME_BUDGET:
+        logger.warning(f"[PRICE_FETCH] ⏱️ Time budget exceeded ({elapsed:.1f}s >= {OVERALL_TIME_BUDGET}s), aborting")
+        return None, None
     price = get_price_from_hashdive(token_id)
     if price is not None:
         source = "HashiDive"
+        elapsed = time.time() - start_time
+        logger.info(f"[PRICE_FETCH] ✅ Got price from {source} in {elapsed:.2f}s")
         if debug:
             logger.info(f"[PRICE_FETCH] [DEBUG] Source: {source}")
         return price, source
     
-    # Шаг 5: FinFeed API
-    logger.info(f"[PRICE_FETCH] Step 5/6: FinFeed API")
+    # Шаг 5: ClickHouse
+    logger.info(f"[PRICE_FETCH] Step 5/7: ClickHouse")
+    elapsed = time.time() - start_time
+    # Check time budget - ClickHouse queries can be slower (up to 10s timeout)
+    if elapsed >= (OVERALL_TIME_BUDGET - 12):  # 10s timeout + 2s buffer
+        logger.warning(f"[PRICE_FETCH] ⏱️ Insufficient time budget for ClickHouse ({elapsed:.1f}s remaining, need 12s), skipping")
+    else:
+        if CLICKHOUSE_CLIENT_AVAILABLE:
+            price = get_price_from_clickhouse(token_id)
+            if price is not None:
+                source = "clickhouse"
+                elapsed = time.time() - start_time
+                logger.info(f"[PRICE_FETCH] ✅ Got price from {source} in {elapsed:.2f}s")
+                if debug:
+                    logger.info(f"[PRICE_FETCH] [DEBUG] Source: {source}")
+                return price, source
+        else:
+            logger.debug(f"[PRICE_FETCH] [ClickHouse] Skipped: client not available")
+    
+    # Шаг 6: FinFeed API
+    logger.info(f"[PRICE_FETCH] Step 6/7: FinFeed API")
+    elapsed = time.time() - start_time
+    if elapsed >= OVERALL_TIME_BUDGET:
+        logger.warning(f"[PRICE_FETCH] ⏱️ Time budget exceeded ({elapsed:.1f}s >= {OVERALL_TIME_BUDGET}s), aborting")
+        return None, None
     price = get_price_from_finfeed(token_id)
     if price is not None:
         source = "FinFeed"
+        elapsed = time.time() - start_time
+        logger.info(f"[PRICE_FETCH] ✅ Got price from {source} in {elapsed:.2f}s")
         if debug:
             logger.info(f"[PRICE_FETCH] [DEBUG] Source: {source}")
         return price, source
     
-    # Шаг 6: Средняя цена из wallet_prices (если предоставлена) - fail-open
-    logger.info(f"[PRICE_FETCH] Step 6/6: wallet_prices fallback")
+    # Шаг 7: Средняя цена из wallet_prices (если предоставлена) - fail-open
+    logger.info(f"[PRICE_FETCH] Step 7/7: wallet_prices fallback")
+    elapsed = time.time() - start_time
+    if elapsed >= OVERALL_TIME_BUDGET:
+        logger.warning(f"[PRICE_FETCH] ⏱️ Time budget exceeded ({elapsed:.1f}s >= {OVERALL_TIME_BUDGET}s), aborting wallet_prices fallback")
+        return None, None
     if wallet_prices:
         logger.info(f"[WALLET_FALLBACK] Trying wallet_prices fallback (provided {len(wallet_prices)} wallet prices)...")
         logger.info(f"[WALLET_FALLBACK] wallet_prices content: {wallet_prices}")
@@ -665,6 +930,7 @@ def get_current_price(token_id: Optional[str] = None,
         logger.warning(f"[WALLET_FALLBACK] Skipped: wallet_prices empty or invalid")
     
     # Все источники исчерпаны
-    logger.warning(f"[PRICE_FETCH] ❗ All sources failed — returning None for token_id={token_id[:30]}... condition_id={condition_id[:20] if condition_id else 'N/A'}... outcome={outcome_index}")
+    elapsed = time.time() - start_time
+    logger.warning(f"[PRICE_FETCH] ❗ All sources failed after {elapsed:.2f}s — returning None for token_id={token_id[:30]}... condition_id={condition_id[:20] if condition_id else 'N/A'}... outcome={outcome_index}")
     return None, None
 

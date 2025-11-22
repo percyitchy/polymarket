@@ -1,105 +1,70 @@
 #!/bin/bash
-# Скрипт для загрузки бота на сервер
-
-SERVER="ubuntu@YOUR_SERVER_IP"
-REMOTE_DIR="/opt/polymarket-bot"
-LOCAL_DIR="/Users/johnbravo/polymarket"
+# Скрипт для развертывания обновлений на сервере
 
 echo "=========================================="
-echo "🚀 Загрузка Polymarket Bot на сервер"
+echo "Развертывание исправлений на сервере"
 echo "=========================================="
-echo "Сервер: $SERVER"
-echo "Удаленная директория: $REMOTE_DIR"
+
+# Настройки (измените под ваш сервер)
+SERVER_USER="your_user"
+SERVER_HOST="your_server_ip"
+SERVER_PATH="/opt/polymarket-bot"
+LOCAL_FILE="polymarket_notifier.py"
+
 echo ""
-
-# Проверка подключения
-echo "📡 Проверка подключения к серверу..."
-if ! ssh -o ConnectTimeout=5 -o BatchMode=yes $SERVER "echo 'OK'" 2>/dev/null; then
-    echo "❌ Не удалось подключиться к серверу"
-    echo "Проверьте SSH ключи и доступность сервера"
+echo "1. Проверка локального файла..."
+if [ ! -f "$LOCAL_FILE" ]; then
+    echo "❌ Файл $LOCAL_FILE не найден!"
     exit 1
 fi
-echo "✅ Подключение установлено"
-echo ""
+echo "✅ Файл найден"
 
-# Создание директории на сервере
-echo "📁 Создание директории на сервере..."
-ssh $SERVER "sudo mkdir -p $REMOTE_DIR && sudo chown ubuntu:ubuntu $REMOTE_DIR"
-echo "✅ Директория создана"
 echo ""
+echo "2. Копирование файла на сервер..."
+echo "   Команда: scp $LOCAL_FILE $SERVER_USER@$SERVER_HOST:$SERVER_PATH/"
+read -p "Продолжить? (y/n) " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Отменено"
+    exit 1
+fi
 
-# Синхронизация файлов (исключая ненужное)
-echo "📦 Синхронизация файлов..."
-rsync -avz --progress \
-    --exclude='.env' \
-    --exclude='.env.*' \
-    --exclude='*.db' \
-    --exclude='*.db-*' \
-    --exclude='*.log' \
-    --exclude='*.out' \
-    --exclude='*.err' \
-    --exclude='__pycache__/' \
-    --exclude='*.pyc' \
-    --exclude='*.pyo' \
-    --exclude='.git/' \
-    --exclude='.DS_Store' \
-    --exclude='*.xls' \
-    --exclude='*.xlsx' \
-    --exclude='*.csv' \
-    --exclude='archive_*/' \
-    --exclude='debug_*/' \
-    --exclude='*.png' \
-    --exclude='*.html' \
-    --exclude='venv/' \
-    --exclude='.venv/' \
-    "$LOCAL_DIR/" "$SERVER:$REMOTE_DIR/"
+scp "$LOCAL_FILE" "$SERVER_USER@$SERVER_HOST:$SERVER_PATH/"
 
 if [ $? -eq 0 ]; then
-    echo "✅ Файлы загружены успешно"
+    echo "✅ Файл скопирован"
 else
-    echo "❌ Ошибка при загрузке файлов"
+    echo "❌ Ошибка копирования файла"
     exit 1
 fi
-echo ""
 
-# Копирование .env.example как шаблон (если .env нет на сервере)
-echo "📝 Проверка .env файла..."
-if ssh $SERVER "test ! -f $REMOTE_DIR/.env"; then
-    echo "⚠️  .env файл не найден на сервере"
-    echo "Создаю .env из .env.example..."
-    ssh $SERVER "cd $REMOTE_DIR && cp env.example .env 2>/dev/null || echo '# Создайте .env файл вручную' > .env"
-    echo "✅ Шаблон .env создан"
-    echo "⚠️  ВАЖНО: Отредактируйте .env на сервере с вашими настройками!"
-else
-    echo "✅ .env файл уже существует на сервере"
+echo ""
+echo "3. Перезапуск бота на сервере..."
+echo "   Команда: ssh $SERVER_USER@$SERVER_HOST 'sudo systemctl restart polymarket-bot'"
+read -p "Продолжить? (y/n) " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Отменено"
+    exit 1
 fi
-echo ""
 
-# Установка прав на исполняемые файлы
-echo "🔧 Установка прав на исполняемые файлы..."
-ssh $SERVER "cd $REMOTE_DIR && chmod +x *.sh *.py 2>/dev/null || true"
-echo "✅ Права установлены"
-echo ""
+ssh "$SERVER_USER@$SERVER_HOST" "sudo systemctl restart polymarket-bot.service"
 
-# Проверка requirements.txt
-echo "📋 Проверка зависимостей..."
-if ssh $SERVER "test -f $REMOTE_DIR/requirements.txt"; then
-    echo "✅ requirements.txt найден"
-    echo "💡 На сервере выполните: pip3 install -r requirements.txt"
+if [ $? -eq 0 ]; then
+    echo "✅ Бот перезапущен"
 else
-    echo "⚠️  requirements.txt не найден"
+    echo "❌ Ошибка перезапуска бота"
+    exit 1
 fi
-echo ""
 
+echo ""
+echo "4. Проверка статуса бота..."
+ssh "$SERVER_USER@$SERVER_HOST" "sudo systemctl status polymarket-bot.service --no-pager | head -10"
+
+echo ""
 echo "=========================================="
-echo "✅ Загрузка завершена!"
+echo "Развертывание завершено!"
 echo "=========================================="
 echo ""
-echo "📝 Следующие шаги на сервере:"
-echo "1. Подключитесь: ssh -l ubuntu YOUR_SERVER_IP"
-echo "2. Перейдите: cd $REMOTE_DIR"
-echo "3. Отредактируйте .env файл с вашими настройками"
-echo "4. Установите зависимости: pip3 install -r requirements.txt"
-echo "5. Настройте systemd сервисы (если нужно)"
-echo ""
-
+echo "Проверьте логи на сервере:"
+echo "  ssh $SERVER_USER@$SERVER_HOST 'tail -50 $SERVER_PATH/polymarket_notifier.log'"

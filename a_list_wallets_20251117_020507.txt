@@ -1,0 +1,3780 @@
+====================================================================================================
+A LIST TRADERS EXPORT
+Generated: 2025-11-17 02:05:07 UTC
+====================================================================================================
+
+📊 OVERALL STATISTICS
+----------------------------------------------------------------------------------------------------
+Total A List wallets: 330
+Total category records: 330
+Total markets analyzed: 14948
+Average winrate: 99.48%
+Total PnL: $21,723,571.50
+Total volume: $45,395,050.66
+
+📈 CATEGORY BREAKDOWN
+----------------------------------------------------------------------------------------------------
+Category                       Wallets    Markets      Avg WR       Total PnL       Avg ROI     
+----------------------------------------------------------------------------------------------------
+other/Unknown                  330        14948        99.48%   21,723,571.50       0.7145
+
+
+====================================================================================================
+DETAILED A LIST WALLETS
+====================================================================================================
+
+
+====================================================================================================
+CATEGORY: other/Unknown
+====================================================================================================
+
+Wallet: 0x00113e75c6b045f3d21103008b908c047e3374f0
+  Display: 0x00113e75c6b045f3d2...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $590.76
+    - Volume: $794.40
+    - ROI: 0.7437 (74.37%)
+    - Avg PnL per market: $11.82
+
+Wallet: 0x00ad25e7033f56a9958114655ff3421bcf702480
+  Display: 0x00ad25e7033f56a995...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $601.44
+    - Volume: $1,066.25
+    - ROI: 0.5641 (56.41%)
+    - Avg PnL per market: $12.03
+
+Wallet: 0x03bc97aea53fe9eb8e1c49435f299756033d530c
+  Display: 0x03bc97aea53fe9eb8e...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $629.80
+    - Volume: $2,722.83
+    - ROI: 0.2313 (23.13%)
+    - Avg PnL per market: $12.60
+
+Wallet: 0x03fe8c5740b6624ba50d3480176ed7239a22b465
+  Display: 0x03fe8c5740b6624ba5...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $2,392.47
+    - Volume: $4,422.37
+    - ROI: 0.5410 (54.10%)
+    - Avg PnL per market: $47.85
+
+Wallet: 0x057ac4ddef0b43348b5a4be31955e82df5733bac
+  Display: 0x057ac4ddef0b43348b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $482,746.25
+    - Volume: $527,372.34
+    - ROI: 0.9154 (91.54%)
+    - Avg PnL per market: $9,654.93
+
+Wallet: 0x08052d80ffe580e132fa94d66619f80aff2b31c0
+  Display: 0x08052d80ffe580e132...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $30,068.82
+    - Volume: $195,765.30
+    - ROI: 0.1536 (15.36%)
+    - Avg PnL per market: $601.38
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 261
+    - Global PnL: $30,068.82
+
+Wallet: 0x0b482c0616a68f076d3bf1128e040336714b0415
+  Display: 0x0b482c0616a68f076d...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $523.64
+    - Volume: $1,290.51
+    - ROI: 0.4058 (40.58%)
+    - Avg PnL per market: $10.47
+
+Wallet: 0x0b52d91616b5d7f31dcd52e9e8143cff273e0479
+  Display: 0x0b52d91616b5d7f31d...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $13.89
+    - Volume: $123.69
+    - ROI: 0.1123 (11.23%)
+    - Avg PnL per market: $0.28
+
+Wallet: 0x0be78c0e7823f7bcd2e5f9fa6c872ec149381d99
+  Display: 0x0be78c0e7823f7bcd2...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $23,700.60
+    - Volume: $14,094.53
+    - ROI: 1.6815 (168.15%)
+    - Avg PnL per market: $474.01
+
+Wallet: 0x0df827738cc1aeaccb48d8ab6b7f8078c070f42e
+  Display: 0x0df827738cc1aeaccb...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $4,501.80
+    - Volume: $5,710.29
+    - ROI: 0.7884 (78.84%)
+    - Avg PnL per market: $90.04
+
+Wallet: 0x117174080dd4dd38a760a082b1f0da7f69d1ff19
+  Display: 0x117174080dd4dd38a7...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $859.68
+    - Volume: $493.04
+    - ROI: 1.7436 (174.36%)
+    - Avg PnL per market: $17.19
+
+Wallet: 0x115d7269753b2846fd0bdb936c31d84756aef608
+  Display: 0x115d7269753b2846fd...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $3,269.56
+    - Volume: $11,006.72
+    - ROI: 0.2971 (29.71%)
+    - Avg PnL per market: $65.39
+
+Wallet: 0x11eb51a8f4d8509365eaaa8488a247c8a2670fb0
+  Display: 0x11eb51a8f4d8509365...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $413.44
+    - Volume: $612.43
+    - ROI: 0.6751 (67.51%)
+    - Avg PnL per market: $8.27
+
+Wallet: 0x13414a77a4be48988851c73dfd824d0168e70853
+  Display: 0x13414a77a4be489888...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $226,546.83
+    - Volume: $195,244.12
+    - ROI: 1.1603 (116.03%)
+    - Avg PnL per market: $4,530.94
+
+Wallet: 0x12e543d34f4421d24ae8da14982d14e328f6bc51
+  Display: 0x12e543d34f4421d24a...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,341.84
+    - Volume: $421.02
+    - ROI: 3.1871 (318.71%)
+    - Avg PnL per market: $26.84
+
+Wallet: 0x14de3cb526412d0eedb8156a03f065b4bdca489c
+  Display: 0x14de3cb526412d0eed...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $119.46
+    - Volume: $482.74
+    - ROI: 0.2475 (24.75%)
+    - Avg PnL per market: $2.39
+
+Wallet: 0x15434f0303f8209d2ebb07a2704132c40ffd623c
+  Display: 0x15434f0303f8209d2e...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $4,281.25
+    - Volume: $24,442.07
+    - ROI: 0.1752 (17.52%)
+    - Avg PnL per market: $85.62
+
+Wallet: 0x156d47dfe9440adaa3e2290624764483511386ab
+  Display: 0x156d47dfe9440adaa3...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $16.31
+    - Volume: $100.12
+    - ROI: 0.1629 (16.29%)
+    - Avg PnL per market: $0.33
+
+Wallet: 0x186c18caabd40f2a9d5db1f0bcfc4bd509a11d32
+  Display: 0x186c18caabd40f2a9d...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $748.43
+    - Volume: $604.00
+    - ROI: 1.2391 (123.91%)
+    - Avg PnL per market: $14.97
+
+Wallet: 0x1940749e190d4bad99146f0e664d2be7bd7ff54a
+  Display: 0x1940749e190d4bad99...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,468.18
+    - Volume: $1,187.08
+    - ROI: 1.2368 (123.68%)
+    - Avg PnL per market: $29.36
+
+Wallet: 0x1a4249cd596a8e51b267dfe3c56cacc25815a00b
+  Display: 0x1a4249cd596a8e51b2...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $146,361.75
+    - Volume: $144,515.58
+    - ROI: 1.0128 (101.28%)
+    - Avg PnL per market: $2,927.24
+
+Wallet: 0x1ada370926162f2cf9559dfe4f51266fa87b43b0
+  Display: 0x1ada370926162f2cf9...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $37,167.74
+    - Volume: $64,125.64
+    - ROI: 0.5796 (57.96%)
+    - Avg PnL per market: $743.35
+
+Wallet: 0x1b41a62b4d684f4dcc8e31788df325a87a4daba3
+  Display: 0x1b41a62b4d684f4dcc...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $11,958.91
+    - Volume: $10,223.23
+    - ROI: 1.1698 (116.98%)
+    - Avg PnL per market: $239.18
+
+Wallet: 0x1c569d222d9b27db5e2ed1686bab6772b6369774
+  Display: 0x1c569d222d9b27db5e...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $715.00
+    - Volume: $4,026.89
+    - ROI: 0.1776 (17.76%)
+    - Avg PnL per market: $14.30
+
+Wallet: 0x1d0176e355421b3ac38abaa69de48e2ed73e9b25
+  Display: 0x1d0176e355421b3ac3...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $981.09
+    - Volume: $15,270.54
+    - ROI: 0.0642 (6.42%)
+    - Avg PnL per market: $19.62
+
+Wallet: 0x1df278c0937c2e1fa88567086887451fa35b8b85
+  Display: 0x1df278c0937c2e1fa8...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $397.47
+    - Volume: $590.11
+    - ROI: 0.6736 (67.36%)
+    - Avg PnL per market: $7.95
+
+Wallet: 0x1de959ed87930459fb9f9279edfb12041b0b3339
+  Display: 0x1de959ed87930459fb...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $231.46
+    - Volume: $319.72
+    - ROI: 0.7240 (72.40%)
+    - Avg PnL per market: $4.63
+
+Wallet: 0x21e0c78efe797ee642bf125d4107a1f3363e1865
+  Display: 0x21e0c78efe797ee642...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $217.07
+    - Volume: $537.76
+    - ROI: 0.4037 (40.37%)
+    - Avg PnL per market: $4.34
+
+Wallet: 0x22c878588fae7bcc4ad0d81d872dfcc101d1d3f3
+  Display: 0x22c878588fae7bcc4a...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $6,090.12
+    - Volume: $4,814.75
+    - ROI: 1.2649 (126.49%)
+    - Avg PnL per market: $121.80
+
+Wallet: 0x23cb796cf58bfa12352f0164f479deedbd50658e
+  Display: 0x23cb796cf58bfa1235...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $45,564.15
+    - Volume: $81,779.71
+    - ROI: 0.5572 (55.72%)
+    - Avg PnL per market: $911.28
+
+Wallet: 0x23ae72d6e1fb9b92bd477d449fe1ccf31570854d
+  Display: 0x23ae72d6e1fb9b92bd...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $40,585.18
+    - Volume: $34,380.40
+    - ROI: 1.1805 (118.05%)
+    - Avg PnL per market: $811.70
+
+Wallet: 0x27068ddf3669e549e9fb663b901f92d98e6044dc
+  Display: 0x27068ddf3669e549e9...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $976.39
+    - Volume: $8,313.74
+    - ROI: 0.1174 (11.74%)
+    - Avg PnL per market: $19.53
+
+Wallet: 0x286e270388e4697c12b71bee55cfd69c4c222cbc
+  Display: 0x286e270388e4697c12...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $558.32
+    - Volume: $711.52
+    - ROI: 0.7847 (78.47%)
+    - Avg PnL per market: $11.17
+
+Wallet: 0x2910eda74b54235302360007be2832dea91dec9c
+  Display: 0x2910eda74b54235302...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $3,142.03
+    - Volume: $31,298.82
+    - ROI: 0.1004 (10.04%)
+    - Avg PnL per market: $62.84
+
+Wallet: 0x29826077d805c6999bd758f429032d4fdac3aa17
+  Display: 0x29826077d805c6999b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $382.10
+    - Volume: $9,948.90
+    - ROI: 0.0384 (3.84%)
+    - Avg PnL per market: $7.64
+
+Wallet: 0x2a211203c51831ba66e2a9480fbe8250b5dddd0e
+  Display: 0x2a211203c51831ba66...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $79.62
+    - Volume: $141.37
+    - ROI: 0.5632 (56.32%)
+    - Avg PnL per market: $1.59
+
+Wallet: 0x2c04db857d6645e397a96b5f53f0c8e4868e7031
+  Display: 0x2c04db857d6645e397...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $293.87
+    - Volume: $730.14
+    - ROI: 0.4025 (40.25%)
+    - Avg PnL per market: $5.88
+
+Wallet: 0x2be3ad48f1c88e10c85e64d93f3227b3419ff77c
+  Display: 0x2be3ad48f1c88e10c8...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $299.11
+    - Volume: $41,493.24
+    - ROI: 0.0072 (0.72%)
+    - Avg PnL per market: $5.98
+
+Wallet: 0x2c45f2be0c74bf01580a4b558bb26979d6e64790
+  Display: 0x2c45f2be0c74bf0158...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $78.24
+    - Volume: $7,394.27
+    - ROI: 0.0106 (1.06%)
+    - Avg PnL per market: $1.56
+
+Wallet: 0x2e832373ceb808e4362c9493836b5f880e304645
+  Display: 0x2e832373ceb808e436...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $43.32
+    - Volume: $1,064.69
+    - ROI: 0.0407 (4.07%)
+    - Avg PnL per market: $0.87
+
+Wallet: 0x2fa0af87a0b7102800ab28018b185743355caa66
+  Display: 0x2fa0af87a0b7102800...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $2,796.84
+    - Volume: $10,406.98
+    - ROI: 0.2687 (26.87%)
+    - Avg PnL per market: $55.94
+
+Wallet: 0x2fc21b0839c06491fa8fbf0cbf848bc58693687e
+  Display: 0x2fc21b0839c06491fa...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $264.08
+    - Volume: $939.36
+    - ROI: 0.2811 (28.11%)
+    - Avg PnL per market: $5.28
+
+Wallet: 0x3305196733ef696c1a3ff6af280944f7eaad8210
+  Display: 0x3305196733ef696c1a...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $5,636.79
+    - Volume: $3,774.32
+    - ROI: 1.4935 (149.35%)
+    - Avg PnL per market: $112.74
+
+Wallet: 0x34c7c78fcbf90f45b5b8c0959ec800a64b0eb060
+  Display: 0x34c7c78fcbf90f45b5...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $6,521.44
+    - Volume: $23,494.88
+    - ROI: 0.2776 (27.76%)
+    - Avg PnL per market: $130.43
+
+Wallet: 0x355d7a67573c88a0144f8eefbd21115d7660ace2
+  Display: 0x355d7a67573c88a014...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $78.35
+    - Volume: $521.84
+    - ROI: 0.1501 (15.01%)
+    - Avg PnL per market: $1.57
+
+Wallet: 0x3520de5cdf208c7ca44ebe3c1adc52d961a2f128
+  Display: 0x3520de5cdf208c7ca4...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $19,115.85
+    - Volume: $44,335.68
+    - ROI: 0.4312 (43.12%)
+    - Avg PnL per market: $382.32
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 319
+    - Global PnL: $19,115.85
+
+Wallet: 0x386e90def17df514ac7dad9318f22b7945653463
+  Display: 0x386e90def17df514ac...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $960.61
+    - Volume: $1,100.20
+    - ROI: 0.8731 (87.31%)
+    - Avg PnL per market: $19.21
+
+Wallet: 0x39b55ea3f6b878781af5e9dbef5932207c9bcf5f
+  Display: 0x39b55ea3f6b878781a...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $3,203.30
+    - Volume: $5,941.24
+    - ROI: 0.5392 (53.92%)
+    - Avg PnL per market: $64.07
+
+Wallet: 0x3b78eecb008a979187dc19f8a768224033f82637
+  Display: 0x3b78eecb008a979187...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $759.46
+    - Volume: $1,446.62
+    - ROI: 0.5250 (52.50%)
+    - Avg PnL per market: $15.19
+
+Wallet: 0x3ca2fe3e842c6f7a9d731009938beac995e5f018
+  Display: 0x3ca2fe3e842c6f7a9d...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $980.56
+    - Volume: $1,598.70
+    - ROI: 0.6133 (61.33%)
+    - Avg PnL per market: $19.61
+
+Wallet: 0x3abffa6d0b8a22423a66064ca458499225feb143
+  Display: 0x3abffa6d0b8a22423a...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $42,246.15
+    - Volume: $109,355.24
+    - ROI: 0.3863 (38.63%)
+    - Avg PnL per market: $844.92
+
+Wallet: 0x3d5ac04c7d9d8703ca666169057ee23e7c9378e9
+  Display: 0x3d5ac04c7d9d8703ca...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $898.03
+    - Volume: $4,456.21
+    - ROI: 0.2015 (20.15%)
+    - Avg PnL per market: $17.96
+
+Wallet: 0x3e63af5178ff82833390fe4ccd915dbe96d7b2e1
+  Display: 0x3e63af5178ff828333...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $278.89
+    - Volume: $344.52
+    - ROI: 0.8095 (80.95%)
+    - Avg PnL per market: $5.58
+
+Wallet: 0x3ed7344d1e9df0ced4706c6800603cee226de617
+  Display: 0x3ed7344d1e9df0ced4...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $2,074,137.14
+    - Volume: $3,110,834.48
+    - ROI: 0.6667 (66.67%)
+    - Avg PnL per market: $41,482.74
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 146
+    - Global PnL: $2,074,137.14
+
+Wallet: 0x3f1f56bc214c49e9249c480cd3ec333f28fefeae
+  Display: 0x3f1f56bc214c49e924...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $667.06
+    - Volume: $1,062.88
+    - ROI: 0.6276 (62.76%)
+    - Avg PnL per market: $13.34
+
+Wallet: 0x4058ebfdac713a7337319b8862b0c89039d98b1c
+  Display: 0x4058ebfdac713a7337...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,167.41
+    - Volume: $9,786.86
+    - ROI: 0.1193 (11.93%)
+    - Avg PnL per market: $23.35
+
+Wallet: 0x4231e98f3b1044c3b34bf19cb27b9441d157f63e
+  Display: 0x4231e98f3b1044c3b3...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $557,817.71
+    - Volume: $512,574.83
+    - ROI: 1.0883 (108.83%)
+    - Avg PnL per market: $11,156.35
+
+Wallet: 0x425deaccb5e849eb6519ba6e37e765461d9cb8a6
+  Display: 0x425deaccb5e849eb65...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $82.82
+    - Volume: $74.70
+    - ROI: 1.1087 (110.87%)
+    - Avg PnL per market: $1.66
+
+Wallet: 0x4302da58fa5a7bc39dd4fe96026c32c4e3deaed4
+  Display: 0x4302da58fa5a7bc39d...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $8,649.98
+    - Volume: $33,650.35
+    - ROI: 0.2571 (25.71%)
+    - Avg PnL per market: $173.00
+
+Wallet: 0x45f57e6d6e5313f2a28b70dd5ce4b3ce0d83435e
+  Display: 0x45f57e6d6e5313f2a2...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $89.85
+    - Volume: $122.95
+    - ROI: 0.7308 (73.08%)
+    - Avg PnL per market: $1.80
+
+Wallet: 0x48af263d34e467dcd5dd2436ff2dd93868b10910
+  Display: 0x48af263d34e467dcd5...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $68.76
+    - Volume: $281.67
+    - ROI: 0.2441 (24.41%)
+    - Avg PnL per market: $1.38
+
+Wallet: 0x4ab4cbb260e092e7626388f3d364807b8fdf9606
+  Display: 0x4ab4cbb260e092e762...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $135.60
+    - Volume: $299.81
+    - ROI: 0.4523 (45.23%)
+    - Avg PnL per market: $2.71
+
+Wallet: 0x4b8ae011176b76888949476d7fb7a56985faf4a4
+  Display: 0x4b8ae011176b768889...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $4,029.08
+    - Volume: $7,001.31
+    - ROI: 0.5755 (57.55%)
+    - Avg PnL per market: $80.58
+
+Wallet: 0x4f1bad13ef34a4dfbbf167a29c7ce2723677bc10
+  Display: 0x4f1bad13ef34a4dfbb...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $138.41
+    - Volume: $271.04
+    - ROI: 0.5107 (51.07%)
+    - Avg PnL per market: $2.77
+
+Wallet: 0x4f371ed1962e48a2c1fb97a3c2669a6e2e907155
+  Display: 0x4f371ed1962e48a2c1...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $486.10
+    - Volume: $870.73
+    - ROI: 0.5583 (55.83%)
+    - Avg PnL per market: $9.72
+
+Wallet: 0x53da42e30351d221c9bffacefed247c8357a5418
+  Display: 0x53da42e30351d221c9...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,494.31
+    - Volume: $1,341.42
+    - ROI: 1.1140 (111.40%)
+    - Avg PnL per market: $29.89
+
+Wallet: 0x52b6392df0b0afd04a8fe948ea1a67be5405b02e
+  Display: 0x52b6392df0b0afd04a...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $8,584.89
+    - Volume: $4,863.63
+    - ROI: 1.7651 (176.51%)
+    - Avg PnL per market: $171.70
+
+Wallet: 0x53588947c49cdf8a5025dbb23385f2f7b8b85243
+  Display: 0x53588947c49cdf8a50...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $16,012.33
+    - Volume: $69,900.37
+    - ROI: 0.2291 (22.91%)
+    - Avg PnL per market: $320.25
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 155
+    - Global PnL: $16,012.33
+
+Wallet: 0x55ae4f943513ada897c5c3e186cab0bac1425aff
+  Display: 0x55ae4f943513ada897...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $87.98
+    - Volume: $520.41
+    - ROI: 0.1691 (16.91%)
+    - Avg PnL per market: $1.76
+
+Wallet: 0x56d48e453f2d4cabf6d437dde988c454f783746f
+  Display: 0x56d48e453f2d4cabf6...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $7,544.95
+    - Volume: $11,077.53
+    - ROI: 0.6811 (68.11%)
+    - Avg PnL per market: $150.90
+
+Wallet: 0x56db4e9073b3f0357da687645235426deccd171c
+  Display: 0x56db4e9073b3f0357d...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $54,196.76
+    - Volume: $28,593.26
+    - ROI: 1.8954 (189.54%)
+    - Avg PnL per market: $1,083.94
+
+Wallet: 0x576630d175b0d8edfab8336abde11765221fc03b
+  Display: 0x576630d175b0d8edfa...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $4.96
+    - Volume: $61.00
+    - ROI: 0.0813 (8.13%)
+    - Avg PnL per market: $0.10
+
+Wallet: 0x59032e5e608d94115d2c63e8c0c6f77e3c02bc30
+  Display: 0x59032e5e608d94115d...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $724.63
+    - Volume: $1,705.17
+    - ROI: 0.4250 (42.50%)
+    - Avg PnL per market: $14.49
+
+Wallet: 0x59a26a6df771dfe75e7430792603e8293ba9080d
+  Display: 0x59a26a6df771dfe75e...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $430.25
+    - Volume: $1,728.47
+    - ROI: 0.2489 (24.89%)
+    - Avg PnL per market: $8.60
+
+Wallet: 0x5b87d38577b2811179b7aa8f2cddc65d7046b6bd
+  Display: 0x5b87d38577b2811179...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $13,745.93
+    - Volume: $21,553.53
+    - ROI: 0.6378 (63.78%)
+    - Avg PnL per market: $274.92
+
+Wallet: 0x5be580b2a0d320a69b403e3642427a77c2328d0c
+  Display: 0x5be580b2a0d320a69b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $3,160.97
+    - Volume: $1,837.69
+    - ROI: 1.7201 (172.01%)
+    - Avg PnL per market: $63.22
+
+Wallet: 0x5d90ffe19c3743b5ae294bb8b4f97cd102847b8e
+  Display: 0x5d90ffe19c3743b5ae...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,511.66
+    - Volume: $2,356.78
+    - ROI: 0.6414 (64.14%)
+    - Avg PnL per market: $30.23
+
+Wallet: 0x5e25b0b5d7b55b8299cfde31d46fe1afaec21cb3
+  Display: 0x5e25b0b5d7b55b8299...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $107.92
+    - Volume: $168.59
+    - ROI: 0.6401 (64.01%)
+    - Avg PnL per market: $2.16
+
+Wallet: 0x5eb4950d75b25feeb52d8d1f61e3bbb67b944da9
+  Display: 0x5eb4950d75b25feeb5...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $90.50
+    - Volume: $144.00
+    - ROI: 0.6285 (62.85%)
+    - Avg PnL per market: $1.81
+
+Wallet: 0x5edac84d3078a6de72d8c67aa6495d3ff095d453
+  Display: 0x5edac84d3078a6de72...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,496.33
+    - Volume: $9,221.87
+    - ROI: 0.1623 (16.23%)
+    - Avg PnL per market: $29.93
+
+Wallet: 0x5f8433debb2cf9ca2b26f9660937c7b503ee67ef
+  Display: 0x5f8433debb2cf9ca2b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $3,271.66
+    - Volume: $1,708.29
+    - ROI: 1.9152 (191.52%)
+    - Avg PnL per market: $65.43
+
+Wallet: 0x6179c18450b20abf7c1221e9c827edc28afbd549
+  Display: 0x6179c18450b20abf7c...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $2,636.78
+    - Volume: $9,049.40
+    - ROI: 0.2914 (29.14%)
+    - Avg PnL per market: $52.74
+
+Wallet: 0x625689b0c128e4677f69857ef7d5d2a64ff2a229
+  Display: 0x625689b0c128e4677f...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $4,104.46
+    - Volume: $4,769.58
+    - ROI: 0.8605 (86.05%)
+    - Avg PnL per market: $82.09
+
+Wallet: 0x63532e163db8bf9d2c70bbec08a87709b975e617
+  Display: 0x63532e163db8bf9d2c...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $323.93
+    - Volume: $619.15
+    - ROI: 0.5232 (52.32%)
+    - Avg PnL per market: $6.48
+
+Wallet: 0x655cc52a2c521f43b2a1ff1a4b2c028b4aba436a
+  Display: 0x655cc52a2c521f43b2...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $8,286.22
+    - Volume: $180,637.17
+    - ROI: 0.0459 (4.59%)
+    - Avg PnL per market: $165.72
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 127
+    - Global PnL: $8,286.22
+
+Wallet: 0x671a1feca9938c55f57e77c1ac9d85c9e29a0a6d
+  Display: 0x671a1feca9938c55f5...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,127.92
+    - Volume: $2,803.99
+    - ROI: 0.4023 (40.23%)
+    - Avg PnL per market: $22.56
+
+Wallet: 0x6822b58967af40622561dd6315fc28592caa977a
+  Display: 0x6822b58967af406225...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $182.11
+    - Volume: $822.49
+    - ROI: 0.2214 (22.14%)
+    - Avg PnL per market: $3.64
+
+Wallet: 0x6864204009ba1e137989983eafee8644cb3f294b
+  Display: 0x6864204009ba1e1379...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $81,285.86
+    - Volume: $78,005.03
+    - ROI: 1.0421 (104.21%)
+    - Avg PnL per market: $1,625.72
+
+Wallet: 0x696ff668eac206233b84d077532ed52190596f29
+  Display: 0x696ff668eac206233b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $6,591.74
+    - Volume: $5,192.60
+    - ROI: 1.2694 (126.94%)
+    - Avg PnL per market: $131.83
+
+Wallet: 0x6a74a9f6c1561a650552263cdbec3d2fd437c3e4
+  Display: 0x6a74a9f6c1561a6505...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $942.40
+    - Volume: $2,831.31
+    - ROI: 0.3328 (33.28%)
+    - Avg PnL per market: $18.85
+
+Wallet: 0x6b0ebbef2630b9a0da35594bf7ddd1911246e3ea
+  Display: 0x6b0ebbef2630b9a0da...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $15,293.10
+    - Volume: $157,073.98
+    - ROI: 0.0974 (9.74%)
+    - Avg PnL per market: $305.86
+
+Wallet: 0x6b356ad06d215a10370630bc5b13626cd431d448
+  Display: 0x6b356ad06d215a1037...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $2,896.56
+    - Volume: $4,719.34
+    - ROI: 0.6138 (61.38%)
+    - Avg PnL per market: $57.93
+
+Wallet: 0x6c12a0ca91873ec5a99a8aee34656a1ca05c8b5e
+  Display: 0x6c12a0ca91873ec5a9...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $110.18
+    - Volume: $88.56
+    - ROI: 1.2441 (124.41%)
+    - Avg PnL per market: $2.20
+
+Wallet: 0x6dfcbbf534c9d2f0b1ccd60cce452d643448ac28
+  Display: 0x6dfcbbf534c9d2f0b1...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $81.14
+    - Volume: $226.52
+    - ROI: 0.3582 (35.82%)
+    - Avg PnL per market: $1.62
+
+Wallet: 0x709f7768ad96df014891589e402037407a73635a
+  Display: 0x709f7768ad96df0148...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,067.04
+    - Volume: $2,271.09
+    - ROI: 0.4698 (46.98%)
+    - Avg PnL per market: $21.34
+
+Wallet: 0x71a70f24538d885d1b45f9cea158a2cdf2e56fcf
+  Display: 0x71a70f24538d885d1b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $503,504.56
+    - Volume: $725,349.75
+    - ROI: 0.6942 (69.42%)
+    - Avg PnL per market: $10,070.09
+
+Wallet: 0x71a827bea6177b7dcccdf547cac8be5ee2d3f165
+  Display: 0x71a827bea6177b7dcc...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $144.23
+    - Volume: $1,613.88
+    - ROI: 0.0894 (8.94%)
+    - Avg PnL per market: $2.88
+
+Wallet: 0x74508e737f66a3fa9cc71c9c2d1a8638666ca23d
+  Display: 0x74508e737f66a3fa9c...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $23.66
+    - Volume: $50.00
+    - ROI: 0.4732 (47.32%)
+    - Avg PnL per market: $0.47
+
+Wallet: 0x75299bae937a1949dea2c6841fc4281a9c5b7fd9
+  Display: 0x75299bae937a1949de...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $426.49
+    - Volume: $453.53
+    - ROI: 0.9404 (94.04%)
+    - Avg PnL per market: $8.53
+
+Wallet: 0x76062e7bbfc0fb783487ff884960c4bc17962836
+  Display: 0x76062e7bbfc0fb7834...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $2,975,147.94
+    - Volume: $4,387,827.99
+    - ROI: 0.6780 (67.80%)
+    - Avg PnL per market: $59,502.96
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 142
+    - Global PnL: $2,975,147.94
+
+Wallet: 0x781765e0f3a7ce8d036553ad98a74d4af1140df3
+  Display: 0x781765e0f3a7ce8d03...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $54.35
+    - Volume: $217.20
+    - ROI: 0.2502 (25.02%)
+    - Avg PnL per market: $1.09
+
+Wallet: 0x7bf90ae06f275a7ab1efbccb6335a89c86af2059
+  Display: 0x7bf90ae06f275a7ab1...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $159.58
+    - Volume: $160.09
+    - ROI: 0.9968 (99.68%)
+    - Avg PnL per market: $3.19
+
+Wallet: 0x7b8c5eadb49be4452148aa31fd98738766c01556
+  Display: 0x7b8c5eadb49be44521...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,308,454.08
+    - Volume: $4,715,988.22
+    - ROI: 0.2775 (27.75%)
+    - Avg PnL per market: $26,169.08
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 228
+    - Global PnL: $1,308,454.08
+
+Wallet: 0x7c1c92868789e414a1868cd5afe6b234c956a0a4
+  Display: 0x7c1c92868789e414a1...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $491,699.36
+    - Volume: $803,338.09
+    - ROI: 0.6121 (61.21%)
+    - Avg PnL per market: $9,833.99
+
+Wallet: 0x7c962e7444c2c1f7b4f376c2ff13fefdbc2cc94b
+  Display: 0x7c962e7444c2c1f7b4...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $3,045.20
+    - Volume: $2,528.67
+    - ROI: 1.2043 (120.43%)
+    - Avg PnL per market: $60.90
+
+Wallet: 0x819e6a947c9fa591a8cf41b2dac86793f114e967
+  Display: 0x819e6a947c9fa591a8...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $237.14
+    - Volume: $1,576.86
+    - ROI: 0.1504 (15.04%)
+    - Avg PnL per market: $4.74
+
+Wallet: 0x842dabdbf420acea760af817fe7c85a249179d4d
+  Display: 0x842dabdbf420acea76...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $299,586.76
+    - Volume: $291,130.01
+    - ROI: 1.0290 (102.90%)
+    - Avg PnL per market: $5,991.74
+
+Wallet: 0x849ccb5907938ce8be18ed5dbf583288e2da4009
+  Display: 0x849ccb5907938ce8be...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $2,678.80
+    - Volume: $18,829.30
+    - ROI: 0.1423 (14.23%)
+    - Avg PnL per market: $53.58
+
+Wallet: 0x864a1140430b314f926c92e16aefdf6c4d787cac
+  Display: 0x864a1140430b314f92...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $11,619.77
+    - Volume: $21,971.13
+    - ROI: 0.5289 (52.89%)
+    - Avg PnL per market: $232.40
+
+Wallet: 0x8646a03387f2eacfa86eaefd95d479f82106947f
+  Display: 0x8646a03387f2eacfa8...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $63.04
+    - Volume: $1,313.92
+    - ROI: 0.0480 (4.80%)
+    - Avg PnL per market: $1.26
+
+Wallet: 0x8749194e5105c97c3d134e974e103b44eea44ea4
+  Display: 0x8749194e5105c97c3d...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $466,300.33
+    - Volume: $291,181.08
+    - ROI: 1.6014 (160.14%)
+    - Avg PnL per market: $9,326.01
+
+Wallet: 0x87dc9ff3199966fa22532488d3a70d4c4fb6a465
+  Display: 0x87dc9ff3199966fa22...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $565.59
+    - Volume: $4,845.98
+    - ROI: 0.1167 (11.67%)
+    - Avg PnL per market: $11.31
+
+Wallet: 0x88a4aabe652927a1ff7ed4728b1803f6446c346a
+  Display: 0x88a4aabe652927a1ff...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $56,168.12
+    - Volume: $31,077.04
+    - ROI: 1.8074 (180.74%)
+    - Avg PnL per market: $1,123.36
+
+Wallet: 0x89f478340ae1263b0403609117afaa2d5bd3761a
+  Display: 0x89f478340ae1263b04...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $95.32
+    - Volume: $1,372.70
+    - ROI: 0.0694 (6.94%)
+    - Avg PnL per market: $1.91
+
+Wallet: 0x8c7040df743366a3cb3f6291302b1ff6cdd6139b
+  Display: 0x8c7040df743366a3cb...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $102.07
+    - Volume: $473.77
+    - ROI: 0.2155 (21.55%)
+    - Avg PnL per market: $2.04
+
+Wallet: 0x8c9fd7cd54f7cea246d858f1f41ba44fe2c48c23
+  Display: 0x8c9fd7cd54f7cea246...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $2,045.42
+    - Volume: $1,468.70
+    - ROI: 1.3927 (139.27%)
+    - Avg PnL per market: $40.91
+
+Wallet: 0x8e996655d7ab4f235b2d7e495cc67a1bbf86a10c
+  Display: 0x8e996655d7ab4f235b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,572.60
+    - Volume: $2,786.03
+    - ROI: 0.5645 (56.45%)
+    - Avg PnL per market: $31.45
+
+Wallet: 0x91583ceb1ebec79951a068e1d7d02c1ea590fa7b
+  Display: 0x91583ceb1ebec79951...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,423,426.79
+    - Volume: $1,391,569.31
+    - ROI: 1.0229 (102.29%)
+    - Avg PnL per market: $28,468.54
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 197
+    - Global PnL: $1,423,426.79
+
+Wallet: 0x91e8112308d53cddc158fdd76df1e3c24438a953
+  Display: 0x91e8112308d53cddc1...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,461.33
+    - Volume: $10,510.12
+    - ROI: 0.1390 (13.90%)
+    - Avg PnL per market: $29.23
+
+Wallet: 0x9479ec23771a4401abb7ceb05254341b1137cf2d
+  Display: 0x9479ec23771a4401ab...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $254.48
+    - Volume: $2,249.52
+    - ROI: 0.1131 (11.31%)
+    - Avg PnL per market: $5.09
+
+Wallet: 0x94cd9153669c3fe87b588539ef48e9290a3a8903
+  Display: 0x94cd9153669c3fe87b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $52.85
+    - Volume: $69.75
+    - ROI: 0.7577 (75.77%)
+    - Avg PnL per market: $1.06
+
+Wallet: 0x953d730c212ca3a3548ce49865d2f1e55cf1c08f
+  Display: 0x953d730c212ca3a354...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,472.28
+    - Volume: $3,648.00
+    - ROI: 0.4036 (40.36%)
+    - Avg PnL per market: $29.45
+
+Wallet: 0x96d7f5891686f42f2014f476b441d0994a5630dd
+  Display: 0x96d7f5891686f42f20...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $163.17
+    - Volume: $2,556.20
+    - ROI: 0.0638 (6.38%)
+    - Avg PnL per market: $3.26
+
+Wallet: 0x989ca422fc8307f028d5c257aa406341025b9210
+  Display: 0x989ca422fc8307f028...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $2,631.04
+    - Volume: $2,568.41
+    - ROI: 1.0244 (102.44%)
+    - Avg PnL per market: $52.62
+
+Wallet: 0x98d03e3ca086f02524839a1f248133d9389601a4
+  Display: 0x98d03e3ca086f02524...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,765.00
+    - Volume: $1,917.36
+    - ROI: 0.9205 (92.05%)
+    - Avg PnL per market: $35.30
+
+Wallet: 0x99772abe60306745b7d99eb7c031f565fb0fad57
+  Display: 0x99772abe60306745b7...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $3,922.53
+    - Volume: $4,011.02
+    - ROI: 0.9779 (97.79%)
+    - Avg PnL per market: $78.45
+
+Wallet: 0x99d73983a049405ffa14fd20ec4fda3833b34d25
+  Display: 0x99d73983a049405ffa...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $195.71
+    - Volume: $205.47
+    - ROI: 0.9525 (95.25%)
+    - Avg PnL per market: $3.91
+
+Wallet: 0x9b12c8f9993b0cd1e12efa85de76b0d487a71c52
+  Display: 0x9b12c8f9993b0cd1e1...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $193.30
+    - Volume: $219.51
+    - ROI: 0.8806 (88.06%)
+    - Avg PnL per market: $3.87
+
+Wallet: 0x9c36c3b764580b3b650df02a46bbff4908de9805
+  Display: 0x9c36c3b764580b3b65...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $10,677.40
+    - Volume: $9,851.06
+    - ROI: 1.0839 (108.39%)
+    - Avg PnL per market: $213.55
+
+Wallet: 0x9c693ddad8d792fd52a6875c1bf08a93d1bf7576
+  Display: 0x9c693ddad8d792fd52...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $703.78
+    - Volume: $846.89
+    - ROI: 0.8310 (83.10%)
+    - Avg PnL per market: $14.08
+
+Wallet: 0x9c9474b3116abd738bc731ac4a827a46395531bf
+  Display: 0x9c9474b3116abd738b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $3,543.39
+    - Volume: $5,127.25
+    - ROI: 0.6911 (69.11%)
+    - Avg PnL per market: $70.87
+
+Wallet: 0x9ca2a12ac9855ed29521901468b08e32e5ba1f5e
+  Display: 0x9ca2a12ac9855ed295...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $32.66
+    - Volume: $2,894.78
+    - ROI: 0.0113 (1.13%)
+    - Avg PnL per market: $0.65
+
+Wallet: 0x9dd992ebd6f447f8b5207a5c2de84fe9f351b1b1
+  Display: 0x9dd992ebd6f447f8b5...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $12,074.35
+    - Volume: $11,886.67
+    - ROI: 1.0158 (101.58%)
+    - Avg PnL per market: $241.49
+
+Wallet: 0xa20b482f97063f4f88ef621c9203e60814399940
+  Display: 0xa20b482f97063f4f88...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $14,806.92
+    - Volume: $13,968.55
+    - ROI: 1.0600 (106.00%)
+    - Avg PnL per market: $296.14
+
+Wallet: 0xa44ba1ffab23b8e2ef1027566a3bdd04ed1362e4
+  Display: 0xa44ba1ffab23b8e2ef...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $55.93
+    - Volume: $302.83
+    - ROI: 0.1847 (18.47%)
+    - Avg PnL per market: $1.12
+
+Wallet: 0xa5a41a6cd9d811d7918c349d094294dfb78ec1ba
+  Display: 0xa5a41a6cd9d811d791...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $14,424.69
+    - Volume: $13,145.21
+    - ROI: 1.0973 (109.73%)
+    - Avg PnL per market: $288.49
+
+Wallet: 0xa67cb49d2073fef1ed5f06c4200a2caff0b80d2c
+  Display: 0xa67cb49d2073fef1ed...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,527.75
+    - Volume: $1,603.50
+    - ROI: 0.9528 (95.28%)
+    - Avg PnL per market: $30.55
+
+Wallet: 0xa68bc2666bed9187339599f38452767b9d879595
+  Display: 0xa68bc2666bed918733...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $42.91
+    - Volume: $65.00
+    - ROI: 0.6601 (66.01%)
+    - Avg PnL per market: $0.86
+
+Wallet: 0xa72709832f50eaed5b87bb08a3cce23884bf4148
+  Display: 0xa72709832f50eaed5b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $60,257.39
+    - Volume: $62,660.84
+    - ROI: 0.9616 (96.16%)
+    - Avg PnL per market: $1,205.15
+
+Wallet: 0xa6ec94f47079bb4bd047b9a98c63f9429613115f
+  Display: 0xa6ec94f47079bb4bd0...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $155.45
+    - Volume: $104.00
+    - ROI: 1.4947 (149.47%)
+    - Avg PnL per market: $3.11
+
+Wallet: 0xa7cfafa0db244f760436fcf83c8b1eb98904ba10
+  Display: 0xa7cfafa0db244f7604...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,688.52
+    - Volume: $150,638.74
+    - ROI: 0.0112 (1.12%)
+    - Avg PnL per market: $33.77
+
+Wallet: 0xa8995e41496a71d91a2974fe6bdb4a115e68f68d
+  Display: 0xa8995e41496a71d91a...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $2,456.73
+    - Volume: $3,303.64
+    - ROI: 0.7436 (74.36%)
+    - Avg PnL per market: $49.13
+
+Wallet: 0xaa518e8ed9c92cc6f71f9f184b56bd461d9d792e
+  Display: 0xaa518e8ed9c92cc6f7...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $8,994.03
+    - Volume: $12,212.45
+    - ROI: 0.7365 (73.65%)
+    - Avg PnL per market: $179.88
+
+Wallet: 0xaa6c3f0f9c4b072107f66f4201367c76c3274b49
+  Display: 0xaa6c3f0f9c4b072107...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $14,034.64
+    - Volume: $20,059.44
+    - ROI: 0.6997 (69.97%)
+    - Avg PnL per market: $280.69
+
+Wallet: 0xade860b310b31b5c886135e51904e858f8054506
+  Display: 0xade860b310b31b5c88...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $30.87
+    - Volume: $90.00
+    - ROI: 0.3430 (34.30%)
+    - Avg PnL per market: $0.62
+
+Wallet: 0xade8dfeb4550b7938d9061e7ea02b20ba753b0bd
+  Display: 0xade8dfeb4550b7938d...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $299,744.65
+    - Volume: $392,220.49
+    - ROI: 0.7642 (76.42%)
+    - Avg PnL per market: $5,994.89
+
+Wallet: 0xaeb4b62295adfe1bc21f371ba46201d34ee45ebc
+  Display: 0xaeb4b62295adfe1bc2...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $916.96
+    - Volume: $86.99
+    - ROI: 10.5413 (1054.13%)
+    - Avg PnL per market: $18.34
+
+Wallet: 0xb05e26ffae4d40f8ce147f444575433b62364fce
+  Display: 0xb05e26ffae4d40f8ce...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $7,299.37
+    - Volume: $16,230.62
+    - ROI: 0.4497 (44.97%)
+    - Avg PnL per market: $145.99
+
+Wallet: 0xb72c46255f5cc37adf86e4096e82d3a49197653e
+  Display: 0xb72c46255f5cc37adf...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $3,432.06
+    - Volume: $9,590.43
+    - ROI: 0.3579 (35.79%)
+    - Avg PnL per market: $68.64
+
+Wallet: 0xb75722d8d58f014a125a8f6e20ac8d171d2daaa2
+  Display: 0xb75722d8d58f014a12...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,080.76
+    - Volume: $5,742.31
+    - ROI: 0.1882 (18.82%)
+    - Avg PnL per market: $21.62
+
+Wallet: 0xb8d14d0488bee8a3f1403d118ba876f2e6ee40c3
+  Display: 0xb8d14d0488bee8a3f1...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $20,020.72
+    - Volume: $18,523.54
+    - ROI: 1.0808 (108.08%)
+    - Avg PnL per market: $400.41
+
+Wallet: 0xbace19b995b39ecafb2b6cf21234fffa11f76a61
+  Display: 0xbace19b995b39ecafb...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $7,980.48
+    - Volume: $29,586.35
+    - ROI: 0.2697 (26.97%)
+    - Avg PnL per market: $159.61
+
+Wallet: 0xbb4bb21191020824ec9caaac4cce246072b4ab60
+  Display: 0xbb4bb21191020824ec...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $18,024.59
+    - Volume: $21,789.75
+    - ROI: 0.8272 (82.72%)
+    - Avg PnL per market: $360.49
+
+Wallet: 0xbd62fec66dd5634aa99f57a8a507bbf188446382
+  Display: 0xbd62fec66dd5634aa9...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $82.22
+    - Volume: $194.00
+    - ROI: 0.4238 (42.38%)
+    - Avg PnL per market: $1.64
+
+Wallet: 0xbe2e1730b1c3a29042c21bdfd0416c631bdbeb40
+  Display: 0xbe2e1730b1c3a29042...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $751.60
+    - Volume: $805.38
+    - ROI: 0.9332 (93.32%)
+    - Avg PnL per market: $15.03
+
+Wallet: 0xbe285f036120817114f342b4a57a140e74f578ec
+  Display: 0xbe285f036120817114...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $51,680.11
+    - Volume: $39,072.72
+    - ROI: 1.3227 (132.27%)
+    - Avg PnL per market: $1,033.60
+
+Wallet: 0xbfccc586c262d94f42c5f4fa34465d20105312a6
+  Display: 0xbfccc586c262d94f42...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $5,295.90
+    - Volume: $23,219.34
+    - ROI: 0.2281 (22.81%)
+    - Avg PnL per market: $105.92
+
+Wallet: 0xc0603879ceb00f8011e65271e9b55888e6d54fea
+  Display: 0xc0603879ceb00f8011...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,730.34
+    - Volume: $4,870.28
+    - ROI: 0.3553 (35.53%)
+    - Avg PnL per market: $34.61
+
+Wallet: 0xc2a28a5bd7f3913470d9a2cafbc8c6441ca7d5e9
+  Display: 0xc2a28a5bd7f3913470...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $7,045.16
+    - Volume: $7,510.01
+    - ROI: 0.9381 (93.81%)
+    - Avg PnL per market: $140.90
+
+Wallet: 0xc29d9ddd6f8070bcd78ca55ac2427d8311b21396
+  Display: 0xc29d9ddd6f8070bcd7...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $438.25
+    - Volume: $1,243.53
+    - ROI: 0.3524 (35.24%)
+    - Avg PnL per market: $8.77
+
+Wallet: 0xc4531b3ba99ad22d620f283b4e925f688d9aa29c
+  Display: 0xc4531b3ba99ad22d62...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $2,343.76
+    - Volume: $4,945.51
+    - ROI: 0.4739 (47.39%)
+    - Avg PnL per market: $46.88
+
+Wallet: 0xc75975f347581be12d05f26ab5b9b1b61b7cb0d2
+  Display: 0xc75975f347581be12d...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $4,525.56
+    - Volume: $3,763.64
+    - ROI: 1.2024 (120.24%)
+    - Avg PnL per market: $90.51
+
+Wallet: 0xc761b19de4403549f44830b9a03dadd7b08c793d
+  Display: 0xc761b19de4403549f4...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,481.38
+    - Volume: $1,518.61
+    - ROI: 0.9755 (97.55%)
+    - Avg PnL per market: $29.63
+
+Wallet: 0xcb636e66fe89038ef9c805d0876c6c29339858a1
+  Display: 0xcb636e66fe89038ef9...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $77.67
+    - Volume: $180.00
+    - ROI: 0.4315 (43.15%)
+    - Avg PnL per market: $1.55
+
+Wallet: 0xcbad5c47fef96567d7a28be5e66bdfce991bba98
+  Display: 0xcbad5c47fef96567d7...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $449.27
+    - Volume: $1,131.38
+    - ROI: 0.3971 (39.71%)
+    - Avg PnL per market: $8.99
+
+Wallet: 0xcc81e2cb4507dffe7871e9df22023c9722a1cb4b
+  Display: 0xcc81e2cb4507dffe78...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $127.24
+    - Volume: $116.00
+    - ROI: 1.0969 (109.69%)
+    - Avg PnL per market: $2.54
+
+Wallet: 0xce0a9a3c325820a078fda1f74fc973b7c16cc836
+  Display: 0xce0a9a3c325820a078...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $7,122.56
+    - Volume: $4,129.37
+    - ROI: 1.7249 (172.49%)
+    - Avg PnL per market: $142.45
+
+Wallet: 0xceced08d52c841856447837d8608220c1f2c8c50
+  Display: 0xceced08d52c8418564...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $3,176.79
+    - Volume: $6,116.46
+    - ROI: 0.5194 (51.94%)
+    - Avg PnL per market: $63.54
+
+Wallet: 0xd272c4d602eda074d725f1610eb4607da4d951e7
+  Display: 0xd272c4d602eda074d7...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $3,445.71
+    - Volume: $5,608.40
+    - ROI: 0.6144 (61.44%)
+    - Avg PnL per market: $68.91
+
+Wallet: 0xd5b7664d607599be3a5440ae68cc6c5df7feadf5
+  Display: 0xd5b7664d607599be3a...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $320.86
+    - Volume: $413.92
+    - ROI: 0.7752 (77.52%)
+    - Avg PnL per market: $6.42
+
+Wallet: 0xd8345f47d3b78a65636ef56e444c7a4c9c4be011
+  Display: 0xd8345f47d3b78a6563...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $405.97
+    - Volume: $4,708.00
+    - ROI: 0.0862 (8.62%)
+    - Avg PnL per market: $8.12
+
+Wallet: 0xd8fa47ccc86a1357e055f9061f8d51c367f0a6ea
+  Display: 0xd8fa47ccc86a1357e0...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $52.44
+    - Volume: $110.16
+    - ROI: 0.4761 (47.61%)
+    - Avg PnL per market: $1.05
+
+Wallet: 0xd9663878e8a1011afbb5e40fd31c75585bf181eb
+  Display: 0xd9663878e8a1011afb...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $360.53
+    - Volume: $317.66
+    - ROI: 1.1349 (113.49%)
+    - Avg PnL per market: $7.21
+
+Wallet: 0xda779356466f84d9a2196c756b01fb8557708240
+  Display: 0xda779356466f84d9a2...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $7,488.96
+    - Volume: $9,064.67
+    - ROI: 0.8262 (82.62%)
+    - Avg PnL per market: $149.78
+
+Wallet: 0xdb6fb3647f8e4391c72080e98b1fa46f4a1c14f4
+  Display: 0xdb6fb3647f8e4391c7...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $33.79
+    - Volume: $84.00
+    - ROI: 0.4022 (40.22%)
+    - Avg PnL per market: $0.68
+
+Wallet: 0xdc696da418428d1b5c20ede23f559c991e9b62e9
+  Display: 0xdc696da418428d1b5c...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $318.13
+    - Volume: $258.62
+    - ROI: 1.2301 (123.01%)
+    - Avg PnL per market: $6.36
+
+Wallet: 0xdd45c0e514003e828d6ff186d4b2c132c825b39e
+  Display: 0xdd45c0e514003e828d...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $10,392.50
+    - Volume: $8,312.59
+    - ROI: 1.2502 (125.02%)
+    - Avg PnL per market: $207.85
+
+Wallet: 0xe0f48575d59b0d37abcd7ad377f7c5b07cc5e02f
+  Display: 0xe0f48575d59b0d37ab...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $5,506.76
+    - Volume: $15,062.69
+    - ROI: 0.3656 (36.56%)
+    - Avg PnL per market: $110.14
+
+Wallet: 0xe212ea133acebef577760c0711808c9e2fd1d5f4
+  Display: 0xe212ea133acebef577...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $17,789.96
+    - Volume: $96,499.07
+    - ROI: 0.1844 (18.44%)
+    - Avg PnL per market: $355.80
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 168
+    - Global PnL: $17,789.96
+
+Wallet: 0xe4053a10837fe8a9780955122fc232c881a7bf91
+  Display: 0xe4053a10837fe8a978...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $422,008.48
+    - Volume: $1,186,342.17
+    - ROI: 0.3557 (35.57%)
+    - Avg PnL per market: $8,440.17
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 176
+    - Global PnL: $422,008.48
+
+Wallet: 0xe3b8b17110cb875fce9dd91adaff0c5ec4e0e7d5
+  Display: 0xe3b8b17110cb875fce...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,964.74
+    - Volume: $3,191.56
+    - ROI: 0.6156 (61.56%)
+    - Avg PnL per market: $39.29
+
+Wallet: 0xe48c30d29be48ef78bb02b332c407b2bdda1163a
+  Display: 0xe48c30d29be48ef78b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $2,019.39
+    - Volume: $1,461.86
+    - ROI: 1.3814 (138.14%)
+    - Avg PnL per market: $40.39
+
+Wallet: 0xe42e0ad78e9ebb121314384484b983231db48d89
+  Display: 0xe42e0ad78e9ebb1213...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $565,575.94
+    - Volume: $724,412.22
+    - ROI: 0.7807 (78.07%)
+    - Avg PnL per market: $11,311.52
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 281
+    - Global PnL: $565,575.94
+
+Wallet: 0xe644ec2adf3a99e872851cb03bfb8de1ca781dff
+  Display: 0xe644ec2adf3a99e872...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $9,457.93
+    - Volume: $251,312.30
+    - ROI: 0.0376 (3.76%)
+    - Avg PnL per market: $189.16
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 119
+    - Global PnL: $9,457.93
+
+Wallet: 0xe6cbefad4e8c1d286f47e84e333b4075c2ea2b12
+  Display: 0xe6cbefad4e8c1d286f...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $35,786.68
+    - Volume: $39,418.22
+    - ROI: 0.9079 (90.79%)
+    - Avg PnL per market: $715.73
+
+Wallet: 0xe96c4ce133649709ad66919351808eccb6c9a0aa
+  Display: 0xe96c4ce133649709ad...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,641.87
+    - Volume: $2,431.36
+    - ROI: 0.6753 (67.53%)
+    - Avg PnL per market: $32.84
+
+Wallet: 0xead152b855effa6b5b5837f53b24c0756830c76a
+  Display: 0xead152b855effa6b5b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,311,635.16
+    - Volume: $1,593,430.70
+    - ROI: 0.8232 (82.32%)
+    - Avg PnL per market: $26,232.70
+
+Wallet: 0xf02f1afab02432f1be4df881b7253c0c27e7ff23
+  Display: 0xf02f1afab02432f1be...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $8,619.80
+    - Volume: $60,221.92
+    - ROI: 0.1431 (14.31%)
+    - Avg PnL per market: $172.40
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 181
+    - Global PnL: $8,619.80
+
+Wallet: 0xf0d9b4656e787f9c01ae2c2689ec98d3b7f5b3c8
+  Display: 0xf0d9b4656e787f9c01...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $210.77
+    - Volume: $3,467.11
+    - ROI: 0.0608 (6.08%)
+    - Avg PnL per market: $4.22
+
+Wallet: 0xf1f49615e8c955ac48acf937b375feb674c27942
+  Display: 0xf1f49615e8c955ac48...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $5,428.24
+    - Volume: $8,209.67
+    - ROI: 0.6612 (66.12%)
+    - Avg PnL per market: $108.56
+
+Wallet: 0xf1abc2696bb41e3821de279fb75a1dee1d76361b
+  Display: 0xf1abc2696bb41e3821...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $523.85
+    - Volume: $430.91
+    - ROI: 1.2157 (121.57%)
+    - Avg PnL per market: $10.48
+
+Wallet: 0xf3002c13a7927e55e0545ff6e4857f44f0704329
+  Display: 0xf3002c13a7927e55e0...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $207.19
+    - Volume: $161.66
+    - ROI: 1.2817 (128.17%)
+    - Avg PnL per market: $4.14
+
+Wallet: 0xf307a1a4a8657f46e1e08b594850ba53e5ca5f69
+  Display: 0xf307a1a4a8657f46e1...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $88.07
+    - Volume: $272.00
+    - ROI: 0.3238 (32.38%)
+    - Avg PnL per market: $1.76
+
+Wallet: 0xf377facc997e80dbaf2adbde12864646b680bc00
+  Display: 0xf377facc997e80dbaf...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $380.01
+    - Volume: $697.29
+    - ROI: 0.5450 (54.50%)
+    - Avg PnL per market: $7.60
+
+Wallet: 0xf45ac3623eaaba4fc6f9cf74b8b3922a63c6d0b7
+  Display: 0xf45ac3623eaaba4fc6...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $3,570.89
+    - Volume: $2,574.22
+    - ROI: 1.3872 (138.72%)
+    - Avg PnL per market: $71.42
+
+Wallet: 0xf79db95c0e63bd4e2095439497d190aea7f24350
+  Display: 0xf79db95c0e63bd4e20...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $1,874.02
+    - Volume: $9,704.49
+    - ROI: 0.1931 (19.31%)
+    - Avg PnL per market: $37.48
+
+Wallet: 0xfb9d0ad8ee7b036fb6ba388b42eab7ecc6ceb033
+  Display: 0xfb9d0ad8ee7b036fb6...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $2,652.34
+    - Volume: $2,412.09
+    - ROI: 1.0996 (109.96%)
+    - Avg PnL per market: $53.05
+
+Wallet: 0xfd2b05928e63a513efda1e60d6d925b271e29ff9
+  Display: 0xfd2b05928e63a513ef...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $13,733.54
+    - Volume: $98,338.12
+    - ROI: 0.1397 (13.97%)
+    - Avg PnL per market: $274.67
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 283
+    - Global PnL: $13,733.54
+
+Wallet: 0xfd453969a6522c026576b3c30a7d338dd98a6d93
+  Display: 0xfd453969a6522c0265...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $618.85
+    - Volume: $622.87
+    - ROI: 0.9935 (99.35%)
+    - Avg PnL per market: $12.38
+
+Wallet: 0xfd6a3ffd2a8d706c830fab2dd60dfaddb736f9dc
+  Display: 0xfd6a3ffd2a8d706c83...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $3,548.29
+    - Volume: $25,886.69
+    - ROI: 0.1371 (13.71%)
+    - Avg PnL per market: $70.97
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 592
+    - Global PnL: $3,548.29
+
+Wallet: 0xfd8ef430087eaf7fa48d0ae9f5855fb1adfb085e
+  Display: 0xfd8ef430087eaf7fa4...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 100.00%
+    - PnL: $12,850.00
+    - Volume: $12,850.00
+    - ROI: 1.0000 (100.00%)
+    - Avg PnL per market: $257.00
+
+Wallet: 0x569fffa15a130de2000ecd36e53a1532f7195561
+  Display: 0x569fffa15a130de200...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 49
+    - Winrate: 100.00%
+    - PnL: $317.33
+    - Volume: $627.78
+    - ROI: 0.5055 (50.55%)
+    - Avg PnL per market: $6.48
+
+Wallet: 0x56e0f656c9568a08abfe78b5a0145b69582ff075
+  Display: 0x56e0f656c9568a08ab...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 49
+    - Winrate: 100.00%
+    - PnL: $103.55
+    - Volume: $138.13
+    - ROI: 0.7496 (74.96%)
+    - Avg PnL per market: $2.11
+
+Wallet: 0x5d746fbafd770c170bf8863363f9987b31ecbe87
+  Display: 0x5d746fbafd770c170b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 49
+    - Winrate: 100.00%
+    - PnL: $22,064.94
+    - Volume: $12,521.87
+    - ROI: 1.7621 (176.21%)
+    - Avg PnL per market: $450.30
+
+Wallet: 0x6239c6fa473f967d46dab883a09dd327be32c24f
+  Display: 0x6239c6fa473f967d46...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 49
+    - Winrate: 100.00%
+    - PnL: $171,429.44
+    - Volume: $80,198.17
+    - ROI: 2.1376 (213.76%)
+    - Avg PnL per market: $3,498.56
+
+Wallet: 0x68c76a79b5ffd9c4782d7ca1dfa673f671e4fa37
+  Display: 0x68c76a79b5ffd9c478...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 49
+    - Winrate: 100.00%
+    - PnL: $10,934.64
+    - Volume: $5,107.38
+    - ROI: 2.1409 (214.09%)
+    - Avg PnL per market: $223.16
+
+Wallet: 0x9714537c9c0b68824d3cf67a6b53138d01ab3014
+  Display: 0x9714537c9c0b68824d...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 49
+    - Winrate: 100.00%
+    - PnL: $3,260.74
+    - Volume: $82,219.71
+    - ROI: 0.0397 (3.97%)
+    - Avg PnL per market: $66.55
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 225
+    - Global PnL: $3,260.74
+
+Wallet: 0x980a7464ca19e9a99242057baa739ed54a9a8ccb
+  Display: 0x980a7464ca19e9a992...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 49
+    - Winrate: 100.00%
+    - PnL: $1,218.30
+    - Volume: $3,164.33
+    - ROI: 0.3850 (38.50%)
+    - Avg PnL per market: $24.86
+
+Wallet: 0xa76ecc1e0fb35b8583ac329df3cf5b603387dcb6
+  Display: 0xa76ecc1e0fb35b8583...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 49
+    - Winrate: 100.00%
+    - PnL: $3,793.00
+    - Volume: $4,466.34
+    - ROI: 0.8492 (84.92%)
+    - Avg PnL per market: $77.41
+
+Wallet: 0xb4de513676659b3def9bcce82dc6ec91c104cb5c
+  Display: 0xb4de513676659b3def...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 49
+    - Winrate: 100.00%
+    - PnL: $1,771.65
+    - Volume: $10,039.34
+    - ROI: 0.1765 (17.65%)
+    - Avg PnL per market: $36.16
+
+Wallet: 0xb6fa57039ea79185895500dbd0067c288594abcf
+  Display: 0xb6fa57039ea7918589...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 49
+    - Winrate: 100.00%
+    - PnL: $9,029.85
+    - Volume: $130,166.84
+    - ROI: 0.0694 (6.94%)
+    - Avg PnL per market: $184.28
+
+Wallet: 0xdabdaaacaab53d1cfae5e7e00a36560a398117d7
+  Display: 0xdabdaaacaab53d1cfa...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 49
+    - Winrate: 100.00%
+    - PnL: $398.44
+    - Volume: $88,466.40
+    - ROI: 0.0045 (0.45%)
+    - Avg PnL per market: $8.13
+
+Wallet: 0xeffcc79a8572940cee2238b44eac89f2c48fda88
+  Display: 0xeffcc79a8572940cee...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 49
+    - Winrate: 100.00%
+    - PnL: $189,525.42
+    - Volume: $162,364.86
+    - ROI: 1.1673 (116.73%)
+    - Avg PnL per market: $3,867.87
+
+Wallet: 0x28b255ed9747765be4f44ce484532d4b6bdfa74f
+  Display: 0x28b255ed9747765be4...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 48
+    - Winrate: 100.00%
+    - PnL: $9,010.26
+    - Volume: $402,330.29
+    - ROI: 0.0224 (2.24%)
+    - Avg PnL per market: $187.71
+
+Wallet: 0x3e08fceef3b451dc37b4dab23071079a6ee06bad
+  Display: 0x3e08fceef3b451dc37...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 48
+    - Winrate: 100.00%
+    - PnL: $3,084.57
+    - Volume: $5,881.50
+    - ROI: 0.5245 (52.45%)
+    - Avg PnL per market: $64.26
+
+Wallet: 0x8b1df679a18eb7e79c7d01c92d6a39d50635b3a5
+  Display: 0x8b1df679a18eb7e79c...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 48
+    - Winrate: 100.00%
+    - PnL: $96.15
+    - Volume: $292.17
+    - ROI: 0.3291 (32.91%)
+    - Avg PnL per market: $2.00
+
+Wallet: 0xb25674e17bb06902593c34e124ca2cc29c72b6df
+  Display: 0xb25674e17bb0690259...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 48
+    - Winrate: 100.00%
+    - PnL: $10,842.17
+    - Volume: $14,949.99
+    - ROI: 0.7252 (72.52%)
+    - Avg PnL per market: $225.88
+
+Wallet: 0xb4763416499108750f49f22278c75cb4ff0b2d87
+  Display: 0xb4763416499108750f...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 48
+    - Winrate: 100.00%
+    - PnL: $436.38
+    - Volume: $1,663.05
+    - ROI: 0.2624 (26.24%)
+    - Avg PnL per market: $9.09
+
+Wallet: 0xbfc3317656b23fbf131544523370d2a54266b21f
+  Display: 0xbfc3317656b23fbf13...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 48
+    - Winrate: 100.00%
+    - PnL: $9,607.49
+    - Volume: $24,944.55
+    - ROI: 0.3852 (38.52%)
+    - Avg PnL per market: $200.16
+
+Wallet: 0xd97c5c25774ee6e7ebbc4456e1eaa32f2b29aedb
+  Display: 0xd97c5c25774ee6e7eb...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 48
+    - Winrate: 100.00%
+    - PnL: $23,687.94
+    - Volume: $59,266.16
+    - ROI: 0.3997 (39.97%)
+    - Avg PnL per market: $493.50
+
+Wallet: 0xfe4a062042e17c03f179aeef4112636739289373
+  Display: 0xfe4a062042e17c03f1...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 48
+    - Winrate: 100.00%
+    - PnL: $964.81
+    - Volume: $4,437.95
+    - ROI: 0.2174 (21.74%)
+    - Avg PnL per market: $20.10
+
+Wallet: 0x3513c79179a3fc315107f35487a053f4bef1c19d
+  Display: 0x3513c79179a3fc3151...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 47
+    - Winrate: 100.00%
+    - PnL: $2,633.22
+    - Volume: $3,495.81
+    - ROI: 0.7533 (75.33%)
+    - Avg PnL per market: $56.03
+
+Wallet: 0x3dbc00c003e96b7b6edb1dde9acfe849cc95a8c1
+  Display: 0x3dbc00c003e96b7b6e...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 47
+    - Winrate: 100.00%
+    - PnL: $519.27
+    - Volume: $1,047.30
+    - ROI: 0.4958 (49.58%)
+    - Avg PnL per market: $11.05
+
+Wallet: 0x92672c80d36dcd08172aa1e51dface0f20b70f9a
+  Display: 0x92672c80d36dcd0817...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 47
+    - Winrate: 100.00%
+    - PnL: $1,855,692.97
+    - Volume: $2,334,099.51
+    - ROI: 0.7950 (79.50%)
+    - Avg PnL per market: $39,482.83
+
+Wallet: 0x09fe78c8b9f10fb9c7c0a584bfab4205c76876ee
+  Display: 0x09fe78c8b9f10fb9c7...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 46
+    - Winrate: 100.00%
+    - PnL: $10,108.51
+    - Volume: $43,368.16
+    - ROI: 0.2331 (23.31%)
+    - Avg PnL per market: $219.75
+
+Wallet: 0x293ed5233e9cab8af3ce9b1c3aa0ec4688099962
+  Display: 0x293ed5233e9cab8af3...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 46
+    - Winrate: 100.00%
+    - PnL: $1,089.62
+    - Volume: $16,830.17
+    - ROI: 0.0647 (6.47%)
+    - Avg PnL per market: $23.69
+
+Wallet: 0x79eb410113d6075c2aaef7855986c8a15990f471
+  Display: 0x79eb410113d6075c2a...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 46
+    - Winrate: 100.00%
+    - PnL: $2,299.39
+    - Volume: $8,365.87
+    - ROI: 0.2749 (27.49%)
+    - Avg PnL per market: $49.99
+
+Wallet: 0x0f863d92dd2b960e3eb6a23a35fd92a91981404e
+  Display: 0x0f863d92dd2b960e3e...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 45
+    - Winrate: 100.00%
+    - PnL: $59,778.82
+    - Volume: $57,381.76
+    - ROI: 1.0418 (104.18%)
+    - Avg PnL per market: $1,328.42
+
+Wallet: 0x21064fd320bfd5a86f8c92a94d3209edf4154dea
+  Display: 0x21064fd320bfd5a86f...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 45
+    - Winrate: 100.00%
+    - PnL: $40,752.66
+    - Volume: $38,597.51
+    - ROI: 1.0558 (105.58%)
+    - Avg PnL per market: $905.61
+
+Wallet: 0x369e12f4b81ba2e78662241a9e90d848de62d016
+  Display: 0x369e12f4b81ba2e786...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 45
+    - Winrate: 100.00%
+    - PnL: $1,599.68
+    - Volume: $1,819.69
+    - ROI: 0.8791 (87.91%)
+    - Avg PnL per market: $35.55
+
+Wallet: 0x756dee02461aef486fff4f035de7c542484b4b84
+  Display: 0x756dee02461aef486f...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 45
+    - Winrate: 100.00%
+    - PnL: $386.29
+    - Volume: $1,731.11
+    - ROI: 0.2231 (22.31%)
+    - Avg PnL per market: $8.58
+
+Wallet: 0xb9fc8078fd6c0275c631ec10fcf8d5cc52d6da76
+  Display: 0xb9fc8078fd6c0275c6...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 45
+    - Winrate: 100.00%
+    - PnL: $75,587.05
+    - Volume: $170,422.84
+    - ROI: 0.4435 (44.35%)
+    - Avg PnL per market: $1,679.71
+
+Wallet: 0xdc814e7371182f4752a14363ddf85b038f824f06
+  Display: 0xdc814e7371182f4752...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 45
+    - Winrate: 100.00%
+    - PnL: $623.60
+    - Volume: $24,854.36
+    - ROI: 0.0251 (2.51%)
+    - Avg PnL per market: $13.86
+
+Wallet: 0x057dcca8f9c1c44cddfc9c14604743c6166e4d1f
+  Display: 0x057dcca8f9c1c44cdd...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 44
+    - Winrate: 100.00%
+    - PnL: $4,025.09
+    - Volume: $13,912.83
+    - ROI: 0.2893 (28.93%)
+    - Avg PnL per market: $91.48
+
+Wallet: 0x1b66e77353a8c91e4bdf9a0cf2ae98eb43cde90a
+  Display: 0x1b66e77353a8c91e4b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 44
+    - Winrate: 100.00%
+    - PnL: $531.87
+    - Volume: $6,535.71
+    - ROI: 0.0814 (8.14%)
+    - Avg PnL per market: $12.09
+
+Wallet: 0xf3c907c2e5567e00dbb46d3f96a288951195d527
+  Display: 0xf3c907c2e5567e00db...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 44
+    - Winrate: 100.00%
+    - PnL: $382.50
+    - Volume: $779.57
+    - ROI: 0.4907 (49.07%)
+    - Avg PnL per market: $8.69
+
+Wallet: 0x16b335bfbb6a7a90458e205d30e8c76a568c403b
+  Display: 0x16b335bfbb6a7a9045...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 43
+    - Winrate: 100.00%
+    - PnL: $768.78
+    - Volume: $4,002.69
+    - ROI: 0.1921 (19.21%)
+    - Avg PnL per market: $17.88
+
+Wallet: 0x4ef0194e8cfd5617972665826f402836ac5f15a0
+  Display: 0x4ef0194e8cfd561797...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 43
+    - Winrate: 100.00%
+    - PnL: $45,875.88
+    - Volume: $190,658.53
+    - ROI: 0.2406 (24.06%)
+    - Avg PnL per market: $1,066.88
+
+Wallet: 0xf23a0aa1089b041518346ee5d5d95d2c62eedf6f
+  Display: 0xf23a0aa1089b041518...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 43
+    - Winrate: 100.00%
+    - PnL: $1,618.18
+    - Volume: $5,318.00
+    - ROI: 0.3043 (30.43%)
+    - Avg PnL per market: $37.63
+
+Wallet: 0x9e8077593bf0a6fd63f988dcf589f7558897f694
+  Display: 0x9e8077593bf0a6fd63...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 42
+    - Winrate: 100.00%
+    - PnL: $7,034.33
+    - Volume: $359,045.05
+    - ROI: 0.0196 (1.96%)
+    - Avg PnL per market: $167.48
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 512
+    - Global PnL: $7,034.33
+
+Wallet: 0x3f7aee8f1fafcd873343105b24f83f3f98a9248e
+  Display: 0x3f7aee8f1fafcd8733...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 41
+    - Winrate: 100.00%
+    - PnL: $71,333.57
+    - Volume: $11,414,157.63
+    - ROI: 0.0062 (0.62%)
+    - Avg PnL per market: $1,739.84
+
+Wallet: 0x78c9bb70ca8305b14454cb261401100026571623
+  Display: 0x78c9bb70ca8305b144...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 41
+    - Winrate: 100.00%
+    - PnL: $86.02
+    - Volume: $232.74
+    - ROI: 0.3696 (36.96%)
+    - Avg PnL per market: $2.10
+
+Wallet: 0xac8c9660e12ec9a710b4c5a558b638c8c2ce415c
+  Display: 0xac8c9660e12ec9a710...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 41
+    - Winrate: 100.00%
+    - PnL: $4,542.21
+    - Volume: $7,194.57
+    - ROI: 0.6313 (63.13%)
+    - Avg PnL per market: $110.79
+
+Wallet: 0xcbbc5e035504421b084ad9248b660f6e9618b5d0
+  Display: 0xcbbc5e035504421b08...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 41
+    - Winrate: 100.00%
+    - PnL: $45,544.58
+    - Volume: $32,002.45
+    - ROI: 1.4232 (142.32%)
+    - Avg PnL per market: $1,110.84
+
+Wallet: 0xf10299cf1fff507cff45e1a906800e5b44bf1348
+  Display: 0xf10299cf1fff507cff...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 41
+    - Winrate: 100.00%
+    - PnL: $8,744.61
+    - Volume: $5,299.92
+    - ROI: 1.6500 (165.00%)
+    - Avg PnL per market: $213.28
+
+Wallet: 0x118ed6e1e562ec54f1fa6e7f0a2741fe0d32ea4b
+  Display: 0x118ed6e1e562ec54f1...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 40
+    - Winrate: 100.00%
+    - PnL: $68,279.72
+    - Volume: $64,672.38
+    - ROI: 1.0558 (105.58%)
+    - Avg PnL per market: $1,706.99
+
+Wallet: 0xd73be9337245b322ab585fa844c30a77c68c70ad
+  Display: 0xd73be9337245b322ab...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 40
+    - Winrate: 100.00%
+    - PnL: $33,471.11
+    - Volume: $45,502.39
+    - ROI: 0.7356 (73.56%)
+    - Avg PnL per market: $836.78
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 262
+    - Global PnL: $33,471.11
+
+Wallet: 0xe85df01449ed394c9bedc427d6b1461059a829bc
+  Display: 0xe85df01449ed394c9b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 40
+    - Winrate: 100.00%
+    - PnL: $10.44
+    - Volume: $3,907.19
+    - ROI: 0.0027 (0.27%)
+    - Avg PnL per market: $0.26
+
+Wallet: 0xf5cfe6f998d597085e366f915b140e82e0869fc6
+  Display: 0xf5cfe6f998d597085e...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 40
+    - Winrate: 100.00%
+    - PnL: $191,105.95
+    - Volume: $254,138.42
+    - ROI: 0.7520 (75.20%)
+    - Avg PnL per market: $4,777.65
+
+Wallet: 0x3a3ad7a76763aa7298aad2f2be11e52a098e5921
+  Display: 0x3a3ad7a76763aa7298...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 39
+    - Winrate: 100.00%
+    - PnL: $10.59
+    - Volume: $4,126.24
+    - ROI: 0.0026 (0.26%)
+    - Avg PnL per market: $0.27
+
+Wallet: 0xa8e2b61cc00595ca708568d723b4dc0a73d145ca
+  Display: 0xa8e2b61cc00595ca70...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 39
+    - Winrate: 100.00%
+    - PnL: $11.47
+    - Volume: $3,542.62
+    - ROI: 0.0032 (0.32%)
+    - Avg PnL per market: $0.29
+
+Wallet: 0xb4d54b91cc2e546ff9a660a0935ff6daecaa841c
+  Display: 0xb4d54b91cc2e546ff9...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 39
+    - Winrate: 100.00%
+    - PnL: $1,453.08
+    - Volume: $157.41
+    - ROI: 9.2313 (923.13%)
+    - Avg PnL per market: $37.26
+
+Wallet: 0xc3304972a7e6ebbb16a464ac062f72f2c19e19fe
+  Display: 0xc3304972a7e6ebbb16...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 39
+    - Winrate: 100.00%
+    - PnL: $11.14
+    - Volume: $4,153.97
+    - ROI: 0.0027 (0.27%)
+    - Avg PnL per market: $0.29
+
+Wallet: 0x1117eade222413335b7ec959e5b48c1d3dbc3532
+  Display: 0x1117eade222413335b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 38
+    - Winrate: 100.00%
+    - PnL: $1,846,279.18
+    - Volume: $1,799,360.79
+    - ROI: 1.0261 (102.61%)
+    - Avg PnL per market: $48,586.29
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 768
+    - Global PnL: $1,846,279.18
+
+Wallet: 0x74f9b4e2cba9249f93e88cc78596a16fa76839b0
+  Display: 0x74f9b4e2cba9249f93...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 38
+    - Winrate: 100.00%
+    - PnL: $7,936.28
+    - Volume: $7,761.58
+    - ROI: 1.0225 (102.25%)
+    - Avg PnL per market: $208.85
+
+Wallet: 0x75d0cb443843a4c91de3314da9dae3f401f477cb
+  Display: 0x75d0cb443843a4c91d...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 38
+    - Winrate: 100.00%
+    - PnL: $607.04
+    - Volume: $1,038.96
+    - ROI: 0.5843 (58.43%)
+    - Avg PnL per market: $15.97
+
+Wallet: 0x8ad91dd6daf288ee387a81afe2542646c50b65d7
+  Display: 0x8ad91dd6daf288ee38...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 38
+    - Winrate: 100.00%
+    - PnL: $2,339.77
+    - Volume: $10,309.97
+    - ROI: 0.2269 (22.69%)
+    - Avg PnL per market: $61.57
+
+Wallet: 0xfc3fed94e294d6b7c08f1f2069d66832fefaaf85
+  Display: 0xfc3fed94e294d6b7c0...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 38
+    - Winrate: 100.00%
+    - PnL: $10.35
+    - Volume: $4,223.55
+    - ROI: 0.0025 (0.25%)
+    - Avg PnL per market: $0.27
+
+Wallet: 0x15d5ceea7ee11ebf36abc6dac972e38e8964ef7b
+  Display: 0x15d5ceea7ee11ebf36...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 37
+    - Winrate: 100.00%
+    - PnL: $13,565.96
+    - Volume: $10,697.93
+    - ROI: 1.2681 (126.81%)
+    - Avg PnL per market: $366.65
+
+Wallet: 0xa4ed53c0943d23bf03da0c9109d33fe3c0bba16c
+  Display: 0xa4ed53c0943d23bf03...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 37
+    - Winrate: 100.00%
+    - PnL: $27.60
+    - Volume: $74.00
+    - ROI: 0.3729 (37.29%)
+    - Avg PnL per market: $0.75
+
+Wallet: 0xcbe7ae8da4399e07e9fb64f5eb6016929d937896
+  Display: 0xcbe7ae8da4399e07e9...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 36
+    - Winrate: 100.00%
+    - PnL: $4,013.76
+    - Volume: $8,415.78
+    - ROI: 0.4769 (47.69%)
+    - Avg PnL per market: $111.49
+
+Wallet: 0xe86354b9a7c57f770628eb63be7b00e2d6bce221
+  Display: 0xe86354b9a7c57f7706...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 36
+    - Winrate: 100.00%
+    - PnL: $1,672.47
+    - Volume: $3,561.64
+    - ROI: 0.4696 (46.96%)
+    - Avg PnL per market: $46.46
+
+Wallet: 0x5fd48440d810ca1e3b77aaf6215d62283f158d9f
+  Display: 0x5fd48440d810ca1e3b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 35
+    - Winrate: 100.00%
+    - PnL: $897.28
+    - Volume: $2,952.26
+    - ROI: 0.3039 (30.39%)
+    - Avg PnL per market: $25.64
+
+Wallet: 0x2bace940278da373e37fcf5c5576ecb41290f238
+  Display: 0x2bace940278da373e3...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 34
+    - Winrate: 100.00%
+    - PnL: $23,909.17
+    - Volume: $37,287.11
+    - ROI: 0.6412 (64.12%)
+    - Avg PnL per market: $703.21
+
+Wallet: 0x7c8f3eedc6b402127af7a9c4b60d9aa159a6b377
+  Display: 0x7c8f3eedc6b402127a...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 34
+    - Winrate: 100.00%
+    - PnL: $363.82
+    - Volume: $92.86
+    - ROI: 3.9179 (391.79%)
+    - Avg PnL per market: $10.70
+
+Wallet: 0xed0ccadc6b0920b9014c84fdb6d171490c205e23
+  Display: 0xed0ccadc6b0920b901...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 34
+    - Winrate: 100.00%
+    - PnL: $4,366.03
+    - Volume: $11,828.95
+    - ROI: 0.3691 (36.91%)
+    - Avg PnL per market: $128.41
+
+Wallet: 0x9dd9e18b9dcc393705e73966bc79eccbbd9108bd
+  Display: 0x9dd9e18b9dcc393705...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 32
+    - Winrate: 100.00%
+    - PnL: $78,568.54
+    - Volume: $78,895.41
+    - ROI: 0.9959 (99.59%)
+    - Avg PnL per market: $2,455.27
+
+Wallet: 0xa976d4a7248126439a189bcd5538c4e501735c43
+  Display: 0xa976d4a7248126439a...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 32
+    - Winrate: 100.00%
+    - PnL: $5,475.42
+    - Volume: $1,850.85
+    - ROI: 2.9583 (295.83%)
+    - Avg PnL per market: $171.11
+
+Wallet: 0xb9fd668cd64f38e8e8498e1f483842848fcd55d3
+  Display: 0xb9fd668cd64f38e8e8...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 32
+    - Winrate: 100.00%
+    - PnL: $5.72
+    - Volume: $754.46
+    - ROI: 0.0076 (0.76%)
+    - Avg PnL per market: $0.18
+
+Wallet: 0xd3fb3aa016afa69fe6cb1e1fd52d3979fad657e5
+  Display: 0xd3fb3aa016afa69fe6...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 32
+    - Winrate: 100.00%
+    - PnL: $6,553.93
+    - Volume: $77,341.33
+    - ROI: 0.0847 (8.47%)
+    - Avg PnL per market: $204.81
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 455
+    - Global PnL: $6,553.93
+
+Wallet: 0xde0463ea7f611b065e8ab06bbfbddad75e6dfa37
+  Display: 0xde0463ea7f611b065e...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 31
+    - Winrate: 100.00%
+    - PnL: $441,743.78
+    - Volume: $214,642.03
+    - ROI: 2.0580 (205.80%)
+    - Avg PnL per market: $14,249.80
+
+Wallet: 0xeee92f1cc6d6e0ad0b4ffda20b01cf3678e27ecb
+  Display: 0xeee92f1cc6d6e0ad0b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 31
+    - Winrate: 100.00%
+    - PnL: $213,426.33
+    - Volume: $207,938.59
+    - ROI: 1.0264 (102.64%)
+    - Avg PnL per market: $6,884.72
+
+Wallet: 0x8304ada4e1747a1d188d7233b5c047dfce42f086
+  Display: 0x8304ada4e1747a1d18...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 30
+    - Winrate: 100.00%
+    - PnL: $1,730.25
+    - Volume: $8,495.39
+    - ROI: 0.2037 (20.37%)
+    - Avg PnL per market: $57.68
+
+Wallet: 0xe31a1eeb278d171656bbc4880e9050885254adff
+  Display: 0xe31a1eeb278d171656...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 30
+    - Winrate: 100.00%
+    - PnL: $19,178.75
+    - Volume: $37,400.55
+    - ROI: 0.5128 (51.28%)
+    - Avg PnL per market: $639.29
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 528
+    - Global PnL: $19,178.75
+
+Wallet: 0x8fba2c29715c41dd87e781c23373aa1e0549d08a
+  Display: 0x8fba2c29715c41dd87...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 29
+    - Winrate: 100.00%
+    - PnL: $830,543.02
+    - Volume: $758,174.22
+    - ROI: 1.0955 (109.55%)
+    - Avg PnL per market: $28,639.41
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 393
+    - Global PnL: $830,543.02
+
+Wallet: 0x0781872fe78deb6ad8147e482952b4a5461ec4ff
+  Display: 0x0781872fe78deb6ad8...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 28
+    - Winrate: 100.00%
+    - PnL: $4,010.44
+    - Volume: $6,758.47
+    - ROI: 0.5934 (59.34%)
+    - Avg PnL per market: $143.23
+
+Wallet: 0xade7126ef6be560bde90c892a702acd1662a9d34
+  Display: 0xade7126ef6be560bde...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 28
+    - Winrate: 100.00%
+    - PnL: $373.94
+    - Volume: $611.05
+    - ROI: 0.6120 (61.20%)
+    - Avg PnL per market: $13.36
+
+Wallet: 0x04847b0925c5a537c001185c50a6ea2ac1919321
+  Display: 0x04847b0925c5a537c0...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 27
+    - Winrate: 100.00%
+    - PnL: $8,436.62
+    - Volume: $3,936.73
+    - ROI: 2.1431 (214.31%)
+    - Avg PnL per market: $312.47
+
+Wallet: 0x148deffa889ffafb89fc767598809ab88194cf90
+  Display: 0x148deffa889ffafb89...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 27
+    - Winrate: 100.00%
+    - PnL: $1.48
+    - Volume: $93.14
+    - ROI: 0.0159 (1.59%)
+    - Avg PnL per market: $0.05
+
+Wallet: 0x34597bf5e10d5f2f17cecc7ec6b2f85d56b4808a
+  Display: 0x34597bf5e10d5f2f17...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 26
+    - Winrate: 100.00%
+    - PnL: $888.03
+    - Volume: $120.50
+    - ROI: 7.3698 (736.98%)
+    - Avg PnL per market: $34.15
+
+Wallet: 0x3eb0d78d281e972cab438a601a8a20c512698826
+  Display: 0x3eb0d78d281e972cab...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 26
+    - Winrate: 100.00%
+    - PnL: $2,045.47
+    - Volume: $1,855.24
+    - ROI: 1.1025 (110.25%)
+    - Avg PnL per market: $78.67
+
+Wallet: 0x62e2adda57d8990e85b922dd0d20ccb292bf7b24
+  Display: 0x62e2adda57d8990e85...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 26
+    - Winrate: 100.00%
+    - PnL: $8,292.22
+    - Volume: $20,121.47
+    - ROI: 0.4121 (41.21%)
+    - Avg PnL per market: $318.93
+
+Wallet: 0x571cf56fad0bf5ed134b4c596f1f461e2a65c16a
+  Display: 0x571cf56fad0bf5ed13...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 25
+    - Winrate: 100.00%
+    - PnL: $82,082.19
+    - Volume: $68,868.00
+    - ROI: 1.1919 (119.19%)
+    - Avg PnL per market: $3,283.29
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 264
+    - Global PnL: $82,082.19
+
+Wallet: 0x6f1901e9a069db659339b086d50d6e02da93b9ff
+  Display: 0x6f1901e9a069db6593...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 25
+    - Winrate: 100.00%
+    - PnL: $8,038.30
+    - Volume: $15,075.59
+    - ROI: 0.5332 (53.32%)
+    - Avg PnL per market: $321.53
+
+Wallet: 0xd8b5d75749ecffa7602b466666db93860929b789
+  Display: 0xd8b5d75749ecffa760...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 25
+    - Winrate: 100.00%
+    - PnL: $2,053.34
+    - Volume: $3,995.67
+    - ROI: 0.5139 (51.39%)
+    - Avg PnL per market: $82.13
+
+Wallet: 0x6a5d917bae7422b445b50dbecbaad0af4df347d0
+  Display: 0x6a5d917bae7422b445...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 24
+    - Winrate: 100.00%
+    - PnL: $1,899.60
+    - Volume: $10,077.63
+    - ROI: 0.1885 (18.85%)
+    - Avg PnL per market: $79.15
+
+Wallet: 0x961a3ebcc591e90255b590a1299c1fc4aba973ac
+  Display: 0x961a3ebcc591e90255...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 24
+    - Winrate: 100.00%
+    - PnL: $3,208.72
+    - Volume: $13,842.83
+    - ROI: 0.2318 (23.18%)
+    - Avg PnL per market: $133.70
+
+Wallet: 0xbe9cc7e6406fa2c75ddcf5fdad149512ab6d7be3
+  Display: 0xbe9cc7e6406fa2c75d...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 24
+    - Winrate: 100.00%
+    - PnL: $1,083.21
+    - Volume: $3,477.90
+    - ROI: 0.3115 (31.15%)
+    - Avg PnL per market: $45.13
+
+Wallet: 0x018ca7a3332508db0c1abfde56e5d748cb3d448a
+  Display: 0x018ca7a3332508db0c...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 23
+    - Winrate: 100.00%
+    - PnL: $296.97
+    - Volume: $174.18
+    - ROI: 1.7050 (170.50%)
+    - Avg PnL per market: $12.91
+
+Wallet: 0x067f7f6e3d5363f1cf962499d1be2ca6de8be041
+  Display: 0x067f7f6e3d5363f1cf...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 23
+    - Winrate: 100.00%
+    - PnL: $172,378.93
+    - Volume: $117,844.13
+    - ROI: 1.4628 (146.28%)
+    - Avg PnL per market: $7,494.74
+
+Wallet: 0x38d5a13ef8e32d5e5a808ceba52d6ac78d4c063c
+  Display: 0x38d5a13ef8e32d5e5a...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 23
+    - Winrate: 100.00%
+    - PnL: $1,033.06
+    - Volume: $4,314.57
+    - ROI: 0.2394 (23.94%)
+    - Avg PnL per market: $44.92
+
+Wallet: 0xbc4a75a5d0353409e2eaf0fac3c75732a18a822a
+  Display: 0xbc4a75a5d0353409e2...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 23
+    - Winrate: 100.00%
+    - PnL: $2,004.77
+    - Volume: $1,830.70
+    - ROI: 1.0951 (109.51%)
+    - Avg PnL per market: $87.16
+
+Wallet: 0xd9fcd0c58343f8443379a2498f4e3d31f4890ab0
+  Display: 0xd9fcd0c58343f84433...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 23
+    - Winrate: 100.00%
+    - PnL: $850.84
+    - Volume: $3,549.47
+    - ROI: 0.2397 (23.97%)
+    - Avg PnL per market: $36.99
+
+Wallet: 0x6a9743e7872cb5e321ca2eb97edc907bc6c14800
+  Display: 0x6a9743e7872cb5e321...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 22
+    - Winrate: 100.00%
+    - PnL: $7,048.83
+    - Volume: $36,395.09
+    - ROI: 0.1937 (19.37%)
+    - Avg PnL per market: $320.40
+
+Wallet: 0x8345f823ee8c78d818cbc5d11be6b953c9310060
+  Display: 0x8345f823ee8c78d818...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 22
+    - Winrate: 100.00%
+    - PnL: $151.36
+    - Volume: $968.64
+    - ROI: 0.1563 (15.63%)
+    - Avg PnL per market: $6.88
+
+Wallet: 0xcbea99bbde60f63b26e6e2ae6b036819cbfe4b88
+  Display: 0xcbea99bbde60f63b26...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 22
+    - Winrate: 100.00%
+    - PnL: $1.65
+    - Volume: $472.63
+    - ROI: 0.0035 (0.35%)
+    - Avg PnL per market: $0.08
+
+Wallet: 0x5b11bd4901e439c0843ffde91a812cb3c066003f
+  Display: 0x5b11bd4901e439c084...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 21
+    - Winrate: 100.00%
+    - PnL: $34,229.05
+    - Volume: $82,651.06
+    - ROI: 0.4141 (41.41%)
+    - Avg PnL per market: $1,629.95
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 116
+    - Global PnL: $34,229.05
+
+Wallet: 0x5dc140ff8cbe35545c94402b8b787619e19efc84
+  Display: 0x5dc140ff8cbe35545c...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 21
+    - Winrate: 100.00%
+    - PnL: $24.63
+    - Volume: $2,237.04
+    - ROI: 0.0110 (1.10%)
+    - Avg PnL per market: $1.17
+
+Wallet: 0x6a8328b1ae11569f7b27600073558879885e4c59
+  Display: 0x6a8328b1ae11569f7b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 21
+    - Winrate: 100.00%
+    - PnL: $22,107.56
+    - Volume: $125,481.74
+    - ROI: 0.1762 (17.62%)
+    - Avg PnL per market: $1,052.74
+  Global Stats:
+    - Global Winrate: 100.00%
+    - Global Trades: 606
+    - Global PnL: $22,107.56
+
+Wallet: 0xfd21fd5eea4c8ba596c7bca5d55e1ba9af0aefdb
+  Display: 0xfd21fd5eea4c8ba596...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 21
+    - Winrate: 100.00%
+    - PnL: $13,248.62
+    - Volume: $8,786.75
+    - ROI: 1.5078 (150.78%)
+    - Avg PnL per market: $630.89
+
+Wallet: 0xff34c2cc46e7624310f3549ea355540d57a4694b
+  Display: 0xff34c2cc46e7624310...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 21
+    - Winrate: 100.00%
+    - PnL: $21,242.41
+    - Volume: $8,319.10
+    - ROI: 2.5534 (255.34%)
+    - Avg PnL per market: $1,011.54
+
+Wallet: 0x26ea7de5a14d84989a910a326fa522321cc667ad
+  Display: 0x26ea7de5a14d84989a...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 98.00%
+    - PnL: $143.15
+    - Volume: $571.86
+    - ROI: 0.2503 (25.03%)
+    - Avg PnL per market: $2.86
+
+Wallet: 0xa5c955bc89ff8b8d8cbd5a5856bb7453553289ba
+  Display: 0xa5c955bc89ff8b8d8c...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 98.00%
+    - PnL: $1,731.06
+    - Volume: $5,524.05
+    - ROI: 0.3134 (31.34%)
+    - Avg PnL per market: $34.62
+
+Wallet: 0xb3bb56fdd306cdbcd23db52b1917dbb585051c38
+  Display: 0xb3bb56fdd306cdbcd2...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 98.00%
+    - PnL: $132.97
+    - Volume: $445.03
+    - ROI: 0.2988 (29.88%)
+    - Avg PnL per market: $2.66
+
+Wallet: 0x01e780afbdef38366938ab8e7ddd66410db089b4
+  Display: 0x01e780afbdef383669...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 40
+    - Winrate: 97.50%
+    - PnL: $18,137.08
+    - Volume: $31,179.46
+    - ROI: 0.5817 (58.17%)
+    - Avg PnL per market: $453.43
+  Global Stats:
+    - Global Winrate: 97.50%
+    - Global Trades: 104
+    - Global PnL: $18,137.08
+
+Wallet: 0xc82184487a4ac4413e8f8eaf47e916f3abfff352
+  Display: 0xc82184487a4ac4413e...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 31
+    - Winrate: 96.77%
+    - PnL: $14.91
+    - Volume: $44.00
+    - ROI: 0.3389 (33.89%)
+    - Avg PnL per market: $0.48
+
+Wallet: 0x5bf900978d8ee018874e18a3c37c4417d9f9086c
+  Display: 0x5bf900978d8ee01887...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 96.00%
+    - PnL: $825.30
+    - Volume: $1,463.21
+    - ROI: 0.5640 (56.40%)
+    - Avg PnL per market: $16.51
+
+Wallet: 0x8174166cc7e074f5d47f7f6c2766f6e89213b38d
+  Display: 0x8174166cc7e074f5d4...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 96.00%
+    - PnL: $270.89
+    - Volume: $376.55
+    - ROI: 0.7194 (71.94%)
+    - Avg PnL per market: $5.42
+
+Wallet: 0xdd5580b2247d1a0a9a96eda7393e55efb87ac9bf
+  Display: 0xdd5580b2247d1a0a9a...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 96.00%
+    - PnL: $577.08
+    - Volume: $1,207.68
+    - ROI: 0.4778 (47.78%)
+    - Avg PnL per market: $11.54
+
+Wallet: 0xf3259c32a905168bec507b2cd33cd9240e014329
+  Display: 0xf3259c32a905168bec...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 96.00%
+    - PnL: $324.03
+    - Volume: $4,500.57
+    - ROI: 0.0720 (7.20%)
+    - Avg PnL per market: $6.48
+
+Wallet: 0x120af1c194763c68c14249a64d6eefc206326456
+  Display: 0x120af1c194763c68c1...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 22
+    - Winrate: 95.45%
+    - PnL: $205.11
+    - Volume: $4,558.01
+    - ROI: 0.0450 (4.50%)
+    - Avg PnL per market: $9.32
+
+Wallet: 0xd21aaefee7dfebc95ab7bcf26648c39d39f4b3d8
+  Display: 0xd21aaefee7dfebc95a...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 22
+    - Winrate: 95.45%
+    - PnL: $4.07
+    - Volume: $27.15
+    - ROI: 0.1500 (15.00%)
+    - Avg PnL per market: $0.19
+
+Wallet: 0x242df083db4f7b37a380003a24de482eadd6603a
+  Display: 0x242df083db4f7b37a3...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 21
+    - Winrate: 95.24%
+    - PnL: $8,466.61
+    - Volume: $77,512.24
+    - ROI: 0.1092 (10.92%)
+    - Avg PnL per market: $403.17
+  Global Stats:
+    - Global Winrate: 95.24%
+    - Global Trades: 47
+    - Global PnL: $8,466.61
+
+Wallet: 0x2f3fc897d6773c38878a148ccd6f4cd8638aace2
+  Display: 0x2f3fc897d6773c3887...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 41
+    - Winrate: 95.12%
+    - PnL: $748.57
+    - Volume: $1,864.29
+    - ROI: 0.4015 (40.15%)
+    - Avg PnL per market: $18.26
+
+Wallet: 0x6a18684784e80cdbf458218d75ad8f45c99dfe45
+  Display: 0x6a18684784e80cdbf4...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 37
+    - Winrate: 94.59%
+    - PnL: $387.61
+    - Volume: $3,680.52
+    - ROI: 0.1053 (10.53%)
+    - Avg PnL per market: $10.48
+
+Wallet: 0xc0e65a5689d25a1757c8b223bd3bd7095c767358
+  Display: 0xc0e65a5689d25a1757...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 37
+    - Winrate: 94.59%
+    - PnL: $1,899.42
+    - Volume: $2,244.11
+    - ROI: 0.8464 (84.64%)
+    - Avg PnL per market: $51.34
+
+Wallet: 0x69e97374ca8cb6ba18999524b21916ea4681dee1
+  Display: 0x69e97374ca8cb6ba18...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 35
+    - Winrate: 94.29%
+    - PnL: $31,267.85
+    - Volume: $39,227.09
+    - ROI: 0.7971 (79.71%)
+    - Avg PnL per market: $893.37
+  Global Stats:
+    - Global Winrate: 94.29%
+    - Global Trades: 80
+    - Global PnL: $31,267.85
+
+Wallet: 0xd02c7d704f04828cbb35134cceb32df6ef84769f
+  Display: 0xd02c7d704f04828cbb...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 94.00%
+    - PnL: $1,594.98
+    - Volume: $1,252.14
+    - ROI: 1.2738 (127.38%)
+    - Avg PnL per market: $31.90
+
+Wallet: 0x5ea590966a7490a50639705ec14334e2c02e67e8
+  Display: 0x5ea590966a7490a506...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 31
+    - Winrate: 93.55%
+    - PnL: $146.91
+    - Volume: $426.17
+    - ROI: 0.3447 (34.47%)
+    - Avg PnL per market: $4.74
+
+Wallet: 0x51a15d76e6b5cd7e0b21fa1f3d1995439a5da78f
+  Display: 0x51a15d76e6b5cd7e0b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 44
+    - Winrate: 93.18%
+    - PnL: $8,145.72
+    - Volume: $1,039,874.10
+    - ROI: 0.0078 (0.78%)
+    - Avg PnL per market: $185.13
+  Global Stats:
+    - Global Winrate: 93.18%
+    - Global Trades: 49
+    - Global PnL: $8,145.72
+
+Wallet: 0x9646c8d901a55e8d942778181b3d8efd2323ee6e
+  Display: 0x9646c8d901a55e8d94...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 29
+    - Winrate: 93.10%
+    - PnL: $45.23
+    - Volume: $60.24
+    - ROI: 0.7509 (75.09%)
+    - Avg PnL per market: $1.56
+
+Wallet: 0x0523b3e6a447e9cd616024d3eeea9e256cd17eaa
+  Display: 0x0523b3e6a447e9cd61...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 92.00%
+    - PnL: $719.62
+    - Volume: $4,106.17
+    - ROI: 0.1753 (17.53%)
+    - Avg PnL per market: $14.39
+
+Wallet: 0x9a283bc9039f6b0d7487039910051b3b869ef71a
+  Display: 0x9a283bc9039f6b0d74...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 92.00%
+    - PnL: $985.52
+    - Volume: $824.70
+    - ROI: 1.1950 (119.50%)
+    - Avg PnL per market: $19.71
+
+Wallet: 0x3fc988b7c99f3e266fb24d5923274beeab621296
+  Display: 0x3fc988b7c99f3e266f...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 37
+    - Winrate: 91.89%
+    - PnL: $32.60
+    - Volume: $8,199.98
+    - ROI: 0.0040 (0.40%)
+    - Avg PnL per market: $0.88
+
+Wallet: 0xe452181ac01cf6bfc53bb3380f89f6bca9281208
+  Display: 0xe452181ac01cf6bfc5...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 23
+    - Winrate: 91.30%
+    - PnL: $29.32
+    - Volume: $42.66
+    - ROI: 0.6874 (68.74%)
+    - Avg PnL per market: $1.27
+
+Wallet: 0x31a98916c15e31397c802f950dd9cb560662225a
+  Display: 0x31a98916c15e31397c...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 90.00%
+    - PnL: $34.84
+    - Volume: $56.00
+    - ROI: 0.6221 (62.21%)
+    - Avg PnL per market: $0.70
+
+Wallet: 0x3464a78e4a605e440b9414a155c3b18c37866f99
+  Display: 0x3464a78e4a605e440b...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 90.00%
+    - PnL: $548.29
+    - Volume: $10,330.98
+    - ROI: 0.0531 (5.31%)
+    - Avg PnL per market: $10.97
+
+Wallet: 0x90aeda551052f4ad99fcfa89623c8513a9c5d3b1
+  Display: 0x90aeda551052f4ad99...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 50
+    - Winrate: 90.00%
+    - PnL: $1,955.61
+    - Volume: $10,358.49
+    - ROI: 0.1888 (18.88%)
+    - Avg PnL per market: $39.11
+
+Wallet: 0x58f8f1138be2192696378629fc9aa23c7910dc70
+  Display: 0x58f8f1138be2192696...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 40
+    - Winrate: 90.00%
+    - PnL: $86,325.93
+    - Volume: $369,976.88
+    - ROI: 0.2333 (23.33%)
+    - Avg PnL per market: $2,158.15
+  Global Stats:
+    - Global Winrate: 90.00%
+    - Global Trades: 70
+    - Global PnL: $86,325.93
+
+Wallet: 0x8f6e156b006da12b4d5ca7a5fa5706b3463f6a74
+  Display: 0x8f6e156b006da12b4d...
+  Category: other/Unknown
+  Category Stats:
+    - Markets: 40
+    - Winrate: 90.00%
+    - PnL: $492.82
+    - Volume: $765.74
+    - ROI: 0.6436 (64.36%)
+    - Avg PnL per market: $12.32
+

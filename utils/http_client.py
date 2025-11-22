@@ -7,11 +7,61 @@ import logging
 import requests
 import urllib3
 from typing import Optional, Dict, Any, Union
+from urllib.parse import urlparse, urlunparse
 
-# Disable SSL warnings for proxy connections
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+# Note: SSL warnings are only disabled if verify=False is explicitly passed
+# By default, TLS verification is enabled for security
 
 logger = logging.getLogger(__name__)
+
+
+def _mask_proxy_url(proxy_url: str) -> str:
+    """
+    Mask username and password in proxy URL for safe logging.
+    
+    Args:
+        proxy_url: Proxy URL that may contain credentials
+        
+    Returns:
+        str: Proxy URL with credentials masked (e.g., user:pass@host -> user:***@host)
+    """
+    try:
+        parsed = urlparse(proxy_url)
+        if parsed.username or parsed.password:
+            # Reconstruct URL with masked password
+            masked_netloc = parsed.netloc
+            if parsed.username:
+                if parsed.password:
+                    # Replace password with ***
+                    masked_netloc = f"{parsed.username}:***@{parsed.hostname}"
+                    if parsed.port:
+                        masked_netloc += f":{parsed.port}"
+                else:
+                    # Username only, no password
+                    masked_netloc = f"{parsed.username}@{parsed.hostname}"
+                    if parsed.port:
+                        masked_netloc += f":{parsed.port}"
+            
+            return urlunparse((
+                parsed.scheme,
+                masked_netloc,
+                parsed.path,
+                parsed.params,
+                parsed.query,
+                parsed.fragment
+            ))
+        return proxy_url
+    except Exception:
+        # If parsing fails, return a safe version (just scheme://host:port)
+        try:
+            parsed = urlparse(proxy_url)
+            safe_url = f"{parsed.scheme}://{parsed.hostname}"
+            if parsed.port:
+                safe_url += f":{parsed.port}"
+            return safe_url
+        except Exception:
+            # Last resort: return a generic masked string
+            return "***:***@***"
 
 
 def http_get(
@@ -20,7 +70,7 @@ def http_get(
     headers: Optional[Dict[str, str]] = None,
     proxy: Optional[Union[str, Dict[str, str]]] = None,
     timeout: int = 10,
-    verify: bool = False
+    verify: bool = True
 ) -> Optional[requests.Response]:
     """
     Make HTTP GET request with automatic proxy fallback.
@@ -34,7 +84,7 @@ def http_get(
         headers: HTTP headers
         proxy: Proxy configuration (string URL or dict like {"http": "...", "https": "..."})
         timeout: Request timeout in seconds (default: 10)
-        verify: Whether to verify SSL certificates (default: False for proxy compatibility)
+        verify: Whether to verify SSL certificates (default: True for security)
     
     Returns:
         Response object if successful, None if both proxy and direct attempts fail
@@ -68,7 +118,9 @@ def http_get(
     if proxy_dict:
         request_headers['Connection'] = 'close'
         request_headers['Proxy-Connection'] = 'close'
-        logger.info(f"[HTTP] Using proxy: {proxy_url}")
+        # Mask credentials in proxy URL before logging
+        safe_proxy_url = _mask_proxy_url(proxy_url) if proxy_url else "N/A"
+        logger.info(f"[HTTP] Using proxy: {safe_proxy_url}")
     
     # Attempt 1: Try with proxy (if configured)
     if proxy_dict:

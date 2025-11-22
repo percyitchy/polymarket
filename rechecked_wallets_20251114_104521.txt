@@ -1,0 +1,501 @@
+================================================================================
+Перепроверка кошельков с новой фильтрацией (500 последних сделок)
+================================================================================
+Дата проверки: 2025-11-14 10:45:21
+MAX_CLOSED_POSITIONS: 500
+MIN_TRADES: 6
+WIN_RATE_THRESHOLD: 65.0%
+MAX_DAILY_FREQUENCY: 35.0
+================================================================================
+
+✅ Прошли фильтры: 50
+❌ Не прошли фильтры: 15
+⚠️  Ошибки: 0
+================================================================================
+
+================================================================================
+КОШЕЛЬКИ, КОТОРЫЕ ПРОШЛИ ФИЛЬТРЫ
+================================================================================
+
+1. 0xfa1991cd8082174eedce066381c6565d6fbd4f3c
+   Display: TES-BDD
+   Trades: 44, Win Rate: 93.33%, PnL: $1,250,770.92
+   Daily Freq: 0.28, Source: https://polymarket.com/leaderboard/overall/monthly/volume
+   Closed Positions (last 500): 15
+   Last Trade: 2025-11-02T08:48:57+00:00
+
+2. 0xd4f904ecac0ff22ac6601de6b972d4f8b6b4f619
+   Display: 0xd4f904ecac0ff22ac6601de6b972d4f8b6b4f619
+   Trades: 234, Win Rate: 100.00%, PnL: $149,177.42
+   Daily Freq: 34.33, Source: polymarket_analytics
+   Closed Positions (last 500): 50
+   Last Trade: 2025-11-09T17:42:07+00:00
+   ⚠️  Win Rate изменился: 96.00% → 100.00%
+
+3. 0xb48ef6deecd526c0974c35e1f7b5c3bbd12fa144
+   Display: 0xb48ef6deecd526c0974c35e1f7b5c3bbd12fa144
+   Trades: 57, Win Rate: 80.00%, PnL: $114,094.23
+   Daily Freq: 0.07, Source: polymarket_analytics
+   Closed Positions (last 500): 30
+   Last Trade: 2025-11-08T03:04:23+00:00
+   ⚠️  Win Rate изменился: 96.00% → 80.00%
+
+4. 0x64fe36ebdbd3fbdc84a810b6161049e4e0fbe618
+   Display: 0x64fe36ebdbd3fbdc84a810b6161049e4e0fbe618
+   Trades: 47, Win Rate: 96.00%, PnL: $56,579.93
+   Daily Freq: 0.89, Source: polymarket_analytics
+   Closed Positions (last 500): 25
+   Last Trade: 2025-11-05T01:52:09+00:00
+
+5. 0x71e5fba32f6b56c5afa95d8739d3396b602750a4
+   Display: 0x71e5fba32f6b56c5afa95d8739d3396b602750a4
+   Trades: 71, Win Rate: 93.33%, PnL: $56,025.91
+   Daily Freq: 0.25, Source: polymarket_analytics_periodic
+   Closed Positions (last 500): 15
+
+6. 0x2c8b130fcdace0f1a8d3381680826d6da057e496
+   Display: 0x2c8b130fcdace0f1a8d3381680826d6da057e496
+   Trades: 63, Win Rate: 85.71%, PnL: $38,420.75
+   Daily Freq: 0.38, Source: polymarket_analytics
+   Closed Positions (last 500): 28
+   Last Trade: 2025-10-02T06:15:59+00:00
+   ⚠️  Win Rate изменился: 96.00% → 85.71%
+
+7. 0xbde72b658e0e8f7e29a6bc3777e7e06a17fcd224
+   Display: 0xbde72b658e0e8f7e29a6bc3777e7e06a17fcd224
+   Trades: 33, Win Rate: 81.25%, PnL: $31,956.03
+   Daily Freq: 0.20, Source: polymarket_analytics
+   Closed Positions (last 500): 16
+   Last Trade: 2025-10-24T18:10:32+00:00
+
+8. 0x0e9be66fb878073dd7860139d61082629f67ce4e
+   Display: 0x0e9be66fb878073dd7860139d61082629f67ce4e
+   Trades: 33, Win Rate: 94.44%, PnL: $31,700.52
+   Daily Freq: 0.20, Source: polymarket_analytics
+   Closed Positions (last 500): 18
+   Last Trade: 2025-11-09T12:31:21+00:00
+
+9. 0x7bed65e8078b2f6f60ab7ebf320ff283f2c0c932
+   Display: 0x7bed65e8078b2f6f60ab7ebf320ff283f2c0c932
+   Trades: 31, Win Rate: 87.50%, PnL: $29,354.89
+   Daily Freq: 0.23, Source: polymarket_analytics
+   Closed Positions (last 500): 16
+   Last Trade: 2025-10-12T03:52:13+00:00
+
+10. 0x9ebff877641d6494d3a2a30f95ea7501cee6874d
+   Display: 0x9ebff877641d6494d3a2a30f95ea7501cee6874d
+   Trades: 59, Win Rate: 96.00%, PnL: $26,694.79
+   Daily Freq: 0.29, Source: polymarket_analytics
+   Closed Positions (last 500): 25
+   Last Trade: 2025-10-26T17:13:37+00:00
+
+11. 0x0f647d05f71224342adb57a2d326e187671aabb1
+   Display: 0x0f647d05f71224342adb57a2d326e187671aabb1
+   Trades: 41, Win Rate: 96.00%, PnL: $26,064.22
+   Daily Freq: 1.03, Source: polymarket_analytics
+   Closed Positions (last 500): 25
+   Last Trade: 2025-11-08T07:21:41+00:00
+
+12. 0x80965cc1738a429ecad016f189b32952f2daf6a4
+   Display: 0x80965cc1738a429ecad016f189b32952f2daf6a4
+   Trades: 50, Win Rate: 85.71%, PnL: $23,905.99
+   Daily Freq: 0.25, Source: polymarket_analytics
+   Closed Positions (last 500): 28
+   Last Trade: 2025-10-25T12:16:01+00:00
+   ⚠️  Win Rate изменился: 96.00% → 85.71%
+
+13. 0xd1800c7faaf67c455ff2acc1dd39b0f274300c89
+   Display: 0xd1800c7faaf67c455ff2acc1dd39b0f274300c89
+   Trades: 45, Win Rate: 78.95%, PnL: $24,374.04
+   Daily Freq: 0.28, Source: polymarket_analytics
+   Closed Positions (last 500): 19
+   Last Trade: 2025-10-16T04:08:31+00:00
+
+14. 0x5269bc324d8affb5d0393a48f06f8d95c54645f0
+   Display: 0x5269bc324d8affb5d0393a48f06f8d95c54645f0
+   Trades: 44, Win Rate: 88.00%, PnL: $23,836.88
+   Daily Freq: 0.23, Source: polymarket_analytics
+   Closed Positions (last 500): 25
+   Last Trade: 2025-10-30T14:42:57+00:00
+
+15. 0x9a3536e60a1ca5b5ebd0271ce1574a7977179fea
+   Display: 0x9a3536e60a1ca5b5ebd0271ce1574a7977179fea
+   Trades: 31, Win Rate: 95.45%, PnL: $22,875.80
+   Daily Freq: 0.20, Source: polymarket_analytics
+   Closed Positions (last 500): 22
+   Last Trade: 2025-10-25T15:07:19+00:00
+
+16. 0x5157a81d86d00b93c4cb66a8b520f2979f8aaa2c
+   Display: 0x5157a81d86d00b93c4cb66a8b520f2979f8aaa2c
+   Trades: 58, Win Rate: 85.71%, PnL: $16,458.25
+   Daily Freq: 11.77, Source: csv_import
+   Closed Positions (last 500): 28
+   Last Trade: 2025-11-10T02:11:37+00:00
+   ⚠️  Win Rate изменился: 83.33% → 85.71%
+
+17. 0x4638d71d7b2d36eb590b5e1824955712dc8ad587
+   Display: 0x4638d71d7b2d36eb590b5e1824955712dc8ad587
+   Trades: 62, Win Rate: 89.47%, PnL: $2,305.85
+   Daily Freq: 0.00, Source: polymarket_analytics
+   Closed Positions (last 500): 38
+   ⚠️  Win Rate изменился: 96.00% → 89.47%
+
+18. 0x45b39e1f71e47fd4afe4b988ffad690b644735bc
+   Display: 0x45b39e1f71e47fd4afe4b988ffad690b644735bc
+   Trades: 36, Win Rate: 84.21%, PnL: $10,600.45
+   Daily Freq: 1.29, Source: polymarket_analytics
+   Closed Positions (last 500): 19
+   Last Trade: 2025-11-08T01:30:19+00:00
+   ⚠️  Win Rate изменился: 81.25% → 84.21%
+
+19. 0x086daad94781785574fec4ee08d1e7fc8328fe29
+   Display: 0x086daad94781785574fec4ee08d1e7fc8328fe29
+   Trades: 77, Win Rate: 78.00%, PnL: $7,892.67
+   Daily Freq: 24.70, Source: polymarket_api
+   Closed Positions (last 500): 50
+   ⚠️  Win Rate изменился: 81.82% → 78.00%
+
+20. 0xd128a7f344f96d8749e528234f44fa65d923e105
+   Display: 0xd128a7f344f96d8749e528234f44fa65d923e105
+   Trades: 32, Win Rate: 85.19%, PnL: $4,439.29
+   Daily Freq: 1.00, Source: csv_import
+   Closed Positions (last 500): 27
+   Last Trade: 2025-11-09T15:39:23+00:00
+   ⚠️  Win Rate изменился: 84.00% → 85.19%
+
+21. 0xc3c07f26b026052b2c2b5ce022c6f611ce4493fd
+   Display: 0xc3c07f26b026052b2c2b5ce022c6f611ce4493fd
+   Trades: 115, Win Rate: 96.00%, PnL: $6,783.24
+   Daily Freq: 4.54, Source: polymarket_api
+   Closed Positions (last 500): 50
+   ⚠️  Win Rate изменился: 92.00% → 96.00%
+
+22. 0x1cd0b92c6143530408bbe8c2202f9f80b5b24516
+   Display: 0x1cd0b92c6143530408bbe8c2202f9f80b5b24516
+   Trades: 70, Win Rate: 72.73%, PnL: $4,204.53
+   Daily Freq: 0.97, Source: polymarket_api
+   Closed Positions (last 500): 44
+   ⚠️  Win Rate изменился: 88.00% → 72.73%
+
+23. 0x7a25c224d0618f5b220afc5c7572d53f9e7fc24d
+   Display: 0x7a25c224d0618f5b220afc5c7572d53f9e7fc24d
+   Trades: 85, Win Rate: 72.97%, PnL: $2,989.67
+   Daily Freq: 2.77, Source: polymarket_api
+   Closed Positions (last 500): 37
+   ⚠️  Win Rate изменился: 84.00% → 72.97%
+
+24. 0x57ac720a329a2e451c518fa84b5eb73e34b52d85
+   Display: 0x57ac720a329a2e451c518fa84b5eb73e34b52d85
+   Trades: 82, Win Rate: 76.00%, PnL: $2,946.30
+   Daily Freq: 1.17, Source: polymarket_api
+   Closed Positions (last 500): 50
+   ⚠️  Win Rate изменился: 88.00% → 76.00%
+
+25. 0xcdaa10866d85d317f22bb8e8366e2b4af6026f38
+   Display: 0xcdaa10866d85d317f22bb8e8366e2b4af6026f38
+   Trades: 86, Win Rate: 68.00%, PnL: $1,152.37
+   Daily Freq: 1.49, Source: polymarket_api
+   Closed Positions (last 500): 50
+   ⚠️  Win Rate изменился: 92.00% → 68.00%
+
+26. 0x00e2aee24f6b9f8e6a3360b3053eac4444f572a3
+   Display: 0x00e2aee24f6b9f8e6a3360b3053eac4444f572a3
+   Trades: 47, Win Rate: 78.79%, PnL: $2,562.11
+   Daily Freq: 8.65, Source: csv_import
+   Closed Positions (last 500): 33
+   Last Trade: 2025-11-08T02:48:15+00:00
+   ⚠️  Win Rate изменился: 80.00% → 78.79%
+
+27. 0xca44d59b47eb3f2fb1eac63588d3bc2f2e146d4e
+   Display: 0xca44d59b47eb3f2fb1eac63588d3bc2f2e146d4e
+   Trades: 89, Win Rate: 66.00%, PnL: $1,110.77
+   Daily Freq: 3.92, Source: polymarket_api
+   Closed Positions (last 500): 50
+   ⚠️  Win Rate изменился: 96.00% → 66.00%
+
+28. 0x39aaed185b92e99a78249610cc14a589b764583c
+   Display: 0x39aaed185b92e99a78249610cc14a589b764583c
+   Trades: 221, Win Rate: 100.00%, PnL: $10,045.89
+   Daily Freq: 21.67, Source: polymarket_api
+   Closed Positions (last 500): 50
+   ⚠️  Win Rate изменился: 92.00% → 100.00%
+
+29. 0x93a443862bd47907ea03a75eca14bfda1c366bdb
+   Display: 0x93a443862bd47907ea03a75eca14bfda1c366bdb
+   Trades: 168, Win Rate: 100.00%, PnL: $596.87
+   Daily Freq: 13.97, Source: polymarket_api
+   Closed Positions (last 500): 50
+   ⚠️  Win Rate изменился: 92.00% → 100.00%
+
+30. 0xaea9271a70cbe70c80013208e4f1e579f8b17f33
+   Display: 0xaea9271a70cbe70c80013208e4f1e579f8b17f33
+   Trades: 71, Win Rate: 66.00%, PnL: $622.98
+   Daily Freq: 4.15, Source: polymarket_api
+   Closed Positions (last 500): 50
+   ⚠️  Win Rate изменился: 80.00% → 66.00%
+
+31. 0x70ffe2d3823f820fdd9ce5de616b44a7df0df41b
+   Display: 0x70ffe2d3823f820fdd9ce5de616b44a7df0df41b
+   Trades: 107, Win Rate: 87.50%, PnL: $444.83
+   Daily Freq: 5.86, Source: polymarket_api
+   Closed Positions (last 500): 48
+   ⚠️  Win Rate изменился: 92.00% → 87.50%
+
+32. 0xdc814e7371182f4752a14363ddf85b038f824f06
+   Display: 0xdc814e7371182f4752a14363ddf85b038f824f06
+   Trades: 143, Win Rate: 100.00%, PnL: $628.81
+   Daily Freq: 6.74, Source: polymarket_api
+   Closed Positions (last 500): 50
+   ⚠️  Win Rate изменился: 76.00% → 100.00%
+
+33. 0xa8cf482de91bb4486d49bd663c8dc8dfd0601dc8
+   Display: 0xa8cf482de91bb4486d49bd663c8dc8dfd0601dc8
+   Trades: 120, Win Rate: 100.00%, PnL: $302.68
+   Daily Freq: 6.38, Source: polymarket_api
+   Closed Positions (last 500): 50
+   ⚠️  Win Rate изменился: 96.00% → 100.00%
+
+34. 0xc7d554bc3c72d396b5d914d767d41642a25e58ef
+   Display: 0xc7d554bc3c72d396b5d914d767d41642a25e58ef
+   Trades: 62, Win Rate: 78.12%, PnL: $99.00
+   Daily Freq: 1.63, Source: polymarket_api
+   Closed Positions (last 500): 32
+   ⚠️  Win Rate изменился: 96.00% → 78.12%
+
+35. 0x5aba1b17fc1bf62f1ecb2cd3e4bd1745e674af7c
+   Display: 0x5aba1b17fc1bf62f1ecb2cd3e4bd1745e674af7c
+   Trades: 202, Win Rate: 100.00%, PnL: $264.80
+   Daily Freq: 4.37, Source: polymarket_api
+   Closed Positions (last 500): 50
+   ⚠️  Win Rate изменился: 88.00% → 100.00%
+
+36. 0x45faebc522466ccd125525664df1bfb5e5639918
+   Display: 0x45faebc522466ccd125525664df1bfb5e5639918
+   Trades: 68, Win Rate: 91.67%, PnL: $104.40
+   Daily Freq: 0.95, Source: polymarket_api
+   Closed Positions (last 500): 24
+   ⚠️  Win Rate изменился: 90.91% → 91.67%
+
+37. 0x03b3666b35e2f1ad6cfbb013a4a36acb13b4b227
+   Display: 0x03b3666b35e2f1ad6cfbb013a4a36acb13b4b227
+   Trades: 65, Win Rate: 86.96%, PnL: $121.15
+   Daily Freq: 2.06, Source: polymarket_api
+   Closed Positions (last 500): 23
+   ⚠️  Win Rate изменился: 75.00% → 86.96%
+
+38. 0x93f6769cb73e1d37174361d1acf7c15eaeb1474f
+   Display: 0x93f6769cb73e1d37174361d1acf7c15eaeb1474f
+   Trades: 66, Win Rate: 89.29%, PnL: $139.52
+   Daily Freq: 3.71, Source: polymarket_api
+   Closed Positions (last 500): 28
+   ⚠️  Win Rate изменился: 87.50% → 89.29%
+
+39. 0x486e590d781d75d377cabe9086aa20683ed86e5e
+   Display: 0x486e590d781d75d377cabe9086aa20683ed86e5e
+   Trades: 78, Win Rate: 78.57%, PnL: $56.03
+   Daily Freq: 1.69, Source: polymarket_api
+   Closed Positions (last 500): 28
+   ⚠️  Win Rate изменился: 84.00% → 78.57%
+
+40. 0xe9d188fb8a0caf377234be0d83c09f376d8f3a4a
+   Display: 0xe9d188fb8a0caf377234be0d83c09f376d8f3a4a
+   Trades: 98, Win Rate: 87.18%, PnL: $133.35
+   Daily Freq: 3.08, Source: polymarket_api
+   Closed Positions (last 500): 39
+   ⚠️  Win Rate изменился: 86.36% → 87.18%
+
+41. 0xf699837848dae15e38ebd90f3af6f27afa9bf1ee
+   Display: 0xf699837848dae15e38ebd90f3af6f27afa9bf1ee
+   Trades: 78, Win Rate: 72.00%, PnL: $220.80
+   Daily Freq: 1.92, Source: polymarket_api
+   Closed Positions (last 500): 50
+   ⚠️  Win Rate изменился: 88.00% → 72.00%
+
+42. 0xeb60bfc54443e1c03b3c5812ada24a7b229015db
+   Display: 0xeb60bfc54443e1c03b3c5812ada24a7b229015db
+   Trades: 89, Win Rate: 76.19%, PnL: $76.61
+   Daily Freq: 1.98, Source: polymarket_api
+   Closed Positions (last 500): 21
+   ⚠️  Win Rate изменился: 78.57% → 76.19%
+
+43. 0x9646c8d901a55e8d942778181b3d8efd2323ee6e
+   Display: 0x9646c8d901a55e8d942778181b3d8efd2323ee6e
+   Trades: 66, Win Rate: 92.86%, PnL: $43.32
+   Daily Freq: 0.21, Source: polymarket_api
+   Closed Positions (last 500): 28
+   ⚠️  Win Rate изменился: 95.65% → 92.86%
+
+44. 0x819e6a947c9fa591a8cf41b2dac86793f114e967
+   Display: 0x819e6a947c9fa591a8cf41b2dac86793f114e967
+   Trades: 124, Win Rate: 92.00%, PnL: $273.56
+   Daily Freq: 8.18, Source: polymarket_api
+   Closed Positions (last 500): 50
+   ⚠️  Win Rate изменился: 82.61% → 92.00%
+
+45. 0x64022d1b1637df49beac258e542f791080162dd2
+   Display: 0x64022d1b1637df49beac258e542f791080162dd2
+   Trades: 116, Win Rate: 100.00%, PnL: $83.77
+   Daily Freq: 5.70, Source: polymarket_api
+   Closed Positions (last 500): 50
+   ⚠️  Win Rate изменился: 88.00% → 100.00%
+
+46. 0x6372bc760aa0c1a794e22113d8fcc2c9bb978954
+   Display: 0x6372bc760aa0c1a794e22113d8fcc2c9bb978954
+   Trades: 87, Win Rate: 100.00%, PnL: $66.61
+   Daily Freq: 4.85, Source: polymarket_api
+   Closed Positions (last 500): 50
+   ⚠️  Win Rate изменился: 96.00% → 100.00%
+
+47. 0xe452181ac01cf6bfc53bb3380f89f6bca9281208
+   Display: 0xe452181ac01cf6bfc53bb3380f89f6bca9281208
+   Trades: 65, Win Rate: 90.91%, PnL: $26.87
+   Daily Freq: 0.20, Source: polymarket_api
+   Closed Positions (last 500): 22
+   ⚠️  Win Rate изменился: 94.12% → 90.91%
+
+48. 0x6b93272cc303d435e4ec83bf179115219ffc50d7
+   Display: 0x6b93272cc303d435e4ec83bf179115219ffc50d7
+   Trades: 63, Win Rate: 68.89%, PnL: $4.03
+   Daily Freq: 0.79, Source: polymarket_api
+   Closed Positions (last 500): 45
+   ⚠️  Win Rate изменился: 88.00% → 68.89%
+
+49. 0x2fc21b0839c06491fa8fbf0cbf848bc58693687e
+   Display: 0x2fc21b0839c06491fa8fbf0cbf848bc58693687e
+   Trades: 101, Win Rate: 100.00%, PnL: $264.08
+   Daily Freq: 7.48, Source: polymarket_api
+   Closed Positions (last 500): 50
+   ⚠️  Win Rate изменился: 80.00% → 100.00%
+
+50. 0x15db14ef84461e0bcf8b1a1610cfe62c4e0be2d5
+   Display: 0x15db14ef84461e0bcf8b1a1610cfe62c4e0be2d5
+   Trades: 97, Win Rate: 72.00%, PnL: $33.43
+   Daily Freq: 8.70, Source: polymarket_api
+   Closed Positions (last 500): 50
+   ⚠️  Win Rate изменился: 76.47% → 72.00%
+
+
+================================================================================
+КОШЕЛЬКИ, КОТОРЫЕ НЕ ПРОШЛИ ФИЛЬТРЫ
+================================================================================
+
+1. 0x8e80b474de55b641a4845fd9e869150c208159e8
+   Display: 0x8e80b474de55b641a4845fd9e869150c208159e8
+   Причина: win_rate < 65.0% (44.0%)
+   Trades: 52, Win Rate: 44.00%, PnL: $238,165.94
+   Daily Freq: 0.34
+   Closed Positions (last 500): 50
+   Старые значения: Trades=52, WR=88.00%, PnL=$816,688.74
+
+2. 0xc1c9269e2fb298be48a6842eb4c1a3b5f3b696d9
+   Display: 0xc1c9269e2fb298be48a6842eb4c1a3b5f3b696d9
+   Причина: win_rate < 65.0% (42.0%)
+   Trades: 51, Win Rate: 42.00%, PnL: $254,470.40
+   Daily Freq: 0.45
+   Closed Positions (last 500): 50
+   Старые значения: Trades=51, WR=84.00%, PnL=$526,097.34
+
+3. 0xb3a7248f8587bd09ad2860494332e35303d8e661
+   Display: 0xb3a7248f8587bd09ad2860494332e35303d8e661
+   Причина: win_rate < 65.0% (42.0%)
+   Trades: 59, Win Rate: 42.00%, PnL: $221,415.46
+   Daily Freq: 0.23
+   Closed Positions (last 500): 50
+   Старые значения: Trades=55, WR=84.00%, PnL=$317,736.88
+
+4. 0xf20986f7c6b8e3ea603a7bb33797d5ba982597e1
+   Display: 0xf20986f7c6b8e3ea603a7bb33797d5ba982597e1
+   Причина: win_rate < 65.0% (46.0%)
+   Trades: 75, Win Rate: 46.00%, PnL: $204,194.28
+   Daily Freq: 0.80
+   Closed Positions (last 500): 50
+   Старые значения: Trades=62, WR=80.00%, PnL=$209,175.02
+
+5. 0x2c709ebbf3e1b8effa748070293b7567bf83232a
+   Display: 0x2c709ebbf3e1b8effa748070293b7567bf83232a
+   Причина: win_rate < 65.0% (38.0%)
+   Trades: 54, Win Rate: 38.00%, PnL: $60,279.68
+   Daily Freq: 0.50
+   Closed Positions (last 500): 50
+   Старые значения: Trades=54, WR=76.00%, PnL=$115,412.97
+
+6. 0xa81eefec9c08fa157d855f1ac5caf8feab1903dc
+   Display: 0xa81eefec9c08fa157d855f1ac5caf8feab1903dc
+   Причина: win_rate < 65.0% (54.0%)
+   Trades: 43, Win Rate: 54.00%, PnL: $63,665.43
+   Daily Freq: 5.63
+   Closed Positions (last 500): 50
+   Старые значения: Trades=38, WR=92.00%, PnL=$62,619.85
+
+7. 0x07d2dc0bef4fc2b066cf8536ee7d132808261b32
+   Display: 0x07d2dc0bef4fc2b066cf8536ee7d132808261b32
+   Причина: win_rate < 65.0% (63.6%)
+   Trades: 59, Win Rate: 63.64%, PnL: $46,346.18
+   Daily Freq: 1.12
+   Closed Positions (last 500): 33
+   Старые значения: Trades=59, WR=84.00%, PnL=$49,632.10
+
+8. 0x2e3ea056400d81c42e2ce26ef25fda4ec5caabea
+   Display: 0x2e3ea056400d81c42e2ce26ef25fda4ec5caabea
+   Причина: win_rate < 65.0% (49.0%)
+   Trades: 41, Win Rate: 48.98%, PnL: $13,214.97
+   Daily Freq: 0.86
+   Closed Positions (last 500): 49
+   Старые значения: Trades=41, WR=92.00%, PnL=$16,338.27
+
+9. 0x0f214043fe6d32f8692a302270e2ce460a523d6e
+   Display: 0x0f214043fe6d32f8692a302270e2ce460a523d6e
+   Причина: win_rate < 65.0% (40.0%)
+   Trades: 65, Win Rate: 40.00%, PnL: $1,425.99
+   Daily Freq: 2.04
+   Closed Positions (last 500): 50
+   Старые значения: Trades=60, WR=80.00%, PnL=$3,245.72
+
+10. 0x814935ca05848d524c4ce84ce9c7c15cda09f490
+   Display: 0x814935ca05848d524c4ce84ce9c7c15cda09f490
+   Причина: win_rate < 65.0% (60.0%)
+   Trades: 82, Win Rate: 60.00%, PnL: $284.57
+   Daily Freq: 1.52
+   Closed Positions (last 500): 40
+   Старые значения: Trades=76, WR=96.00%, PnL=$1,131.19
+
+11. 0x25b9abf665fe90d0539f2be826038dbb9baa2970
+   Display: 0x25b9abf665fe90d0539f2be826038dbb9baa2970
+   Причина: win_rate < 65.0% (46.0%)
+   Trades: 61, Win Rate: 46.00%, PnL: $383.38
+   Daily Freq: 0.23
+   Closed Positions (last 500): 50
+   Старые значения: Trades=51, WR=76.00%, PnL=$985.03
+
+12. 0x207e8edc66e2d0465053686e8bdf8b4e230d3499
+   Display: 0x207e8edc66e2d0465053686e8bdf8b4e230d3499
+   Причина: win_rate < 65.0% (56.0%)
+   Trades: 70, Win Rate: 56.00%, PnL: $-34.21
+   Daily Freq: 0.16
+   Closed Positions (last 500): 50
+   Старые значения: Trades=64, WR=96.00%, PnL=$525.84
+
+13. 0x4c6ae781da68b8a95695b3231afca463655d2dd7
+   Display: 0x4c6ae781da68b8a95695b3231afca463655d2dd7
+   Причина: win_rate < 65.0% (43.2%)
+   Trades: 66, Win Rate: 43.24%, PnL: $227.20
+   Daily Freq: 3.10
+   Closed Positions (last 500): 37
+   Старые значения: Trades=50, WR=80.00%, PnL=$215.10
+
+14. 0xd3d6c18f2a6f3697c24d9ebe44aca868ea1febef
+   Display: 0xd3d6c18f2a6f3697c24d9ebe44aca868ea1febef
+   Причина: win_rate < 65.0% (62.0%)
+   Trades: 75, Win Rate: 62.00%, PnL: $382.25
+   Daily Freq: 0.21
+   Closed Positions (last 500): 50
+   Старые значения: Trades=62, WR=96.00%, PnL=$73.13
+
+15. 0x686e4ec9284728f4c8f00a3e5a4bbc90953bcd9e
+   Display: 0x686e4ec9284728f4c8f00a3e5a4bbc90953bcd9e
+   Причина: win_rate < 65.0% (54.0%)
+   Trades: 57, Win Rate: 54.00%, PnL: $11.54
+   Daily Freq: 0.31
+   Closed Positions (last 500): 50
+   Старые значения: Trades=54, WR=96.00%, PnL=$48.25
+

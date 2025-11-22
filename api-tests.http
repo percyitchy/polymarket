@@ -1,0 +1,74 @@
+### Polymarket API Tests
+### Используйте REST Client расширение для выполнения этих запросов
+
+### ============================================
+### Gamma API
+### ============================================
+
+### Get Events (Gamma API)
+GET https://gamma-api.polymarket.com/events
+Content-Type: application/json
+
+### Get Event by Slug (GraphQL)
+POST https://gamma-api.polymarket.com/graphql
+Content-Type: application/json
+
+{
+  "query": "query GetEvent($slug: String!) { event(slug: $slug) { id title markets { id slug } } }",
+  "variables": {
+    "slug": "will-trump-win-2024-election"
+  }
+}
+
+### ============================================
+### HashDive API
+### ============================================
+
+### Get API Usage
+GET https://hashdive.com/api/get_api_usage
+x-api-key: {{HASHDIVE_API_KEY}}
+
+### Get Trades
+GET https://hashdive.com/api/get_trades?user_address={{WALLET_ADDRESS}}
+x-api-key: {{HASHDIVE_API_KEY}}
+
+### Get Positions
+GET https://hashdive.com/api/get_positions?user_address={{WALLET_ADDRESS}}
+x-api-key: {{HASHDIVE_API_KEY}}
+
+### Get Latest Whale Trades
+GET https://hashdive.com/api/get_latest_whale_trades?limit=10
+x-api-key: {{HASHDIVE_API_KEY}}
+
+### Search Markets
+GET https://hashdive.com/api/search_markets?query={{SEARCH_QUERY}}
+x-api-key: {{HASHDIVE_API_KEY}}
+
+### ============================================
+### Polymarket CLOB API
+### ============================================
+
+### Get Market by Condition ID
+GET https://clob.polymarket.com/markets/{{CONDITION_ID}}
+Content-Type: application/json
+
+### Get Market Prices
+GET https://clob.polymarket.com/markets/{{CONDITION_ID}}/prices
+Content-Type: application/json
+
+### ============================================
+### Polymarket Analytics API
+### ============================================
+
+### Get Leaderboard (requires authentication)
+GET https://polymarketanalytics.com/api/leaderboard
+Content-Type: application/json
+
+### ============================================
+### Variables (установите в .vscode/settings.json)
+### ============================================
+### HASHDIVE_API_KEY: your-api-key-here
+### WALLET_ADDRESS: 0x123...
+### CONDITION_ID: 0x456...
+### SEARCH_QUERY: trump election
+

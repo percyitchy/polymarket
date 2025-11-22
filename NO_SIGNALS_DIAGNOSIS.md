@@ -139,3 +139,7 @@ print(f'Status: {response.status_code}, Trades: {len(response.json())}')
 
 
 
+
+
+
+

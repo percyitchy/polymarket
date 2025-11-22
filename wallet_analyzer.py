@@ -23,6 +23,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 from db import PolymarketDB
 from proxy_manager import ProxyManager
+from market_utils import classify_market
 
 # Load environment variables
 load_dotenv()
@@ -84,6 +85,12 @@ ANALYSIS_RESULT_REJECTED_LOW_ROI = "rejected_low_roi"  # < MINIMUM_ROI ROI
 ANALYSIS_RESULT_REJECTED_LOW_AVG_PNL = "rejected_low_avg_pnl"  # < MINIMUM_AVG_PNL avg PnL per market
 ANALYSIS_RESULT_REJECTED_LOW_AVG_STAKE = "rejected_low_avg_stake"  # < MINIMUM_AVG_STAKE avg stake per market
 ANALYSIS_RESULT_REJECTED_LEGACY = "rejected_legacy"  # Old format values from previous versions
+
+# Insider detection constants
+INSIDER_MIN_POSITION_SIZE = float(os.getenv("INSIDER_MIN_POSITION_SIZE", "5000.0"))  # Minimum position size for insider detection ($5k default)
+INSIDER_MAX_TOTAL_TRADES = int(os.getenv("INSIDER_MAX_TOTAL_TRADES", "10"))  # Max trades for "new wallet" detection (10 default)
+INSIDER_MIN_WIN_RATE = float(os.getenv("INSIDER_MIN_WIN_RATE", "0.80"))  # Min win rate for insider detection (80% default)
+INSIDER_MAX_MARKETS = int(os.getenv("INSIDER_MAX_MARKETS", "3"))  # Max markets for "concentrated" detection (3 default)
 
 @dataclass
 class AnalysisConfig:
@@ -286,23 +293,93 @@ class WalletAnalyzer:
                 analysis_result = cached['analysis_result']
                 last_trade_at = cached.get('last_trade_at')
                 
-                # If cached result is "accepted", ensure wallet is saved to wallets table
+                # If this is a recompute job, still need to recalculate categories
+                is_recompute = job.get('source') == 'recompute'
+                if is_recompute:
+                    logger.info(f"Recompute requested for {address}, fetching closed positions for category stats...")
+                    try:
+                        closed_positions = self._get_closed_positions(address)
+                        if closed_positions and len(closed_positions) > 0:
+                            self._compute_category_stats(address, closed_positions)
+                            logger.info(f"Category stats recomputed for {address}")
+                        else:
+                            logger.debug(f"No closed positions found for {address} during recompute")
+                    except Exception as e:
+                        logger.warning(f"Error recomputing category stats for cached wallet {address}: {e}")
+                
+                # If cached result is "accepted", ensure wallet is saved to wallets table and refresh insider detection
                 if analysis_result == "accepted":
+                    # Fetch closed positions to compute insider detection for cached accepted wallets
+                    try:
+                        closed_positions = self._get_closed_positions(address)
+                        if closed_positions and len(closed_positions) > 0:
+                            # Calculate total_markets_traded from unique market IDs
+                            total_markets_traded = len(set(pos.get('conditionId') or pos.get('condition_id') for pos in closed_positions if pos.get('conditionId') or pos.get('condition_id')))
+                            
+                            # Detect insider patterns
+                            is_insider_candidate, insider_reason = self._detect_insider_patterns(
+                                address, traded, win_rate, closed_positions, total_markets_traded
+                            )
+                            logger.info(f"[INSIDER] Detection for cached {address}: is_candidate={is_insider_candidate}, reason={insider_reason}")
+                            
+                            # Update cache with insider fields if they changed
+                            cached_insider = cached.get('is_insider_candidate', False)
+                            if is_insider_candidate != cached_insider:
+                                logger.info(f"[INSIDER] Updating cache for {address}: insider status changed from {cached_insider} to {is_insider_candidate}")
+                                self.db.cache_analysis_result(
+                                    address=address,
+                                    traded_total=traded,
+                                    win_rate=win_rate,
+                                    realized_pnl_total=pnl_total,
+                                    daily_frequency=daily_freq,
+                                    analysis_result=analysis_result,
+                                    last_trade_at=last_trade_at,
+                                    source=job.get("source", "queue"),
+                                    is_insider_candidate=is_insider_candidate,
+                                    insider_detection_reason=insider_reason if insider_reason else None,
+                                    total_markets_traded=total_markets_traded
+                                )
+                        else:
+                            # No closed positions available, use cached insider fields if present
+                            is_insider_candidate = cached.get('is_insider_candidate', False)
+                            insider_reason = cached.get('insider_detection_reason')
+                            total_markets_traded = cached.get('total_markets_traded')
+                    except Exception as e:
+                        logger.warning(f"Error refreshing insider detection for cached wallet {address}: {e}")
+                        # Fall back to cached insider fields if available
+                        is_insider_candidate = cached.get('is_insider_candidate', False)
+                        insider_reason = cached.get('insider_detection_reason')
+                        total_markets_traded = cached.get('total_markets_traded')
+                    
                     # Check if wallet already exists in wallets table
                     existing_wallet = self.db.get_wallet(address)
                     if not existing_wallet:
-                        # Wallet was accepted but not saved - save it now
+                        # Wallet was accepted but not saved - save it now with insider fields
                         logger.info(f"Wallet {address} was cached as accepted but not in wallets table, saving now...")
                         success = self.db.upsert_wallet(
                             address, job.get('display', address), traded, win_rate,
-                            pnl_total, daily_freq, job.get('source', 'queue'), last_trade_at
+                            pnl_total, daily_freq, job.get('source', 'queue'), last_trade_at,
+                            total_markets_traded=total_markets_traded,
+                            is_insider_candidate=is_insider_candidate if is_insider_candidate else None,
+                            insider_detection_reason=insider_reason if insider_reason else None
                         )
                         if success:
                             logger.info(f"Successfully saved cached accepted wallet {address} to wallets table")
                         else:
                             logger.error(f"Failed to save cached accepted wallet {address} to wallets table")
                     else:
-                        logger.debug(f"Wallet {address} already exists in wallets table")
+                        # Update wallet with insider fields if they indicate an insider candidate
+                        if is_insider_candidate:
+                            logger.info(f"Updating cached accepted wallet {address} with insider fields")
+                            self.db.upsert_wallet(
+                                address, job.get('display', address), traded, win_rate,
+                                pnl_total, daily_freq, job.get('source', 'queue'), last_trade_at,
+                                total_markets_traded=total_markets_traded,
+                                is_insider_candidate=is_insider_candidate,
+                                insider_detection_reason=insider_reason if insider_reason else None
+                            )
+                        else:
+                            logger.debug(f"Wallet {address} already exists in wallets table")
                 
                 # Return True for cached results (successfully processed, even if filtered out)
                 return True
@@ -368,6 +445,22 @@ class WalletAnalyzer:
                     return True  # Successfully handled (filtered out due to API error)
                 
                 win_rate, pnl_total = self._compute_win_rate_and_pnl(closed_positions)
+                
+                # Calculate total_markets_traded from unique market IDs
+                total_markets_traded = len(set(pos.get('conditionId') or pos.get('condition_id') for pos in closed_positions if pos.get('conditionId') or pos.get('condition_id')))
+                
+                # Detect insider patterns
+                is_insider_candidate, insider_reason = self._detect_insider_patterns(
+                    address, traded, win_rate, closed_positions, total_markets_traded
+                )
+                logger.info(f"[INSIDER] Detection for {address}: is_candidate={is_insider_candidate}, reason={insider_reason}")
+                
+                # Compute category-based statistics
+                if closed_positions and len(closed_positions) > 0:
+                    try:
+                        self._compute_category_stats(address, closed_positions)
+                    except Exception as e:
+                        logger.warning(f"Error computing category stats for {address}: {e}")
                 
                 # Check if we have valid data for analysis
                 if not closed_positions or len(closed_positions) == 0:
@@ -579,6 +672,15 @@ class WalletAnalyzer:
                 analysis_result = ANALYSIS_RESULT_REJECTED_LOW_WINRATE
             
             # Cache the result (always cache, even if accepted)
+            # Use insider detection results computed earlier if available
+            cache_insider_candidate = None
+            cache_insider_reason = None
+            cache_total_markets = None
+            if 'is_insider_candidate' in locals() and 'insider_reason' in locals() and 'total_markets_traded' in locals():
+                cache_insider_candidate = is_insider_candidate
+                cache_insider_reason = insider_reason if insider_reason else None
+                cache_total_markets = total_markets_traded
+            
             self.db.cache_analysis_result(
                 address=address,
                 traded_total=traded,
@@ -587,16 +689,41 @@ class WalletAnalyzer:
                 daily_frequency=daily_freq,
                 analysis_result=analysis_result,
                 last_trade_at=last_trade_at,
-                source=job.get("source", "queue")
+                source=job.get("source", "queue"),
+                is_insider_candidate=cache_insider_candidate,
+                insider_detection_reason=cache_insider_reason,
+                total_markets_traded=cache_total_markets
             )
             
             # Apply criteria: traded >= MIN_TRADES and win_rate >= WIN_RATE_THRESHOLD
             # Note: New quality filters (markets, volume, ROI, avg_pnl, avg_stake) are already checked above
             if traded >= MIN_TRADES and win_rate >= WIN_RATE_THRESHOLD:
-                # Store wallet in database with last_trade_at
+                # Use insider detection results computed earlier (reuse variables from line 397-400)
+                # Calculate quality metrics if we have closed_positions
+                quality_metrics = {}
+                if 'closed_positions' in locals() and closed_positions and len(closed_positions) > 0:
+                    num_markets = len(closed_positions)
+                    total_volume, avg_stake = self._compute_volume_and_stake(closed_positions)
+                    roi = (pnl_total / total_volume) if total_volume > 0 else 0.0
+                    avg_pnl_per_market = (pnl_total / num_markets) if num_markets > 0 else 0.0
+                    quality_metrics = {
+                        'total_volume': total_volume,
+                        'roi': roi,
+                        'avg_pnl_per_market': avg_pnl_per_market,
+                        'avg_stake': avg_stake
+                    }
+                
+                # Store wallet in database with last_trade_at, insider fields, and quality metrics
                 success = self.db.upsert_wallet(
                     address, job.get('display', address), traded, win_rate, 
-                    pnl_total, daily_freq, job.get('source', 'queue'), last_trade_at
+                    pnl_total, daily_freq, job.get('source', 'queue'), last_trade_at,
+                    total_markets_traded=total_markets_traded if 'total_markets_traded' in locals() else None,
+                    is_insider_candidate=is_insider_candidate if 'is_insider_candidate' in locals() and is_insider_candidate else None,
+                    insider_detection_reason=insider_reason if 'insider_reason' in locals() and insider_reason else None,
+                    total_volume=quality_metrics.get('total_volume'),
+                    roi=quality_metrics.get('roi'),
+                    avg_pnl_per_market=quality_metrics.get('avg_pnl_per_market'),
+                    avg_stake=quality_metrics.get('avg_stake')
                 )
                 
                 if success:
@@ -1086,6 +1213,207 @@ class WalletAnalyzer:
         avg_stake = total_volume / num_markets if num_markets > 0 else 0.0
         
         return total_volume, avg_stake
+    
+    def _compute_category_stats(self, address: str, closed_positions: List[Dict[str, Any]]) -> None:
+        """Compute and save category-based statistics for a wallet"""
+        if not closed_positions:
+            return
+        
+        # Aggregate stats by category
+        category_stats = {}  # category -> {markets, volume, pnl, win_markets}
+        
+        for position in closed_positions:
+            condition_id = position.get("conditionId") or position.get("condition_id")
+            if not condition_id:
+                continue
+            
+            # Get event info for classification
+            event = None
+            slug = None
+            question = None
+            
+            # First, try to get slug/question from closed position data itself
+            # Closed positions API returns: title, slug, eventSlug
+            slug = position.get("slug") or position.get("marketSlug") or position.get("eventSlug")
+            question = position.get("title") or position.get("question") or position.get("marketTitle")
+            
+            # Log what we got from position
+            if slug or question:
+                logger.debug(f"[CATEGORY] Got data from position: slug={slug[:50] if slug else 'None'}, question={question[:50] if question else 'None'}")
+            
+            try:
+                # Try to get event from Gamma API
+                from gamma_client import get_event_by_condition_id
+                event = get_event_by_condition_id(condition_id)
+                
+                # Extract slug and question from event
+                if event:
+                    markets = event.get("markets", [])
+                    for market in markets:
+                        market_condition_id = market.get("conditionId") or market.get("condition_id")
+                        if market_condition_id and market_condition_id.lower() == condition_id.lower():
+                            slug = slug or market.get("slug") or market.get("marketSlug")
+                            question = question or market.get("question") or market.get("title")
+                            break
+                    
+                    # If not found in markets, try event-level fields
+                    if not slug:
+                        slug = slug or event.get("slug") or event.get("eventSlug")
+                    if not question:
+                        question = question or event.get("question") or event.get("title")
+            except Exception as e:
+                logger.debug(f"Error getting event for condition {condition_id[:20]}...: {e}")
+            
+            # Fallback: Try CLOB API if we still don't have slug/question
+            if not slug or not question:
+                try:
+                    clob_url = f"https://clob.polymarket.com/markets/{condition_id}"
+                    clob_response = self._http_get_resilient(clob_url)
+                    if clob_response and clob_response.status_code == 200:
+                        clob_data = clob_response.json()
+                        slug = slug or clob_data.get("slug") or clob_data.get("questionSlug")
+                        question = question or clob_data.get("question") or clob_data.get("title")
+                except Exception as e:
+                    logger.debug(f"Error getting market from CLOB API for condition {condition_id[:20]}...: {e}")
+            
+            # Log what we have for debugging
+            if not slug and not question:
+                logger.debug(f"[CATEGORY] No slug/question for condition {condition_id[:20]}..., using empty data")
+            
+            # Classify market
+            category = classify_market(event or {}, slug, question)
+            
+            # Log classification result for debugging
+            if category == "other/Unknown" and (slug or question):
+                logger.debug(f"[CATEGORY] Classified as Unknown: slug={slug[:50] if slug else 'None'}, question={question[:50] if question else 'None'}")
+            
+            # Get position metrics
+            pnl = float(position.get("realizedPnl", 0) or 0)
+            
+            # Calculate volume (same logic as _compute_volume_and_stake)
+            volume = position.get("volume") or position.get("totalVolume") or position.get("total_volume")
+            if volume is None:
+                total_bought = float(position.get("totalBought", 0) or position.get("total_bought", 0) or 0)
+                avg_price = float(position.get("avgPrice", 0) or position.get("avg_price", 0) or 0)
+                if total_bought > 0 and avg_price > 0:
+                    volume = total_bought * avg_price
+                elif total_bought > 0:
+                    volume = total_bought
+                else:
+                    volume = 0.0
+            else:
+                volume = float(volume)
+            
+            # Initialize category stats if needed
+            if category not in category_stats:
+                category_stats[category] = {
+                    'markets': 0,
+                    'volume': 0.0,
+                    'pnl': 0.0,
+                    'win_markets': 0
+                }
+            
+            # Aggregate stats
+            category_stats[category]['markets'] += 1
+            category_stats[category]['volume'] += volume
+            category_stats[category]['pnl'] += pnl
+            if pnl > 0:
+                category_stats[category]['win_markets'] += 1
+        
+        # Calculate final metrics and save to database
+        for category, stats in category_stats.items():
+            markets = stats['markets']
+            volume = stats['volume']
+            pnl = stats['pnl']
+            win_markets = stats['win_markets']
+            
+            # Calculate metrics
+            winrate = win_markets / markets if markets > 0 else 0.0
+            roi = pnl / volume if volume > 0 else 0.0
+            avg_pnl = pnl / markets if markets > 0 else 0.0
+            
+            # Determine A List status: winrate >= 90% and markets > 20
+            is_a_list_trader = (winrate >= 0.90 and markets > 20)
+            
+            # Save to database
+            self.db.upsert_wallet_category_stats(
+                wallet_address=address,
+                category=category,
+                markets=markets,
+                volume=volume,
+                pnl=pnl,
+                winrate=winrate,
+                roi=roi,
+                avg_pnl=avg_pnl,
+                is_a_list_trader=is_a_list_trader
+            )
+            
+            logger.debug(
+                f"[CATEGORY] {address[:12]}... category={category}: "
+                f"markets={markets}, winrate={winrate:.2%}, pnl=${pnl:.2f}, "
+                f"is_a_list={is_a_list_trader}"
+            )
+    
+    def _detect_insider_patterns(self, address: str, traded_total: int, win_rate: float,
+                                 closed_positions: List[Dict[str, Any]], total_markets_traded: int) -> Tuple[bool, str]:
+        """Detect insider trading patterns in wallet behavior
+        
+        Returns:
+            Tuple[bool, str]: (is_insider_candidate, reason)
+        """
+        try:
+            # Pattern 1: New wallet with large position
+            if traded_total < INSIDER_MAX_TOTAL_TRADES:
+                # Calculate max position size from closed positions
+                max_position_size = 0.0
+                for pos in closed_positions:
+                    # Calculate position size: totalBought * avgPrice
+                    total_bought = float(pos.get("totalBought", 0) or pos.get("total_bought", 0) or 0)
+                    avg_price = float(pos.get("avgPrice", 0) or pos.get("avg_price", 0) or 0)
+                    if total_bought > 0 and avg_price > 0:
+                        position_size = total_bought * avg_price
+                        max_position_size = max(max_position_size, position_size)
+                    elif total_bought > 0:
+                        max_position_size = max(max_position_size, total_bought)
+                
+                if max_position_size > INSIDER_MIN_POSITION_SIZE:
+                    logger.info(f"[INSIDER] Pattern 1 detected for {address}: new wallet (trades={traded_total}) with large position (${max_position_size:.2f})")
+                    return (True, "new_wallet_large_position")
+            
+            # Pattern 2: High win rate on first trades
+            if traded_total < INSIDER_MAX_TOTAL_TRADES and win_rate >= INSIDER_MIN_WIN_RATE:
+                logger.info(f"[INSIDER] Pattern 2 detected for {address}: new wallet (trades={traded_total}) with high win rate ({win_rate:.2%})")
+                return (True, "high_winrate_new_wallet")
+            
+            # Pattern 3: Concentrated trading
+            if total_markets_traded <= INSIDER_MAX_MARKETS and traded_total >= 5:
+                # Calculate total volume from closed positions
+                total_volume = 0.0
+                for pos in closed_positions:
+                    volume = pos.get("volume") or pos.get("totalVolume") or pos.get("total_volume")
+                    if volume is not None:
+                        try:
+                            total_volume += float(volume)
+                            continue
+                        except (ValueError, TypeError):
+                            pass
+                    
+                    # Fallback: calculate from totalBought * avgPrice
+                    total_bought = float(pos.get("totalBought", 0) or pos.get("total_bought", 0) or 0)
+                    avg_price = float(pos.get("avgPrice", 0) or pos.get("avg_price", 0) or 0)
+                    if total_bought > 0 and avg_price > 0:
+                        total_volume += total_bought * avg_price
+                    elif total_bought > 0:
+                        total_volume += total_bought
+                
+                if total_volume > INSIDER_MIN_POSITION_SIZE:
+                    logger.info(f"[INSIDER] Pattern 3 detected for {address}: concentrated trading (markets={total_markets_traded}, volume=${total_volume:.2f})")
+                    return (True, "concentrated_trading")
+            
+            return (False, "")
+        except Exception as e:
+            logger.error(f"Error detecting insider patterns for {address}: {e}", exc_info=True)
+            return (False, "")
     
     def add_wallets_to_queue(self, wallets: Dict[str, Dict[str, str]]) -> int:
         """Add multiple wallets to analysis queue"""

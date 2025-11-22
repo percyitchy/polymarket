@@ -190,15 +190,19 @@ Current price: $X.XXX
 
 ### Cron задачи:
 
-1. **Проверка polymarketanalytics.com** (каждые 12 часов):
+**Примечание**: Cron задачи могут быть настроены в старых директориях. Проверьте актуальные настройки на сервере командой `crontab -l`.
+
+1. **Проверка polymarketanalytics.com** (каждые 12 часов) - если используется:
    ```bash
-   0 */12 * * * cd /home/ubuntu/polymarket && python3 check_polymarket_analytics.py
+   0 */12 * * * cd /opt/polymarket-bot && /opt/polymarket-bot/venv/bin/python3 check_polymarket_analytics.py
    ```
 
-2. **Обновление кошельков из лидербордов** (ежедневно в 00:20):
+2. **Обновление кошельков из лидербордов** (ежедневно в 00:20) - если используется:
    ```bash
-   20 0 * * * python3 refresh_wallets_from_leaderboards.py
+   20 0 * * * cd /opt/polymarket-bot && /opt/polymarket-bot/venv/bin/python3 refresh_wallets_from_leaderboards.py
    ```
+
+**Рекомендация**: Вместо cron задач лучше использовать systemd timers (`polymarket-daily-analysis.timer`, `polymarket-daily-refresh.timer`, `polymarket-daily-report.timer`).
 
 3. **Экспорт в Excel** (ежедневно):
    ```bash
@@ -207,10 +211,12 @@ Current price: $X.XXX
 
 ### Systemd сервис:
 
-- **Сервис**: `polymarket-notifier.service`
+- **Сервис**: `polymarket-bot.service`
+- **Рабочая директория**: `/opt/polymarket-bot`
 - **Статус**: Запущен и работает 24/7
 - **Автозапуск**: Включен
 - **Перезапуск**: Автоматический при сбое
+- **Примечание**: Старый сервис `polymarket-notifier.service` из `/home/ubuntu/polymarket/` больше не используется
 
 ---
 

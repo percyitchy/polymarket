@@ -26,7 +26,16 @@ except Exception as e:
 
 from db import PolymarketDB
 from notify import TelegramNotifier
-from wallet_analyzer import WalletAnalyzer, AnalysisConfig, WIN_RATE_THRESHOLD, MAX_DAILY_FREQUENCY
+from market_utils import classify_market
+from wallet_analyzer import WalletAnalyzer, AnalysisConfig, WIN_RATE_THRESHOLD, MAX_DAILY_FREQUENCY, MIN_TRADES
+from clickhouse_client import ClickHouseClient
+try:
+    from adj_news_client import AdjNewsClient, RateLimitExceeded as AdjNewsRateLimitExceeded
+    ADJ_NEWS_AVAILABLE = True
+except ImportError:
+    ADJ_NEWS_AVAILABLE = False
+    AdjNewsClient = None
+    AdjNewsRateLimitExceeded = None
 try:
     from bet_monitor import BetDetector, TelegramNotifier as BetTelegramNotifier
     BET_MONITOR_AVAILABLE = True
@@ -121,7 +130,7 @@ class PolymarketNotifier:
             self.min_consensus = 2
         
         # Minimum total position size (in USDC)
-        self.min_total_position_usd = self._get_env_float("MIN_TOTAL_POSITION_USD", 1000.0)
+        self.min_total_position_usd = self._get_env_float("MIN_TOTAL_POSITION_USD", 2000.0)
         
         self.max_wallets = self._get_env_int("MAX_WALLETS", 2000)
         # Log configuration at startup
@@ -175,6 +184,70 @@ class PolymarketNotifier:
             self.telegram_chat_id,
             hashdive_client=self.hashdive_client
         )
+        
+        # Initialize ClickHouse client
+        self.clickhouse_client = ClickHouseClient()
+        
+        # Initialize AdjNewsClient for news correlation
+        self.adj_news_client = None
+        if ADJ_NEWS_AVAILABLE:
+            try:
+                adj_news_api_key = os.getenv("ADJ_NEWS_API_KEY", "").strip()
+                if adj_news_api_key:
+                    self.adj_news_client = AdjNewsClient(api_key=adj_news_api_key)
+                    logger.info("[AdjNews] AdjNewsClient initialized successfully with API key")
+                else:
+                    self.adj_news_client = AdjNewsClient()
+                    logger.info("[AdjNews] AdjNewsClient initialized without API key (lower rate limits)")
+            except Exception as e:
+                logger.warning(f"[AdjNews] Failed to initialize AdjNewsClient: {e}")
+                self.adj_news_client = None
+        
+        # News correlation configuration
+        news_correlation_enabled_str = os.getenv("NEWS_CORRELATION_ENABLED", "true").strip().lower()
+        self.news_correlation_enabled = news_correlation_enabled_str in ("1", "true", "yes", "on")
+        self.news_min_wallets_for_check = self._get_env_int("NEWS_MIN_WALLETS_FOR_CHECK", 4)
+        self.news_min_a_list_for_check = self._get_env_int("NEWS_MIN_A_LIST_FOR_CHECK", 2)
+        self.news_time_window_hours = self._get_env_float("NEWS_TIME_WINDOW_HOURS", 1.0)
+        
+        # Initialize news correlation tracking stats
+        self.news_correlation_stats = {'total_checks': 0, 'news_found': 0, 'rate_limited': 0, 'errors': 0}
+        
+        # Log news correlation configuration
+        if self.adj_news_client:
+            rate_limit_status = self.adj_news_client.get_rate_limit_status()
+            logger.info(
+                f"[AdjNews] News correlation enabled: {self.news_correlation_enabled}, "
+                f"min_wallets={self.news_min_wallets_for_check}, "
+                f"min_a_list={self.news_min_a_list_for_check}, "
+                f"time_window={self.news_time_window_hours}h, "
+                f"daily_limit={rate_limit_status['daily_queries_limit']}/day"
+            )
+        else:
+            logger.info("[AdjNews] News correlation disabled (AdjNewsClient not available)")
+        
+        # Open Interest and Whale Position monitoring configuration
+        self.oi_spike_threshold_percent = self._get_env_float("OI_SPIKE_THRESHOLD_PERCENT", 20.0)
+        self.whale_position_size_usd = self._get_env_float("WHALE_POSITION_SIZE_USD", 10000.0)
+        self.oi_check_interval_min = self._get_env_float("OI_CHECK_INTERVAL_MIN", 5.0)
+        
+        # Order Flow Imbalance Detection configuration
+        self.order_flow_imbalance_threshold = self._get_env_float("ORDER_FLOW_IMBALANCE_THRESHOLD", 0.70)
+        self.order_flow_time_window_min = self._get_env_float("ORDER_FLOW_TIME_WINDOW_MIN", 15.0)
+        self.order_flow_check_interval_min = self._get_env_float("ORDER_FLOW_CHECK_INTERVAL_MIN", 5.0)
+        
+        # Initialize tracking state
+        self.last_oi_check_time = 0
+        self.oi_check_stats = {'total_checks': 0, 'spikes_detected': 0, 'errors': 0}
+        self.whale_check_stats = {'total_checks': 0, 'positions_detected': 0, 'errors': 0}
+        self.last_order_flow_check_time = 0
+        self.order_flow_stats = {'total_checks': 0, 'imbalances_detected': 0, 'errors': 0}
+        
+        logger.info(
+            f"[Config] Order Flow: threshold={self.order_flow_imbalance_threshold:.2f}, "
+            f"time_window={self.order_flow_time_window_min:.1f}min, "
+            f"check_interval={self.order_flow_check_interval_min:.1f}min"
+        )
         if BET_MONITOR_AVAILABLE:
             self.bet_detector = BetDetector(self.db_path)
         else:
@@ -222,6 +295,15 @@ class PolymarketNotifier:
             'no_trigger_matched': 0,
             'opposite_recent': 0
         }
+        
+        # IMPORTANT: Log that we no longer extract market_slug from events
+        # All slug normalization is now handled by notify.TelegramNotifier
+        logger.warning(
+            "[SLUG] ⚠️  IMPORTANT: market_slug extraction from events is DISABLED. "
+            "All slug normalization is handled by notify.TelegramNotifier via "
+            "_get_event_slug_and_market_id() and _get_market_slug(). "
+            "Do not rely on event['marketSlug'] - it is often outcome-specific and incorrect."
+        )
         # Diagnostic counters for errors
         self.error_counts = {
             'retry_error': 0,
@@ -230,6 +312,12 @@ class PolymarketNotifier:
             'connection_error': 0,
             'json_error': 0,
             'other_error': 0
+        }
+        
+        # Insider detection statistics
+        self.insider_stats = {
+            'total_detected': 0,
+            'by_reason': {}
         }
         
     def validate_config(self) -> bool:
@@ -421,13 +509,22 @@ class PolymarketNotifier:
         4. Average price from wallet_prices (if provided)
         5. Polymarket data-api (last resort)
         
+        Args:
+            slug: Slug parameter (optional). Should be market-level slug, cleaned and normalized.
+                  Only pass if slug is known to be market-level and suitable for Gamma /events API.
+                  If uncertain, pass None and price_fetcher will use condition_id fallback.
+        
         Returns float on success, None on failure. Never raises exceptions.
         """
         # Step 0: Try new price_fetcher module (with all fallbacks, including wallet_prices)
         try:
             from price_fetcher import get_current_price as fetch_price
             logger.info(f"[Price] Trying price_fetcher module with wallet_prices fallback (provided {len(wallet_prices) if wallet_prices else 0} wallets)")
-            result = fetch_price(condition_id=condition_id, outcome_index=outcome_index, wallet_prices=wallet_prices, slug=slug)
+            # CRITICAL: Only pass slug if it's cleaned and market-level (not market-specific)
+            # Since we no longer extract slugs from events, slug will typically be None here
+            # If slug is provided, it should already be cleaned and validated by the caller
+            cleaned_slug_for_price = slug  # Pass as-is if provided (caller should have cleaned it)
+            result = fetch_price(condition_id=condition_id, outcome_index=outcome_index, wallet_prices=wallet_prices, slug=cleaned_slug_for_price)
             # Обработка tuple (цена, источник) или просто цена (для обратной совместимости)
             if isinstance(result, tuple):
                 price, source = result
@@ -1065,8 +1162,26 @@ class PolymarketNotifier:
                 outcome_index = (trade.get("outcomeIndex") if trade.get("outcomeIndex") is not None 
                                else trade.get("outcome") or trade.get("outcomeIndex"))
                 
-                if not condition_id or outcome_index is None:
-                    continue
+                # Allow processing without condition_id - use market slug/title as fallback
+                # This allows signals even when condition_id is not available
+                if not condition_id:
+                    # Try to use market slug or title as identifier
+                    market_slug = trade.get("slug") or trade.get("eventSlug") or ""
+                    market_title = trade.get("title") or trade.get("question") or ""
+                    if market_slug:
+                        condition_id = f"SLUG:{market_slug}"
+                    elif market_title:
+                        # Use first 50 chars of title as identifier
+                        condition_id = f"TITLE:{market_title[:50]}"
+                    else:
+                        # Skip only if we have no way to identify the market
+                        logger.debug(f"[TRADES] Skipping trade {trade_id[:12]}...: no condition_id and no market identifier")
+                        continue
+                
+                if outcome_index is None:
+                    # Default to 0 if outcome_index is missing
+                    outcome_index = 0
+                    logger.debug(f"[TRADES] Using default outcome_index=0 for trade {trade_id[:12]}...")
                 
                 timestamp = trade.get("timestamp") or trade.get("createdAt")
                 if isinstance(timestamp, str):
@@ -1439,7 +1554,30 @@ class PolymarketNotifier:
                 self.alert_window_min, market_title, market_slug, price, side,
                 usd_amount=usd_amount, quantity=quantity
             )
-            wallets_in_window = sorted({e["wallet"] for e in window_data.get("events", [])})
+            # CRITICAL: Filter events by time window before counting wallets
+            # Only include events within the alert_window_min from the most recent event
+            events = window_data.get("events", [])
+            if events:
+                # Get the most recent event timestamp
+                latest_event_ts = max(e["ts"] for e in events)
+                window_start_ts = latest_event_ts - (self.alert_window_min * 60)
+                
+                # Filter events to only include those within the time window
+                recent_events = [e for e in events if e["ts"] >= window_start_ts]
+                
+                # Log if we filtered out old events
+                if len(recent_events) < len(events):
+                    filtered_count = len(events) - len(recent_events)
+                    logger.warning(
+                        f"[CONSENSUS] ⚠️  Filtered out {filtered_count} old event(s) outside {self.alert_window_min}min window. "
+                        f"Events: {len(events)} -> {len(recent_events)} (window: {window_start_ts:.0f} to {latest_event_ts:.0f})"
+                    )
+                
+                events = recent_events
+            
+            wallets_in_window = sorted({e["wallet"] for e in events})
+            # Save a copy of wallets_in_window for database storage (to prevent modification)
+            wallets_for_db = list(wallets_in_window) if wallets_in_window else []
             
             # Log candidate with detailed info
             if not hasattr(self, 'monitoring_stats'):
@@ -1453,25 +1591,29 @@ class PolymarketNotifier:
             )
             
             # FIRST CHECK: Skip markets that are already closed/resolved (check at entry)
-            # Don't send suppressed alert here - we'll send it later if consensus is reached
-            # This prevents duplicate alerts for the same closed market
-            if not self.is_market_active(condition_id, outcome_index):
-                self.suppressed_counts['market_closed'] = self.suppressed_counts.get('market_closed', 0) + 1
-                if not hasattr(self, 'monitoring_stats'):
-                    self.monitoring_stats = {"total_alerts_blocked": 0, "blocked_reasons": {}}
-                self.monitoring_stats["total_alerts_blocked"] = self.monitoring_stats.get("total_alerts_blocked", 0) + 1
-                reason = "market_inactive_early"
-                self.monitoring_stats["blocked_reasons"][reason] = self.monitoring_stats["blocked_reasons"].get(reason, 0) + 1
-                logger.info(
-                    f"[CONSENSUS] ❌ BLOCKED (early check): Market {condition_id[:20]}... is closed or not found (404). Skipping signal. "
-                    f"wallets={len(wallets_in_window)}/{self.min_consensus} outcome={outcome_index} side={side}"
-                )
-                # Don't send suppressed alert here - will be sent in final check if consensus reached
-                return
+            # Skip this check if condition_id is a fallback (starts with SLUG: or TITLE:)
+            # This allows signals even when condition_id is not available
+            if condition_id and not condition_id.startswith(("SLUG:", "TITLE:")):
+                if not self.is_market_active(condition_id, outcome_index):
+                    self.suppressed_counts['market_closed'] = self.suppressed_counts.get('market_closed', 0) + 1
+                    if not hasattr(self, 'monitoring_stats'):
+                        self.monitoring_stats = {"total_alerts_blocked": 0, "blocked_reasons": {}}
+                    self.monitoring_stats["total_alerts_blocked"] = self.monitoring_stats.get("total_alerts_blocked", 0) + 1
+                    reason = "market_inactive_early"
+                    self.monitoring_stats["blocked_reasons"][reason] = self.monitoring_stats["blocked_reasons"].get(reason, 0) + 1
+                    logger.info(
+                        f"[CONSENSUS] ❌ BLOCKED (early check): Market {condition_id[:20]}... is closed or not found (404). Skipping signal. "
+                        f"wallets={len(wallets_in_window)}/{self.min_consensus} outcome={outcome_index} side={side}"
+                    )
+                    # Don't send suppressed alert here - will be sent in final check if consensus reached
+                    return
+            
             # Check if this is first entry for this wallet in this market direction
-            if self.db.has_traded_market(wallet, condition_id, side):
-                logger.debug(f"[CONSENSUS] Skipping {wallet[:12]}...: already traded {condition_id[:20]}... ({side})")
-                return
+            # Skip this check for fallback condition_ids to allow processing
+            if condition_id and not condition_id.startswith(("SLUG:", "TITLE:")):
+                if self.db.has_traded_market(wallet, condition_id, side):
+                    logger.debug(f"[CONSENSUS] Skipping {wallet[:12]}...: already traded {condition_id[:20]}... ({side})")
+                    return
             
             # Mark this market as traded for this wallet
             self.db.mark_market_traded(wallet, condition_id, side, timestamp)
@@ -1484,7 +1626,39 @@ class PolymarketNotifier:
             )
             
             # Get unique wallets in window for this direction
-            wallets_in_window = sorted({e["wallet"] for e in window_data.get("events", [])})
+            # CRITICAL: Filter events by time window before counting wallets
+            # Only include events within the alert_window_min from the most recent event
+            all_events = window_data.get("events", [])
+            filtered_events = all_events  # Will be filtered below
+            
+            if all_events:
+                # Get the most recent event timestamp
+                latest_event_ts = max(e["ts"] for e in all_events)
+                window_start_ts = latest_event_ts - (self.alert_window_min * 60)
+                
+                # Filter events to only include those within the time window
+                filtered_events = [e for e in all_events if e["ts"] >= window_start_ts]
+                
+                # Log if we filtered out old events
+                if len(filtered_events) < len(all_events):
+                    filtered_count = len(all_events) - len(filtered_events)
+                    logger.warning(
+                        f"[CONSENSUS] ⚠️  Filtered out {filtered_count} old event(s) outside {self.alert_window_min}min window. "
+                        f"Events: {len(all_events)} -> {len(filtered_events)} (window: {window_start_ts:.0f} to {latest_event_ts:.0f})"
+                    )
+                
+                # Calculate actual time window for recent events
+                if filtered_events:
+                    first_recent_ts = min(e["ts"] for e in filtered_events)
+                    actual_window_minutes = (latest_event_ts - first_recent_ts) / 60.0
+                    logger.info(
+                        f"[CONSENSUS] Time window check: {len(filtered_events)} events within {self.alert_window_min}min window, "
+                        f"actual span: {actual_window_minutes:.1f} minutes"
+                    )
+            
+            wallets_in_window = sorted({e["wallet"] for e in filtered_events})
+            # Save a copy of wallets_in_window for database storage (to prevent modification)
+            wallets_for_db = list(wallets_in_window) if wallets_in_window else []
             
             if len(wallets_in_window) < self.min_consensus:
                 if not hasattr(self, 'monitoring_stats'):
@@ -1508,15 +1682,20 @@ class PolymarketNotifier:
             )
             
             # STEP 1: Check if market is active (early check after threshold met)
+            # Skip this check if condition_id is a fallback (starts with SLUG: or TITLE:)
+            # This allows signals even when condition_id is not available
             logger.info(f"[CONSENSUS] Step 1/7: Checking market status for condition={condition_id[:20]}... outcome={outcome_index}")
-            market_is_active_early = self.is_market_active(condition_id, outcome_index)
+            market_is_active_early = True  # Default to True for fallback condition_ids
+            if condition_id and not condition_id.startswith(("SLUG:", "TITLE:")):
+                market_is_active_early = self.is_market_active(condition_id, outcome_index)
             logger.info(f"[CONSENSUS] Step 1/7: Market active status = {market_is_active_early}")
             
             # EARLY CHECK: If market is already closed, skip processing events from rolling window
             # This prevents delayed alerts for markets that closed while events were in the window
             # IMPORTANT: Don't send suppressed alerts for old events from closed markets
             # Suppressed alerts should only be sent in real-time when consensus is detected but market is closed
-            if not market_is_active_early:
+            # Skip this check for fallback condition_ids
+            if not market_is_active_early and condition_id and not condition_id.startswith(("SLUG:", "TITLE:")):
                 self.suppressed_counts['market_closed'] = self.suppressed_counts.get('market_closed', 0) + 1
                 if not hasattr(self, 'monitoring_stats'):
                     self.monitoring_stats = {"total_alerts_blocked": 0, "blocked_reasons": {}}
@@ -1552,29 +1731,24 @@ class PolymarketNotifier:
                 return
             
             # Extract market info and prices from window events
+            # BEST-EFFORT: Try to get market_title from events (for display purposes only)
+            # NOTE: We NO LONGER extract market_slug from events - all slug normalization
+            # is handled by notify.TelegramNotifier._get_event_slug_and_market_id() and _get_market_slug()
             market_title = ""
-            # Try to get market_slug from events first, but validate it
-            # If not available or invalid, notify.py will fetch it via _get_market_slug()
-            market_slug = ""
+            market_slug = ""  # Always empty - notify.py will fetch and normalize slug via API
             for event in window_data.get("events", []):
                 if event.get("marketTitle"):
                     market_title = event["marketTitle"]
-                # Try to get slug from events, but we'll validate it in notify.py
-                if event.get("marketSlug") and not market_slug:
-                    potential_slug = event["marketSlug"]
-                    # Only use if it doesn't look obviously wrong
-                    if potential_slug and len(potential_slug) > 5:
-                        market_slug = potential_slug
-                        break
+                    break  # Use first available marketTitle
             wallet_prices = {}  # Map wallet -> price
             
             logger.info(f"[CONSENSUS] Extracting wallet_prices from {len(window_data.get('events', []))} events...")
             for event in window_data.get("events", []):
-                if event.get("marketTitle"):
+                # BEST-EFFORT: Update market_title if we haven't found one yet
+                if event.get("marketTitle") and not market_title:
                     market_title = event["marketTitle"]
-                # Skip marketSlug from events - it's often outcome-specific and incorrect
-                # if event.get("marketSlug"):
-                #     market_slug = event["marketSlug"]
+                # NOTE: We NO LONGER extract marketSlug from events - all slug normalization
+                # is handled by notify.TelegramNotifier._get_event_slug_and_market_id() and _get_market_slug()
                 event_price = event.get("price")
                 event_wallet = event.get("wallet")
                 if event_price and event_wallet:
@@ -1605,15 +1779,11 @@ class PolymarketNotifier:
                     p_min = min(first_three_prices)
                     p_max = max(first_three_prices)
                     # Determine band thresholds
-                    # TEMPORARY: Relaxed for testing with MIN_CONSENSUS=2
-                    # Original: <= 0.10 for p_max >= 0.5, <= 0.25 for p_max < 0.5
-                    # New: <= 0.20 for p_max >= 0.5, <= 0.40 for p_max < 0.5
-                    if p_max <= 0.05:
-                        price_ok = True  # any divergence allowed
-                    elif p_max < 0.5:
-                        price_ok = (p_max - p_min) / p_max <= 0.40  # Relaxed from 0.25
-                    else:
-                        price_ok = (p_max - p_min) / p_max <= 0.20  # Relaxed from 0.10
+                    # Maximum 25% divergence allowed for all prices (as per requirements)
+                    # Calculate divergence as (max - min) / max
+                    divergence = (p_max - p_min) / p_max if p_max > 0 else 0
+                    max_allowed_divergence = 0.25  # 25% maximum divergence
+                    price_ok = divergence <= max_allowed_divergence
                     if not price_ok:
                         if not hasattr(self, 'monitoring_stats'):
                             self.monitoring_stats = {"total_alerts_blocked": 0, "blocked_reasons": {}}
@@ -1678,6 +1848,66 @@ class PolymarketNotifier:
                 logger.warning(f"[CONSENSUS] Step 4/7: ⚠️  Price unavailable after all fallbacks for condition_id={condition_id[:20]}... outcome={outcome_index}, wallet_prices: {wallet_prices}")
             else:
                 logger.info(f"[CONSENSUS] Step 4/7: ✅ Got current price: {current_price:.6f} for condition_id={condition_id[:20]}... outcome={outcome_index}")
+            
+            # Check for insider candidates in consensus
+            insider_wallets = []
+            for w in wallets_in_window:
+                wallet_info = self.db.get_wallet(w)
+                if wallet_info and wallet_info.get('is_insider_candidate'):
+                    insider_wallets.append({
+                        'address': w,
+                        'reason': wallet_info.get('insider_detection_reason'),
+                        'total_trades': wallet_info.get('traded_total'),
+                        'win_rate': wallet_info.get('win_rate'),
+                        'total_markets': wallet_info.get('total_markets_traded')
+                    })
+            
+            # If insider candidates found, send insider alert for each
+            if insider_wallets:
+                logger.info(f"[INSIDER] Detected {len(insider_wallets)} insider candidate(s) in consensus for condition={condition_id[:20]}...")
+                for insider in insider_wallets:
+                    # Calculate position size from events
+                    position_size = 0.0
+                    for e in window_data.get('events', []):
+                        if e.get('wallet') == insider['address']:
+                            position_size += e.get('usd', 0.0)
+                    
+                    # Get category if available
+                    category = None
+                    try:
+                        # Try to get category from market classification
+                        if market_title:
+                            from market_utils import classify_market
+                            event_slug, market_id, market_slug_from_api, event_data = self.notifier._get_event_slug_and_market_id(condition_id)
+                            category = classify_market(event_data or {}, market_slug or market_slug_from_api or "", market_title)
+                    except Exception as e:
+                        logger.debug(f"Error getting category for insider alert: {e}")
+                    
+                    # Send insider alert
+                    try:
+                        self.notifier.send_insider_alert(
+                            condition_id=condition_id,
+                            outcome_index=outcome_index,
+                            wallet=insider['address'],
+                            reason=insider['reason'],
+                            market_title=market_title,
+                            market_slug=market_slug,
+                            side=side,
+                            position_size=position_size,
+                            win_rate=insider['win_rate'] or 0.0,
+                            total_trades=insider['total_trades'] or 0,
+                            total_markets=insider['total_markets'] or 0,
+                            current_price=current_price,
+                            category=category
+                        )
+                        logger.info(f"[INSIDER] Sent insider alert for wallet {insider['address'][:12]}... reason={insider['reason']}")
+                        
+                        # Update insider stats
+                        self.insider_stats['total_detected'] += 1
+                        reason = insider['reason']
+                        self.insider_stats['by_reason'][reason] = self.insider_stats['by_reason'].get(reason, 0) + 1
+                    except Exception as e:
+                        logger.error(f"[INSIDER] Failed to send insider alert: {e}", exc_info=True)
             
             # STEP 5: Check market status based on the actual price we got
             # IMPORTANT: First check if market is active, then check price
@@ -2333,16 +2563,57 @@ class PolymarketNotifier:
             market_info = self.get_market_info(condition_id)
             end_date = market_info.get("end_date") if market_info else None
             
+            # Get category for this market
+            category = "other/Unknown"
+            try:
+                from gamma_client import get_event_by_condition_id
+                event = get_event_by_condition_id(condition_id)
+                if event:
+                    markets = event.get("markets", [])
+                    for market in markets:
+                        market_condition_id = market.get("conditionId") or market.get("condition_id")
+                        if market_condition_id and market_condition_id.lower() == condition_id.lower():
+                            slug = market.get("slug") or market.get("marketSlug")
+                            question = market.get("question") or market.get("title")
+                            category = classify_market(event, slug, question)
+                            break
+                    if category == "other/Unknown":
+                        slug = event.get("slug") or event.get("eventSlug")
+                        question = event.get("question") or event.get("title")
+                        category = classify_market(event, slug, question)
+                else:
+                    # Fallback: classify from slug/question if available
+                    category = classify_market({}, market_slug, market_title)
+            except Exception as e:
+                logger.debug(f"[CONSENSUS] Error classifying market category: {e}")
+                # Fallback: classify from slug/question if available
+                category = classify_market({}, market_slug, market_title)
+            
+            logger.info(f"[CONSENSUS] Category for condition={condition_id[:20]}...: {category}")
+            
+            # Get A List status for wallets in this category
+            a_list_wallets = []
+            for wallet in wallets_in_window:
+                if self.db.is_wallet_a_list_in_category(wallet, category):
+                    a_list_wallets.append(wallet)
+            
+            logger.info(f"[CONSENSUS] A List traders in this signal: {len(a_list_wallets)}/{len(wallets_in_window)}")
+            if a_list_wallets:
+                logger.info(f"[CONSENSUS] A List wallets: {', '.join([w[:12] + '...' for w in a_list_wallets[:5]])}")
+            
             # Send alert with prices and consensus flow (events per minute)
             # Pass current_price (may be None) - send_consensus_alert will handle it
             alert_id = key[:8]
-            events_count = len(window_data.get("events", []))
+            # Use filtered events count (events within time window)
+            events_count = len(filtered_events) if 'filtered_events' in locals() else len(window_data.get("events", []))
             
             logger.info("=" * 80)
             logger.info(f"[CONSENSUS] 📤 SENDING ALERT:")
             logger.info(f"[CONSENSUS]   - Condition: {condition_id[:30]}...")
             logger.info(f"[CONSENSUS]   - Outcome: {outcome_index}")
             logger.info(f"[CONSENSUS]   - Side: {side}")
+            logger.info(f"[CONSENSUS]   - Category: {category}")
+            logger.info(f"[CONSENSUS]   - A List traders: {len(a_list_wallets)}/{len(wallets_in_window)}")
             logger.info(f"[CONSENSUS]   - Wallets: {len(wallets_in_window)}")
             logger.info(f"[CONSENSUS]   - Events: {events_count}")
             logger.info(f"[CONSENSUS]   - Total USD: ${total_usd:.2f}")
@@ -2350,7 +2621,78 @@ class PolymarketNotifier:
             logger.info(f"[CONSENSUS]   - Market Title: {market_title[:50] if market_title else 'N/A'}...")
             logger.info("=" * 80)
             
-            logger.info(f"[NOTIFY] Preparing to send consensus alert: condition={condition_id[:20]}... outcome={outcome_index} side={side} wallets={len(wallets_in_window)}")
+            # Check for OI spike confirmation (enforce 5-minute window between samples)
+            oi_confirmed = False
+            order_flow_confirmed = False
+            try:
+                spike_result = self.db.calculate_oi_spike(condition_id, self.oi_spike_threshold_percent, max_minutes=5)
+                if spike_result:
+                    oi_confirmed = True
+                    logger.info(f"[CONSENSUS] ✅ OI confirmed: {condition_id[:20]}... spiked by {spike_result['spike_percent']:.1f}%")
+            except Exception as e:
+                logger.debug(f"[CONSENSUS] Could not check OI spike: {e}")
+            
+            # Check for order flow confirmation
+            try:
+                latest_order_flow = self.db.get_latest_order_flow(condition_id, outcome_index)
+                if latest_order_flow and latest_order_flow.get('is_imbalanced'):
+                    flow_direction = latest_order_flow.get('imbalance_direction', '').upper()
+                    
+                    # Check freshness of the order flow metric
+                    detected_at = latest_order_flow.get('detected_at')
+                    age_minutes = None
+                    if detected_at:
+                        try:
+                            # Parse detected_at as aware UTC datetime
+                            detected_time = datetime.fromisoformat(detected_at.replace('Z', '+00:00'))
+                            if detected_time.tzinfo is None:
+                                detected_time = detected_time.replace(tzinfo=timezone.utc)
+                            # Compute age in minutes
+                            age_minutes = (datetime.now(timezone.utc) - detected_time).total_seconds() / 60.0
+                        except Exception as e:
+                            logger.debug(f"[CONSENSUS] Could not parse detected_at timestamp: {e}")
+                    
+                    # Set freshness threshold (default: 2x the order flow time window)
+                    max_age_min = self.order_flow_time_window_min * 2
+                    
+                    # Confirm if order flow direction matches consensus side AND metric is fresh
+                    direction_matches = (side.upper() == 'BUY' and flow_direction == 'BUY') or \
+                                      (side.upper() == 'SELL' and flow_direction == 'SELL')
+                    
+                    if direction_matches:
+                        if age_minutes is not None and age_minutes <= max_age_min:
+                            order_flow_confirmed = True
+                            logger.info(f"[CONSENSUS] ✅ Order flow confirmed: {condition_id[:20]}... {flow_direction} imbalance matches {side} consensus (age: {age_minutes:.1f}min)")
+                        elif age_minutes is not None:
+                            logger.info(f"[CONSENSUS] ⚠️ Order flow present but too old: {condition_id[:20]}... {flow_direction} imbalance matches {side} consensus but age {age_minutes:.1f}min exceeds threshold {max_age_min:.1f}min")
+                        else:
+                            # If we can't determine age, don't confirm (safety first)
+                            logger.debug(f"[CONSENSUS] Order flow present but detected_at timestamp unavailable or invalid: {condition_id[:20]}...")
+            except Exception as e:
+                logger.debug(f"[CONSENSUS] Could not check order flow: {e}")
+            
+            # Check for news correlation (only for high-confidence consensus)
+            news_context = None
+            is_high_confidence = (
+                len(wallets_in_window) >= self.news_min_wallets_for_check or
+                len(a_list_wallets) >= self.news_min_a_list_for_check
+            )
+            
+            if is_high_confidence:
+                try:
+                    consensus_timestamp = window_data.get('last_ts', time.time())
+                    news_context = self.check_news_correlation(market_title, condition_id, consensus_timestamp)
+                    if news_context:
+                        logger.info(f"[CONSENSUS] ✅ News correlation found: {news_context.get('headline', '')[:50]}...")
+                    else:
+                        logger.info(f"[CONSENSUS] ⚠️ No news correlation found for high-confidence consensus")
+                except Exception as e:
+                    logger.debug(f"[CONSENSUS] Could not check news correlation: {e}")
+                    news_context = None
+            else:
+                logger.debug(f"[CONSENSUS] Skipping news check (low confidence: {len(wallets_in_window)} wallets, {len(a_list_wallets)} A-list)")
+            
+            logger.info(f"[NOTIFY] Preparing to send consensus alert: condition={condition_id[:20]}... outcome={outcome_index} side={side} wallets={len(wallets_in_window)} oi_confirmed={oi_confirmed} order_flow_confirmed={order_flow_confirmed} news_context={'present' if news_context else 'none'}")
             try:
                 success = self.notifier.send_consensus_alert(
                     condition_id, outcome_index, wallets_in_window, wallet_prices,
@@ -2358,7 +2700,11 @@ class PolymarketNotifier:
                     consensus_events=events_count,
                     total_usd=total_usd,
                     end_date=end_date,
-                    current_price=current_price  # Pass current_price (may be None)
+                    current_price=current_price,  # Pass current_price (may be None)
+                    oi_confirmed=oi_confirmed,  # Pass OI confirmation flag
+                    order_flow_confirmed=order_flow_confirmed,  # Pass order flow confirmation flag
+                    news_context=news_context  # Pass news context
+                    # Removed category and a_list_wallets - not in method signature
                 )
             except Exception as e:
                 logger.error(f"[NOTIFY] ❌ Exception while calling send_consensus_alert: {e}", exc_info=True)
@@ -2387,9 +2733,20 @@ class PolymarketNotifier:
                 return
             
             # Collect wallet details (address, usd_amount, price) for saving
+            # Use filtered events (only events within time window)
             wallet_details = []
             try:
-                events = window_data.get("events", [])
+                # Use filtered_events if available, otherwise filter from window_data
+                if 'filtered_events' in locals():
+                    events = filtered_events
+                else:
+                    events = window_data.get("events", [])
+                    # Re-filter events to ensure we only use recent ones within time window
+                    if events:
+                        latest_event_ts = max(e["ts"] for e in events)
+                        window_start_ts = latest_event_ts - (self.alert_window_min * 60)
+                        events = [e for e in events if e["ts"] >= window_start_ts]
+                
                 wallet_usd_map = {}  # wallet -> total USD
                 wallet_price_map = {}  # wallet -> entry price
                 
@@ -2428,10 +2785,22 @@ class PolymarketNotifier:
                 wallet_details_json = ""
             
             # Mark alert as sent
+            # Use wallets_for_db (saved copy) to ensure wallets are always saved correctly
+            wallets_csv_str = ",".join(wallets_for_db) if wallets_for_db else ""
+            wallet_count_for_db = len(wallets_for_db)
+            
+            # Log warning if wallets_csv is empty but we have wallet_count > 0
+            if not wallets_csv_str and wallet_count_for_db > 0:
+                logger.warning(f"[CONSENSUS] ⚠️  wallets_csv is empty but wallets_for_db has {wallet_count_for_db} wallets!")
+            
+            # Log if wallets_in_window was modified
+            if len(wallets_in_window) != wallet_count_for_db:
+                logger.warning(f"[CONSENSUS] ⚠️  wallets_in_window was modified! Original: {wallet_count_for_db}, Current: {len(wallets_in_window)}")
+            
             alert_saved = self.db.mark_alert_sent(
-                condition_id, outcome_index, len(wallets_in_window),
+                condition_id, outcome_index, wallet_count_for_db,
                 window_data["first_ts"], window_data["last_ts"], alert_key, side,
-                price=(current_price or 0.0), wallets_csv=",".join(wallets_in_window),
+                price=(current_price or 0.0), wallets_csv=wallets_csv_str,
                 wallet_details_json=wallet_details_json,
                 total_usd=total_usd,
                 is_repeat=is_repeat_alert
@@ -2449,6 +2818,737 @@ class PolymarketNotifier:
         except Exception as e:
             logger.error(f"Error checking consensus: {e}")
     
+    def check_open_interest_spikes(self) -> Dict[str, int]:
+        """Check for open interest spikes in active markets
+        
+        Note: Currently, OI monitoring operates only on markets seen in rolling_buys
+        (markets with recent consensus activity), not on all tracked markets. This narrower
+        scope is intentional and focuses monitoring on markets with active trading activity
+        from tracked wallets. To monitor all tracked markets, you would need to expand
+        the selection logic to include markets from tracked wallet positions or a dedicated
+        tracked markets table.
+        """
+        try:
+            import time
+            from clickhouse_client import RateLimitExceeded
+            
+            # Check if enough time has passed since last check
+            current_time = time.time()
+            if self.last_oi_check_time > 0:
+                time_since_last_check = (current_time - self.last_oi_check_time) / 60.0
+                if time_since_last_check < self.oi_check_interval_min:
+                    return {'checked': 0, 'spikes': 0, 'errors': 0}
+            
+            self.oi_check_stats['total_checks'] += 1
+            
+            # Get list of active markets from recent consensus events
+            # Note: This limits OI monitoring to markets with recent rolling consensus activity
+            active_markets = self.db.get_active_markets_from_rolling_buys(minutes=30)
+            
+            if not active_markets:
+                logger.debug("[OI] No active markets found for OI check")
+                return {'checked': 0, 'spikes': 0, 'errors': 0}
+            
+            spikes_detected = 0
+            errors = 0
+            
+            for condition_id in active_markets:
+                try:
+                    # Query ClickHouse for OI data
+                    oi_data = self.clickhouse_client.get_market_open_interest(condition_id)
+                    
+                    if not oi_data:
+                        continue
+                    
+                    open_interest = oi_data.get('open_interest')
+                    timestamp = oi_data.get('timestamp')
+                    
+                    if open_interest is None or timestamp is None:
+                        continue
+                    
+                    # Insert OI data into database
+                    self.db.insert_open_interest(condition_id, open_interest, timestamp)
+                    
+                    # Calculate spike (enforce 5-minute window between samples)
+                    spike_result = self.db.calculate_oi_spike(condition_id, self.oi_spike_threshold_percent, max_minutes=5)
+                    
+                    if spike_result:
+                        spikes_detected += 1
+                        self.oi_check_stats['spikes_detected'] += 1
+                        
+                        # Get market details for alert
+                        market_title = ""
+                        market_slug = ""
+                        try:
+                            # Try to get market details from API
+                            market_url = f"{self.data_api}/markets/{condition_id}"
+                            market_response = self.http_get(market_url, allow_404_as_none=True)
+                            if market_response:
+                                market_data = market_response.json() if hasattr(market_response, 'json') else market_response
+                                market_title = market_data.get('question', market_title)
+                                market_slug = market_data.get('slug', market_slug)
+                        except Exception as e:
+                            logger.debug(f"[OI] Could not fetch market details for {condition_id}: {e}")
+                        
+                        # Send OI spike alert
+                        self.notifier.send_oi_spike_alert(
+                            condition_id=condition_id,
+                            market_title=market_title,
+                            market_slug=market_slug,
+                            old_oi=spike_result['old_oi'],
+                            new_oi=spike_result['new_oi'],
+                            spike_percent=spike_result['spike_percent'],
+                            timestamp=spike_result['timestamp']
+                        )
+                        
+                        logger.info(f"[OI] 🔥 Spike detected: {condition_id[:20]}... OI increased by {spike_result['spike_percent']:.1f}%")
+                
+                except RateLimitExceeded as e:
+                    logger.warning(f"[OI] Rate limit exceeded, skipping remaining markets: {e}")
+                    errors += 1
+                    break
+                
+                except Exception as e:
+                    logger.error(f"[OI] Error checking OI for {condition_id}: {e}")
+                    errors += 1
+                    self.oi_check_stats['errors'] += 1
+            
+            self.last_oi_check_time = current_time
+            
+            stats = {
+                'checked': len(active_markets),
+                'spikes': spikes_detected,
+                'errors': errors
+            }
+            
+            logger.info(f"[OI] Check complete: {stats}")
+            return stats
+            
+        except Exception as e:
+            logger.error(f"[OI] Error in check_open_interest_spikes: {e}", exc_info=True)
+            return {'checked': 0, 'spikes': 0, 'errors': 1}
+    
+    def check_news_correlation(self, market_title: str, condition_id: str, consensus_timestamp: float) -> Optional[Dict[str, Any]]:
+        """
+        Check for news articles correlated with a consensus event
+        
+        Args:
+            market_title: Market title/topic to search for news
+            condition_id: Market condition ID (for logging)
+            consensus_timestamp: Unix timestamp of consensus event
+            
+        Returns:
+            Dict with keys {'headline': str, 'source': str, 'published_at': str, 'url': str} or None
+        """
+        # Check if news correlation is enabled and client is available
+        if not self.adj_news_client or not self.news_correlation_enabled:
+            return None
+        
+        # Validate inputs
+        if not market_title or not isinstance(market_title, str) or not market_title.strip():
+            logger.debug(f"[AdjNews] Invalid market_title for news check: {condition_id[:20]}...")
+            return None
+        
+        # Increment stats
+        self.news_correlation_stats['total_checks'] += 1
+        
+        try:
+            # Query adj.news API for market news (1 day lookback, limit 5 articles)
+            articles = self.adj_news_client.get_market_news(market_title.strip(), days=1, limit=5)
+            
+            if not articles or len(articles) == 0:
+                logger.debug(f"[AdjNews] No news articles found for market: {market_title[:50]}...")
+                return None
+            
+            # Filter articles published within time window of consensus event
+            time_window_seconds = self.news_time_window_hours * 3600
+            relevant_articles = []
+            
+            for article in articles:
+                try:
+                    # Extract published_at timestamp from article
+                    published_at = article.get('published_at') or article.get('publishedAt') or article.get('timestamp')
+                    if not published_at:
+                        continue
+                    
+                    # Parse timestamp (handle both ISO format and Unix timestamp)
+                    if isinstance(published_at, (int, float)):
+                        article_timestamp = float(published_at)
+                    elif isinstance(published_at, str):
+                        try:
+                            # Try ISO format first
+                            dt = datetime.fromisoformat(published_at.replace('Z', '+00:00'))
+                            article_timestamp = dt.timestamp()
+                        except (ValueError, AttributeError):
+                            # Try Unix timestamp string
+                            try:
+                                article_timestamp = float(published_at)
+                            except ValueError:
+                                continue
+                    else:
+                        continue
+                    
+                    # Check if article is within time window
+                    time_diff = abs(consensus_timestamp - article_timestamp)
+                    if time_diff <= time_window_seconds:
+                        relevant_articles.append({
+                            'article': article,
+                            'timestamp': article_timestamp,
+                            'time_diff': time_diff
+                        })
+                except Exception as e:
+                    logger.debug(f"[AdjNews] Error parsing article timestamp: {e}")
+                    continue
+            
+            if not relevant_articles:
+                logger.debug(f"[AdjNews] No news articles within {self.news_time_window_hours}h window for: {market_title[:50]}...")
+                return None
+            
+            # Sort by time difference (closest to consensus event first)
+            relevant_articles.sort(key=lambda x: x['time_diff'])
+            
+            # Extract first relevant article
+            best_article = relevant_articles[0]['article']
+            
+            # Extract article fields
+            headline = best_article.get('headline') or best_article.get('title') or best_article.get('text', '')[:100]
+            source = best_article.get('source') or best_article.get('domain') or 'Unknown'
+            published_at = best_article.get('published_at') or best_article.get('publishedAt') or best_article.get('timestamp')
+            url = best_article.get('url') or best_article.get('link') or ''
+            
+            # Increment stats
+            self.news_correlation_stats['news_found'] += 1
+            
+            # Log API usage stats
+            rate_limit_status = self.adj_news_client.get_rate_limit_status()
+            cache_stats = self.adj_news_client.get_cache_stats()
+            
+            logger.info(
+                f"[AdjNews] ✅ News correlation found: {headline[:50]}... "
+                f"(daily: {rate_limit_status['daily_queries_used']}/{rate_limit_status['daily_queries_limit']}, "
+                f"cache: {cache_stats['hit_rate_percent']:.1f}%)"
+            )
+            
+            # Log warning if approaching daily limit
+            if rate_limit_status['daily_queries_used'] > 25:
+                logger.warning(
+                    f"[AdjNews] ⚠️ Approaching daily rate limit: "
+                    f"{rate_limit_status['daily_queries_used']}/{rate_limit_status['daily_queries_limit']} used"
+                )
+            
+            return {
+                'headline': headline,
+                'source': source,
+                'published_at': str(published_at),
+                'url': url
+            }
+            
+        except AdjNewsRateLimitExceeded as e:
+            self.news_correlation_stats['rate_limited'] += 1
+            logger.warning(
+                f"[AdjNews] ⚠️ Rate limit exceeded: {e.wait_time:.1f}s wait time. "
+                f"Skipping news check for: {market_title[:50]}..."
+            )
+            return None
+            
+        except Exception as e:
+            self.news_correlation_stats['errors'] += 1
+            logger.error(f"[AdjNews] ❌ Error checking news correlation for {market_title[:50]}...: {e}", exc_info=True)
+            return None
+            self.oi_check_stats['errors'] += 1
+            return {'checked': 0, 'spikes': 0, 'errors': 1}
+    
+    def check_whale_positions(self) -> Dict[str, int]:
+        """Check for whale position changes in A-list wallets"""
+        try:
+            import time
+            from clickhouse_client import RateLimitExceeded
+            
+            self.whale_check_stats['total_checks'] += 1
+            
+            # Get list of A-list wallets
+            a_list_wallets = self.db.get_a_list_wallets()
+            
+            if not a_list_wallets:
+                logger.debug("[WHALE] No A-list wallets found")
+                return {'checked': 0, 'positions': 0, 'errors': 0}
+            
+            positions_detected = 0
+            errors = 0
+            
+            for wallet_address in a_list_wallets:
+                try:
+                    # Query ClickHouse for user positions
+                    positions = self.clickhouse_client.get_user_positions(wallet_address)
+                    
+                    if not positions:
+                        continue
+                    
+                    for position in positions:
+                        try:
+                            condition_id = position.get('condition_id')
+                            outcome_index = position.get('outcome_index', 0)
+                            quantity = position.get('quantity', 0.0)
+                            
+                            if not condition_id:
+                                continue
+                            
+                            # Get current price for position size calculation
+                            token_id = f"{condition_id}:{outcome_index}"
+                            current_price = self.clickhouse_client.get_latest_price(token_id)
+                            
+                            if current_price is None or current_price <= 0:
+                                continue
+                            
+                            # Calculate position size in USD
+                            position_size_usd = quantity * current_price
+                            
+                            # Get last known position before applying threshold filter
+                            # This allows us to detect full exits when position falls below threshold
+                            last_position = self.db.get_last_whale_position(wallet_address, condition_id)
+                            
+                            # Check if this is a full exit (previously whale-sized, now below threshold)
+                            if last_position:
+                                last_size = last_position.get('position_size_usd', 0)
+                                last_position_type = last_position.get('position_type', '')
+                                
+                                # Detect full exit: previously whale-sized, now below threshold
+                                if last_size >= self.whale_position_size_usd and position_size_usd < self.whale_position_size_usd:
+                                    # This is a full exit - position fell below whale threshold
+                                    position_type = 'exit'
+                                    
+                                    # Insert whale position record for the exit
+                                    self.db.insert_whale_position(
+                                        user_address=wallet_address,
+                                        condition_id=condition_id,
+                                        outcome_index=outcome_index,
+                                        position_size_usd=position_size_usd,
+                                        position_type=position_type
+                                    )
+                                    
+                                    positions_detected += 1
+                                    self.whale_check_stats['positions_detected'] += 1
+                                    
+                                    # Get market details for alert
+                                    market_title = ""
+                                    market_slug = ""
+                                    try:
+                                        market_url = f"{self.data_api}/markets/{condition_id}"
+                                        market_response = self.http_get(market_url, allow_404_as_none=True)
+                                        if market_response:
+                                            market_data = market_response.json() if hasattr(market_response, 'json') else market_response
+                                            market_title = market_data.get('question', market_title)
+                                            market_slug = market_data.get('slug', market_slug)
+                                    except Exception as e:
+                                        logger.debug(f"[WHALE] Could not fetch market details for {condition_id}: {e}")
+                                    
+                                    # Send whale position alert for exit
+                                    self.notifier.send_whale_position_alert(
+                                        user_address=wallet_address,
+                                        condition_id=condition_id,
+                                        outcome_index=outcome_index,
+                                        market_title=market_title,
+                                        market_slug=market_slug,
+                                        position_size_usd=position_size_usd,
+                                        position_type=position_type,
+                                        current_price=current_price
+                                    )
+                                    
+                                    logger.info(f"[WHALE] 🐋 {position_type.upper()} detected: {wallet_address[:12]}... position ${position_size_usd:,.0f} in {condition_id[:20]}... (full exit from ${last_size:,.0f})")
+                                    continue  # Skip further processing for this position
+                            
+                            # Process positions that are currently above whale threshold
+                            if position_size_usd >= self.whale_position_size_usd:
+                                # Detect entry or partial exit
+                                position_type = 'entry'
+                                if last_position:
+                                    last_size = last_position.get('position_size_usd', 0)
+                                    if position_size_usd < last_size * 0.5:  # Position reduced by >50%
+                                        position_type = 'exit'  # Partial exit
+                                    elif position_size_usd <= last_size * 1.1:  # Position similar (within 10%)
+                                        continue  # Skip if position hasn't changed significantly
+                                
+                                # Insert whale position
+                                self.db.insert_whale_position(
+                                    user_address=wallet_address,
+                                    condition_id=condition_id,
+                                    outcome_index=outcome_index,
+                                    position_size_usd=position_size_usd,
+                                    position_type=position_type
+                                )
+                                
+                                positions_detected += 1
+                                self.whale_check_stats['positions_detected'] += 1
+                                
+                                # Get market details for alert
+                                market_title = ""
+                                market_slug = ""
+                                try:
+                                    market_url = f"{self.data_api}/markets/{condition_id}"
+                                    market_response = self.http_get(market_url, allow_404_as_none=True)
+                                    if market_response:
+                                        market_data = market_response.json() if hasattr(market_response, 'json') else market_response
+                                        market_title = market_data.get('question', market_title)
+                                        market_slug = market_data.get('slug', market_slug)
+                                except Exception as e:
+                                    logger.debug(f"[WHALE] Could not fetch market details for {condition_id}: {e}")
+                                
+                                # Send whale position alert
+                                self.notifier.send_whale_position_alert(
+                                    user_address=wallet_address,
+                                    condition_id=condition_id,
+                                    outcome_index=outcome_index,
+                                    market_title=market_title,
+                                    market_slug=market_slug,
+                                    position_size_usd=position_size_usd,
+                                    position_type=position_type,
+                                    current_price=current_price
+                                )
+                                
+                                logger.info(f"[WHALE] 🐋 {position_type.upper()} detected: {wallet_address[:12]}... position ${position_size_usd:,.0f} in {condition_id[:20]}...")
+                        
+                        except Exception as e:
+                            logger.error(f"[WHALE] Error processing position for {wallet_address}: {e}")
+                            errors += 1
+                
+                except RateLimitExceeded as e:
+                    logger.warning(f"[WHALE] Rate limit exceeded, skipping remaining wallets: {e}")
+                    errors += 1
+                    break
+                
+                except Exception as e:
+                    logger.error(f"[WHALE] Error checking positions for {wallet_address}: {e}")
+                    errors += 1
+                    self.whale_check_stats['errors'] += 1
+            
+            stats = {
+                'checked': len(a_list_wallets),
+                'positions': positions_detected,
+                'errors': errors
+            }
+            
+            logger.info(f"[WHALE] Check complete: {stats}")
+            return stats
+            
+        except Exception as e:
+            logger.error(f"[WHALE] Error in check_whale_positions: {e}", exc_info=True)
+            self.whale_check_stats['errors'] += 1
+            return {'checked': 0, 'positions': 0, 'errors': 1}
+    
+    def process_pending_whale_alerts(self) -> int:
+        """Process pending whale alerts that haven't been sent yet"""
+        try:
+            pending_alerts = self.db.get_pending_whale_alerts(limit=10)
+            
+            alerts_sent = 0
+            for alert in pending_alerts:
+                try:
+                    condition_id = alert['condition_id']
+                    user_address = alert['user_address']
+                    outcome_index = alert['outcome_index']
+                    position_size_usd = alert['position_size_usd']
+                    position_type = alert['position_type']
+                    
+                    # Get market details
+                    market_title = ""
+                    market_slug = ""
+                    current_price = 0.0
+                    
+                    try:
+                        market_url = f"{self.data_api}/markets/{condition_id}"
+                        market_response = self.http_get(market_url, allow_404_as_none=True)
+                        if market_response:
+                            market_data = market_response.json() if hasattr(market_response, 'json') else market_response
+                            market_title = market_data.get('question', market_title)
+                            market_slug = market_data.get('slug', market_slug)
+                        
+                        # Get current price
+                        token_id = f"{condition_id}:{outcome_index}"
+                        current_price = self.clickhouse_client.get_latest_price(token_id) or 0.0
+                    except Exception as e:
+                        logger.debug(f"[WHALE] Could not fetch market details for pending alert: {e}")
+                    
+                    # Send alert
+                    success = self.notifier.send_whale_position_alert(
+                        user_address=user_address,
+                        condition_id=condition_id,
+                        outcome_index=outcome_index,
+                        market_title=market_title,
+                        market_slug=market_slug,
+                        position_size_usd=position_size_usd,
+                        position_type=position_type,
+                        current_price=current_price
+                    )
+                    
+                    if success:
+                        # Mark as alerted
+                        self.db.mark_whale_position_alerted(alert['id'])
+                        alerts_sent += 1
+                
+                except Exception as e:
+                    logger.error(f"[WHALE] Error processing pending alert {alert.get('id')}: {e}")
+            
+            if alerts_sent > 0:
+                logger.info(f"[WHALE] Sent {alerts_sent} pending whale alerts")
+            
+            return alerts_sent
+            
+        except Exception as e:
+            logger.error(f"[WHALE] Error processing pending whale alerts: {e}", exc_info=True)
+            return 0
+
+    def check_order_flow_imbalances(self) -> Dict[str, int]:
+        """Check for order flow imbalances in active markets"""
+        try:
+            import time
+            from datetime import datetime, timezone, timedelta
+            from clickhouse_client import RateLimitExceeded
+            
+            # Check if enough time has passed since last check
+            now = time.time()
+            if now - self.last_order_flow_check_time < (self.order_flow_check_interval_min * 60):
+                return {'checked': 0, 'imbalances': 0, 'errors': 0}
+            
+            self.order_flow_stats['total_checks'] += 1
+            
+            # Get list of active markets from recent consensus alerts (last 24 hours)
+            cutoff_time = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
+            active_markets = []
+            
+            try:
+                with self.db.get_connection() as conn:
+                    cursor = conn.cursor()
+                    cursor.execute("""
+                        SELECT DISTINCT condition_id, outcome_index
+                        FROM alerts_sent
+                        WHERE sent_at >= ?
+                    """, (cutoff_time,))
+                    rows = cursor.fetchall()
+                    active_markets = [(row[0], row[1]) for row in rows]
+            except Exception as e:
+                logger.error(f"[ORDER_FLOW] Error getting active markets: {e}")
+                return {'checked': 0, 'imbalances': 0, 'errors': 1}
+            
+            if not active_markets:
+                logger.debug("[ORDER_FLOW] No active markets found")
+                return {'checked': 0, 'imbalances': 0, 'errors': 0}
+            
+            imbalances_detected = 0
+            errors = 0
+            
+            for condition_id, outcome_index in active_markets:
+                try:
+                    # Query ClickHouse for recent orders
+                    orders = self.clickhouse_client.get_orders_matched(
+                        condition_id=condition_id,
+                        outcome_index=outcome_index,
+                        minutes_back=int(self.order_flow_time_window_min)
+                    )
+                    
+                    if not orders:
+                        continue
+                    
+                    # Calculate buy/sell counts and volumes
+                    buy_count = 0
+                    sell_count = 0
+                    buy_volume = 0.0
+                    sell_volume = 0.0
+                    
+                    for order in orders:
+                        side = order.get('side', '').upper()
+                        size = float(order.get('size', 0.0))
+                        price = float(order.get('price', 0.0))
+                        volume = size * price
+                        
+                        if side == 'BUY':
+                            buy_count += 1
+                            buy_volume += volume
+                        elif side == 'SELL':
+                            sell_count += 1
+                            sell_volume += volume
+                    
+                    total_volume = buy_volume + sell_volume
+                    if total_volume == 0:
+                        continue
+                    
+                    # Calculate buy/sell ratio
+                    buy_sell_ratio = buy_volume / total_volume
+                    
+                    # Detect imbalance
+                    is_imbalanced = False
+                    imbalance_direction = None
+                    
+                    if buy_sell_ratio > self.order_flow_imbalance_threshold:
+                        is_imbalanced = True
+                        imbalance_direction = 'BUY'
+                    elif buy_sell_ratio < (1 - self.order_flow_imbalance_threshold):
+                        is_imbalanced = True
+                        imbalance_direction = 'SELL'
+                    
+                    if not is_imbalanced:
+                        continue
+                    
+                    # Check if imbalance already detected recently (within last check interval)
+                    latest_metric = self.db.get_latest_order_flow(condition_id, outcome_index)
+                    if latest_metric:
+                        latest_detected_at = latest_metric.get('detected_at')
+                        if latest_detected_at:
+                            try:
+                                latest_time = datetime.fromisoformat(latest_detected_at.replace('Z', '+00:00'))
+                                if latest_time.tzinfo is None:
+                                    latest_time = latest_time.replace(tzinfo=timezone.utc)
+                                time_diff = (datetime.now(timezone.utc) - latest_time).total_seconds() / 60.0
+                                if time_diff < self.order_flow_check_interval_min:
+                                    continue  # Already detected recently
+                            except Exception:
+                                pass  # Continue if timestamp parsing fails
+                    
+                    # Insert new imbalance metric
+                    window_start = (datetime.now(timezone.utc) - timedelta(minutes=self.order_flow_time_window_min)).isoformat()
+                    window_end = datetime.now(timezone.utc).isoformat()
+                    
+                    success = self.db.insert_order_flow_metric(
+                        condition_id=condition_id,
+                        outcome_index=outcome_index,
+                        window_start=window_start,
+                        window_end=window_end,
+                        buy_count=buy_count,
+                        sell_count=sell_count,
+                        buy_volume=buy_volume,
+                        sell_volume=sell_volume,
+                        buy_sell_ratio=buy_sell_ratio,
+                        is_imbalanced=True,
+                        imbalance_direction=imbalance_direction
+                    )
+                    
+                    if success:
+                        imbalances_detected += 1
+                        self.order_flow_stats['imbalances_detected'] += 1
+                        logger.info(
+                            f"[ORDER_FLOW] Imbalance detected: {condition_id[:20]}... "
+                            f"{imbalance_direction} {buy_sell_ratio*100:.1f}% "
+                            f"(buy={buy_count}, sell={sell_count}, vol=${total_volume:.2f})"
+                        )
+                
+                except RateLimitExceeded as e:
+                    logger.warning(f"[ORDER_FLOW] Rate limit exceeded: {e}")
+                    errors += 1
+                    self.order_flow_stats['errors'] += 1
+                    break  # Stop processing if rate limited
+                
+                except Exception as e:
+                    logger.error(f"[ORDER_FLOW] Error checking market {condition_id[:20]}...: {e}")
+                    errors += 1
+                    self.order_flow_stats['errors'] += 1
+                    continue
+            
+            self.last_order_flow_check_time = now
+            logger.info(
+                f"[ORDER_FLOW] Checked {len(active_markets)} markets, "
+                f"detected {imbalances_detected} imbalances, {errors} errors"
+            )
+            
+            return {'checked': len(active_markets), 'imbalances': imbalances_detected, 'errors': errors}
+            
+        except Exception as e:
+            logger.error(f"[ORDER_FLOW] Error in check_order_flow_imbalances: {e}", exc_info=True)
+            self.order_flow_stats['errors'] += 1
+            return {'checked': 0, 'imbalances': 0, 'errors': 1}
+    
+    def process_pending_order_flow_alerts(self) -> int:
+        """Process pending order flow alerts that haven't been sent yet"""
+        try:
+            pending_alerts = self.db.get_pending_order_flow_alerts(limit=10)
+            
+            alerts_sent = 0
+            for alert in pending_alerts:
+                try:
+                    condition_id = alert['condition_id']
+                    outcome_index = alert['outcome_index']
+                    buy_count = alert['buy_count']
+                    sell_count = alert['sell_count']
+                    buy_volume = alert['buy_volume']
+                    sell_volume = alert['sell_volume']
+                    buy_sell_ratio = alert['buy_sell_ratio']
+                    imbalance_direction = alert['imbalance_direction']
+                    window_end = alert['window_end']
+                    
+                    # Calculate window minutes from window_end
+                    try:
+                        window_end_dt = datetime.fromisoformat(window_end.replace('Z', '+00:00'))
+                        if window_end_dt.tzinfo is None:
+                            window_end_dt = window_end_dt.replace(tzinfo=timezone.utc)
+                        window_start_dt = datetime.fromisoformat(alert['window_start'].replace('Z', '+00:00'))
+                        if window_start_dt.tzinfo is None:
+                            window_start_dt = window_start_dt.replace(tzinfo=timezone.utc)
+                        window_minutes = (window_end_dt - window_start_dt).total_seconds() / 60.0
+                    except Exception:
+                        window_minutes = self.order_flow_time_window_min
+                    
+                    # Get market details
+                    market_title = ""
+                    market_slug = ""
+                    current_price = None
+                    end_date = None
+                    
+                    try:
+                        market_url = f"{self.data_api}/markets/{condition_id}"
+                        market_response = self.http_get(market_url, allow_404_as_none=True)
+                        if market_response:
+                            market_data = market_response.json() if hasattr(market_response, 'json') else market_response
+                            market_title = market_data.get('question', market_title)
+                            market_slug = market_data.get('slug', market_slug)
+                            
+                            # Get end date
+                            end_date_str = market_data.get('endDate')
+                            if end_date_str:
+                                try:
+                                    end_date = datetime.fromisoformat(end_date_str.replace('Z', '+00:00'))
+                                    if end_date.tzinfo is None:
+                                        end_date = end_date.replace(tzinfo=timezone.utc)
+                                except Exception:
+                                    pass
+                        
+                        # Get current price
+                        token_id = f"{condition_id}:{outcome_index}"
+                        current_price = self.clickhouse_client.get_latest_price(token_id)
+                    except Exception as e:
+                        logger.debug(f"[ORDER_FLOW] Could not fetch market details for pending alert: {e}")
+                    
+                    # Send alert
+                    success = self.notifier.send_order_flow_alert(
+                        condition_id=condition_id,
+                        outcome_index=outcome_index,
+                        buy_count=buy_count,
+                        sell_count=sell_count,
+                        buy_volume=buy_volume,
+                        sell_volume=sell_volume,
+                        buy_sell_ratio=buy_sell_ratio,
+                        imbalance_direction=imbalance_direction,
+                        window_minutes=window_minutes,
+                        market_title=market_title,
+                        market_slug=market_slug,
+                        current_price=current_price,
+                        end_date=end_date
+                    )
+                    
+                    if success:
+                        # Mark as alerted
+                        self.db.mark_order_flow_alerted(alert['id'])
+                        alerts_sent += 1
+                
+                except Exception as e:
+                    logger.error(f"[ORDER_FLOW] Error processing pending alert {alert.get('id')}: {e}")
+            
+            if alerts_sent > 0:
+                logger.info(f"[ORDER_FLOW] Sent {alerts_sent} pending order flow alerts")
+            
+            return alerts_sent
+            
+        except Exception as e:
+            logger.error(f"[ORDER_FLOW] Error processing pending order flow alerts: {e}", exc_info=True)
+            return 0
+
     def monitor_wallets(self):
         """Main monitoring loop"""
         logger.info("=" * 80)
@@ -2469,11 +3569,14 @@ class PolymarketNotifier:
         
         while self.monitoring:
             try:
-                # Get tracked wallets - strict criteria: 75%+ win rate
+                # Get tracked wallets - use strict criteria for wallets with data, relaxed for new wallets
+                # New wallets (without analysis data) will be included with relaxed criteria so they can be analyzed
+                # Wallets with analysis data will be filtered using strict quality criteria
                 wallets = self.db.get_tracked_wallets(
-                    min_trades=6, max_trades=self.max_predictions,
-                    min_win_rate=WIN_RATE_THRESHOLD, max_win_rate=1.0,  # Win rate threshold (65% default)
-                    max_daily_freq=MAX_DAILY_FREQUENCY, limit=self.max_wallets
+                    min_trades=MIN_TRADES, max_trades=self.max_predictions,
+                    min_win_rate=WIN_RATE_THRESHOLD, max_win_rate=1.0,
+                    max_daily_freq=MAX_DAILY_FREQUENCY, limit=self.max_wallets,
+                    use_strict_criteria=True  # Apply strict quality filters (markets, volume, ROI, avg_pnl, avg_stake)
                 )
                 
                 if not wallets:
@@ -2544,7 +3647,9 @@ class PolymarketNotifier:
                 
                 # Collect new wallets from leaderboard if needed (every 20 loops)
                 if self.loop_count % 20 == 0:
-                    current_wallets = self.db.get_tracked_wallets(min_trades=6, max_trades=self.max_predictions, min_win_rate=WIN_RATE_THRESHOLD, max_win_rate=1.0, max_daily_freq=MAX_DAILY_FREQUENCY, limit=self.max_wallets)
+                    # Temporarily use relaxed filters to include newly added wallets (they will be analyzed later)
+                    # New wallets have traded_total=0 and win_rate=0.0, so we need to include them
+                    current_wallets = self.db.get_tracked_wallets(min_trades=0, max_trades=self.max_predictions, min_win_rate=0.0, max_win_rate=1.0, max_daily_freq=MAX_DAILY_FREQUENCY, limit=self.max_wallets)
                     if len(current_wallets) < self.max_wallets:
                         logger.info(f"Only {len(current_wallets)} wallets, collecting more...")
                         wallets_dict = asyncio.run(self.collect_wallets_from_leaderboards())
@@ -2561,6 +3666,48 @@ class PolymarketNotifier:
                     cleaned = self.db.cleanup_expired_cache()
                     if cleaned > 0:
                         logger.info(f"Cleaned up {cleaned} expired cache entries")
+                
+                # Check open interest spikes every 5 minutes (~43 loops at 7s interval)
+                if self.loop_count % 43 == 0:
+                    try:
+                        oi_stats = self.check_open_interest_spikes()
+                        if oi_stats['checked'] > 0:
+                            logger.info(f"[OI] Stats: {oi_stats}")
+                    except Exception as e:
+                        logger.error(f"[OI] Error in OI check: {e}")
+                
+                # Check whale positions every 5 minutes (~43 loops at 7s interval)
+                if self.loop_count % 43 == 0:
+                    try:
+                        whale_stats = self.check_whale_positions()
+                        
+                        # Check for order flow imbalances
+                        try:
+                            order_flow_stats = self.check_order_flow_imbalances()
+                        except Exception as e:
+                            logger.error(f"[ORDER_FLOW] Error in check_order_flow_imbalances: {e}", exc_info=True)
+                        if whale_stats['checked'] > 0:
+                            logger.info(f"[WHALE] Stats: {whale_stats}")
+                    except Exception as e:
+                        logger.error(f"[WHALE] Error in whale check: {e}")
+                
+                # Process pending whale alerts every loop
+                try:
+                    pending_count = self.process_pending_whale_alerts()
+                    
+                    # Process pending order flow alerts
+                    try:
+                        order_flow_pending = self.process_pending_order_flow_alerts()
+                    except Exception as e:
+                        logger.error(f"[ORDER_FLOW] Error in process_pending_order_flow_alerts: {e}", exc_info=True)
+                    if pending_count > 0:
+                        logger.info(f"[WHALE] Processed {pending_count} pending alerts")
+                except Exception as e:
+                    logger.error(f"[WHALE] Error processing pending alerts: {e}")
+                
+                # Log OI, whale, and order flow stats periodically (every 10 loops)
+                if self.loop_count % 10 == 0:
+                    logger.info(f"[STATS] OI: {self.oi_check_stats}, Whale: {self.whale_check_stats}, Order Flow: {self.order_flow_stats}")
                 
                 # Monitor each wallet
                 loop_trades_found = 0
@@ -2624,22 +3771,38 @@ class PolymarketNotifier:
                         
                         # Process only recent events
                         for event in recent_events:
-                            
+                            # BEST-EFFORT: Extract market_title from event (for display purposes only)
+                            # NOTE: We NO LONGER extract market_slug from events - all slug normalization
+                            # is handled by notify.TelegramNotifier._get_event_slug_and_market_id() and _get_market_slug()
                             market_title = event.get("marketTitle", "")
-                            market_slug = event.get("marketSlug", "")
+                            market_slug = ""  # Always empty - notify.py will fetch and normalize slug via API
                             price = event.get("price", 0)
                             side = event.get("side", "BUY")
                             usd_amount = event.get("usd", 0.0)
                             quantity = event.get("quantity", 0.0)
-                            condition_id = event["conditionId"]
-                            outcome_index = event["outcomeIndex"]
+                            
+                            # Handle missing condition_id - use fallback identifier
+                            condition_id = event.get("conditionId")
+                            if not condition_id:
+                                # Use market title as fallback identifier (market_slug is no longer extracted from events)
+                                if market_title:
+                                    condition_id = f"TITLE:{market_title[:50]}"
+                                else:
+                                    logger.warning(f"[MONITOR] Skipping event: no condition_id and no market_title")
+                                    continue
+                            
+                            outcome_index = event.get("outcomeIndex")
+                            if outcome_index is None:
+                                outcome_index = 0  # Default to 0
                             
                             # EARLY CHECK: Verify market is still active before processing event
-                            # This prevents creating suppressed alerts for already-closed markets
-                            if not self.is_market_active(condition_id, outcome_index):
-                                events_skipped_closed += 1
-                                logger.debug(f"[MONITOR] Skipping event for closed market: {condition_id[:20]}... outcome={outcome_index} (entry price was ${price:.3f})")
-                                continue
+                            # Skip this check if condition_id is a fallback (starts with SLUG: or TITLE:)
+                            # This allows signals even when condition_id is not available
+                            if condition_id and not condition_id.startswith(("SLUG:", "TITLE:")):
+                                if not self.is_market_active(condition_id, outcome_index):
+                                    events_skipped_closed += 1
+                                    logger.debug(f"[MONITOR] Skipping event for closed market: {condition_id[:20]}... outcome={outcome_index} (entry price was ${price:.3f})")
+                                    continue
                             
                             # Process event for consensus
                             loop_events_processed += 1

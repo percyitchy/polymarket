@@ -48,6 +48,30 @@ class PolymarketDB:
                 )
             """)
             
+            # Add insider detection columns if they don't exist
+            for alter in (
+                "ALTER TABLE wallets ADD COLUMN total_markets_traded INTEGER",
+                "ALTER TABLE wallets ADD COLUMN is_insider_candidate BOOLEAN DEFAULT 0",
+                "ALTER TABLE wallets ADD COLUMN insider_detection_reason TEXT",
+                "ALTER TABLE wallets ADD COLUMN insider_detected_at TEXT",
+            ):
+                try:
+                    cursor.execute(alter)
+                except sqlite3.OperationalError:
+                    pass
+            
+            # Add quality metrics columns if they don't exist (for strict filtering criteria)
+            for alter in (
+                "ALTER TABLE wallets ADD COLUMN total_volume REAL",
+                "ALTER TABLE wallets ADD COLUMN roi REAL",
+                "ALTER TABLE wallets ADD COLUMN avg_pnl_per_market REAL",
+                "ALTER TABLE wallets ADD COLUMN avg_stake REAL",
+            ):
+                try:
+                    cursor.execute(alter)
+                except sqlite3.OperationalError:
+                    pass
+            
             # Last trades tracking
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS last_trades(
@@ -144,6 +168,23 @@ class PolymarketDB:
                 )
             """)
             
+            # Wallet category statistics - stores per-category metrics for each wallet
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS wallet_category_stats(
+                    wallet_address TEXT NOT NULL,
+                    category TEXT NOT NULL,
+                    markets INTEGER DEFAULT 0,
+                    volume REAL DEFAULT 0.0,
+                    pnl REAL DEFAULT 0.0,
+                    winrate REAL DEFAULT 0.0,
+                    roi REAL DEFAULT 0.0,
+                    avg_pnl REAL DEFAULT 0.0,
+                    is_a_list_trader BOOLEAN DEFAULT 0,
+                    updated_at TEXT,
+                    PRIMARY KEY (wallet_address, category)
+                )
+            """)
+            
             # Raw collected wallets - tracks all wallets collected from different sources
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS raw_collected_wallets(
@@ -159,6 +200,9 @@ class PolymarketDB:
                 "ALTER TABLE wallet_analysis_cache ADD COLUMN last_trade_at TEXT",
                 "ALTER TABLE wallet_analysis_cache ADD COLUMN source TEXT",
                 "ALTER TABLE wallet_analysis_cache ADD COLUMN created_at TEXT",  # For legacy cleanup operations
+                "ALTER TABLE wallet_analysis_cache ADD COLUMN is_insider_candidate BOOLEAN DEFAULT 0",
+                "ALTER TABLE wallet_analysis_cache ADD COLUMN insider_detection_reason TEXT",
+                "ALTER TABLE wallet_analysis_cache ADD COLUMN total_markets_traded INTEGER",
             ):
                 try:
                     cursor.execute(alter)
@@ -189,6 +233,66 @@ class PolymarketDB:
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_raw_collected_address ON raw_collected_wallets(address)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_raw_collected_source ON raw_collected_wallets(source)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_raw_collected_at ON raw_collected_wallets(collected_at)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_category_wallet ON wallet_category_stats(wallet_address)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_category_category ON wallet_category_stats(category)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_category_a_list ON wallet_category_stats(is_a_list_trader)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_wallets_insider ON wallets(is_insider_candidate, insider_detected_at)")
+            
+            # Open interest history table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS open_interest_history(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    condition_id TEXT NOT NULL,
+                    open_interest REAL,
+                    timestamp TEXT,
+                    created_at TEXT
+                )
+            """)
+            
+            # Whale positions table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS whale_positions(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_address TEXT NOT NULL,
+                    condition_id TEXT NOT NULL,
+                    outcome_index INTEGER,
+                    position_size_usd REAL,
+                    position_type TEXT,
+                    detected_at TEXT,
+                    alerted BOOLEAN DEFAULT 0
+                )
+            """)
+            
+            # Create indexes for open interest history
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_oi_condition_timestamp ON open_interest_history(condition_id, timestamp)")
+            
+            # Create indexes for whale positions
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_whale_user_condition ON whale_positions(user_address, condition_id)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_whale_alerted_detected ON whale_positions(alerted, detected_at)")
+            
+            # Order flow metrics table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS order_flow_metrics(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    condition_id TEXT NOT NULL,
+                    outcome_index INTEGER,
+                    window_start TEXT,
+                    window_end TEXT,
+                    buy_count INTEGER DEFAULT 0,
+                    sell_count INTEGER DEFAULT 0,
+                    buy_volume REAL DEFAULT 0.0,
+                    sell_volume REAL DEFAULT 0.0,
+                    buy_sell_ratio REAL,
+                    is_imbalanced BOOLEAN DEFAULT 0,
+                    imbalance_direction TEXT,
+                    detected_at TEXT,
+                    alerted BOOLEAN DEFAULT 0
+                )
+            """)
+            
+            # Create indexes for order flow metrics
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_order_flow_condition_window ON order_flow_metrics(condition_id, window_end)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_order_flow_alerted_detected ON order_flow_metrics(alerted, detected_at)")
             
             conn.commit()
             logger.info("Database initialized successfully")
@@ -222,29 +326,117 @@ class PolymarketDB:
     
     # Wallet operations
     def upsert_wallet(self, address: str, display: str, traded: int, win_rate: float, 
-                     pnl_total: float, daily_freq: float, source: str, last_trade_at: Optional[str] = None) -> bool:
+                     pnl_total: float, daily_freq: float, source: str, last_trade_at: Optional[str] = None,
+                     total_markets_traded: Optional[int] = None, is_insider_candidate: Optional[bool] = None,
+                     insider_detection_reason: Optional[str] = None,
+                     total_volume: Optional[float] = None, roi: Optional[float] = None,
+                     avg_pnl_per_market: Optional[float] = None, avg_stake: Optional[float] = None) -> bool:
         """Insert or update wallet information"""
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
                 now = self.now_iso()
                 
-                cursor.execute("""
-                    INSERT INTO wallets(address, display, traded_total, win_rate, 
-                                     realized_pnl_total, daily_trading_frequency, 
-                                     source, added_at, updated_at, last_trade_at)
-                    VALUES(?,?,?,?,?,?,?,?,?,?)
+                # Build dynamic UPDATE clause for insider fields
+                update_fields = [
+                    "display=excluded.display",
+                    "traded_total=excluded.traded_total",
+                    "win_rate=excluded.win_rate",
+                    "realized_pnl_total=excluded.realized_pnl_total",
+                    "daily_trading_frequency=excluded.daily_trading_frequency",
+                    "source=excluded.source",
+                    "updated_at=excluded.updated_at",
+                    "last_trade_at=excluded.last_trade_at"
+                ]
+                
+                # Add insider fields if provided
+                if total_markets_traded is not None:
+                    update_fields.append("total_markets_traded=excluded.total_markets_traded")
+                if is_insider_candidate is not None:
+                    update_fields.append("is_insider_candidate=excluded.is_insider_candidate")
+                    if is_insider_candidate:
+                        update_fields.append("insider_detection_reason=excluded.insider_detection_reason")
+                        update_fields.append("insider_detected_at=excluded.insider_detected_at")
+                    else:
+                        update_fields.append("insider_detection_reason=NULL")
+                        update_fields.append("insider_detected_at=NULL")
+                
+                # Add quality metrics fields if provided
+                if total_volume is not None:
+                    update_fields.append("total_volume=excluded.total_volume")
+                if roi is not None:
+                    update_fields.append("roi=excluded.roi")
+                if avg_pnl_per_market is not None:
+                    update_fields.append("avg_pnl_per_market=excluded.avg_pnl_per_market")
+                if avg_stake is not None:
+                    update_fields.append("avg_stake=excluded.avg_stake")
+                
+                update_clause = ", ".join(update_fields)
+                
+                # Build VALUES clause
+                values = [
+                    address.lower(), display, traded, win_rate, pnl_total, 
+                    daily_freq, source, now, now, last_trade_at
+                ]
+                
+                # Add insider fields to VALUES if provided
+                if total_markets_traded is not None:
+                    values.append(total_markets_traded)
+                if is_insider_candidate is not None:
+                    values.append(1 if is_insider_candidate else 0)
+                    if is_insider_candidate:
+                        values.append(insider_detection_reason)
+                        values.append(now)
+                    else:
+                        values.append(None)
+                        values.append(None)
+                
+                # Add quality metrics fields to VALUES if provided
+                if total_volume is not None:
+                    values.append(total_volume)
+                if roi is not None:
+                    values.append(roi)
+                if avg_pnl_per_market is not None:
+                    values.append(avg_pnl_per_market)
+                if avg_stake is not None:
+                    values.append(avg_stake)
+                
+                # Build INSERT clause
+                insert_fields = [
+                    "address", "display", "traded_total", "win_rate",
+                    "realized_pnl_total", "daily_trading_frequency",
+                    "source", "added_at", "updated_at", "last_trade_at"
+                ]
+                
+                if total_markets_traded is not None:
+                    insert_fields.append("total_markets_traded")
+                if is_insider_candidate is not None:
+                    insert_fields.append("is_insider_candidate")
+                    if is_insider_candidate:
+                        insert_fields.append("insider_detection_reason")
+                        insert_fields.append("insider_detected_at")
+                
+                # Add quality metrics fields to INSERT if provided
+                if total_volume is not None:
+                    insert_fields.append("total_volume")
+                if roi is not None:
+                    insert_fields.append("roi")
+                if avg_pnl_per_market is not None:
+                    insert_fields.append("avg_pnl_per_market")
+                if avg_stake is not None:
+                    insert_fields.append("avg_stake")
+                
+                placeholders = ",".join(["?"] * len(values))
+                insert_clause = ",".join(insert_fields)
+                
+                query = f"""
+                    INSERT INTO wallets({insert_clause})
+                    VALUES({placeholders})
                     ON CONFLICT(address) DO UPDATE SET
-                        display=excluded.display,
-                        traded_total=excluded.traded_total,
-                        win_rate=excluded.win_rate,
-                        realized_pnl_total=excluded.realized_pnl_total,
-                        daily_trading_frequency=excluded.daily_trading_frequency,
-                        source=excluded.source,
-                        updated_at=excluded.updated_at,
-                        last_trade_at=excluded.last_trade_at
-                """, (address.lower(), display, traded, win_rate, pnl_total, 
-                     daily_freq, source, now, now, last_trade_at))
+                        {update_clause}
+                """
+                
+                cursor.execute(query, tuple(values))
                 
                 conn.commit()
                 return True
@@ -266,29 +458,64 @@ class PolymarketDB:
     
     def get_tracked_wallets(self, min_trades: int = 6, max_trades: int = 1500,
                           min_win_rate: float = 0.65, max_win_rate: float = 1.0,
-                          max_daily_freq: float = 35.0, limit: int = 200) -> List[str]:
+                          max_daily_freq: float = 35.0, limit: int = 200,
+                          use_strict_criteria: bool = True) -> List[str]:
         """Get wallets that meet tracking criteria.
         
         Activity filter logic (matching wallet_analyzer.py):
         - If last_trade_at IS NULL: include wallet (activity unknown, decide by other criteria)
         - If last_trade_at is not NULL: only include if last_trade_at >= 90 days ago
+        
+        If use_strict_criteria=True, applies all strict quality filters:
+        - MINIMUM_MARKETS (12)
+        - MINIMUM_VOLUME ($25,000)
+        - MINIMUM_ROI (0.25%)
+        - MINIMUM_AVG_PNL ($50)
+        - MINIMUM_AVG_STAKE ($100)
         """
         try:
+            # Import strict criteria constants
+            from wallet_analyzer import (
+                MINIMUM_MARKETS, MINIMUM_VOLUME, MINIMUM_ROI,
+                MINIMUM_AVG_PNL, MINIMUM_AVG_STAKE
+            )
+            
             with self.get_connection() as conn:
                 cursor = conn.cursor()
                 # Calculate 3 months ago threshold
                 three_months_ago = (datetime.now(timezone.utc) - timedelta(days=90)).isoformat()
                 
-                cursor.execute("""
-                    SELECT address FROM wallets
-                    WHERE traded_total >= ? AND traded_total <= ?
-                    AND win_rate >= ? AND win_rate <= ?
-                    AND (daily_trading_frequency IS NULL OR daily_trading_frequency <= ?)
-                    AND (last_trade_at IS NULL OR last_trade_at >= ?)
-                    ORDER BY realized_pnl_total DESC, traded_total DESC
-                    LIMIT ?
-                """, (min_trades, max_trades, min_win_rate, max_win_rate, 
-                     max_daily_freq, three_months_ago, limit))
+                if use_strict_criteria:
+                    # Use strict criteria - check all quality metrics
+                    cursor.execute("""
+                        SELECT address FROM wallets
+                        WHERE traded_total >= ? AND traded_total <= ?
+                        AND win_rate >= ? AND win_rate <= ?
+                        AND (daily_trading_frequency IS NULL OR daily_trading_frequency <= ?)
+                        AND (last_trade_at IS NULL OR last_trade_at >= ?)
+                        AND (total_markets_traded IS NULL OR total_markets_traded >= ?)
+                        AND (total_volume IS NULL OR total_volume >= ?)
+                        AND (roi IS NULL OR roi >= ?)
+                        AND (avg_pnl_per_market IS NULL OR avg_pnl_per_market >= ?)
+                        AND (avg_stake IS NULL OR avg_stake >= ?)
+                        ORDER BY realized_pnl_total DESC, traded_total DESC
+                        LIMIT ?
+                    """, (min_trades, max_trades, min_win_rate, max_win_rate, 
+                         max_daily_freq, three_months_ago,
+                         MINIMUM_MARKETS, MINIMUM_VOLUME, MINIMUM_ROI,
+                         MINIMUM_AVG_PNL, MINIMUM_AVG_STAKE, limit))
+                else:
+                    # Use relaxed criteria (for new wallets without data)
+                    cursor.execute("""
+                        SELECT address FROM wallets
+                        WHERE traded_total >= ? AND traded_total <= ?
+                        AND win_rate >= ? AND win_rate <= ?
+                        AND (daily_trading_frequency IS NULL OR daily_trading_frequency <= ?)
+                        AND (last_trade_at IS NULL OR last_trade_at >= ?)
+                        ORDER BY realized_pnl_total DESC, traded_total DESC
+                        LIMIT ?
+                    """, (min_trades, max_trades, min_win_rate, max_win_rate, 
+                         max_daily_freq, three_months_ago, limit))
                 
                 return [row[0] for row in cursor.fetchall()]
         except Exception as e:
@@ -307,17 +534,31 @@ class PolymarketDB:
                 cursor.execute("SELECT COUNT(*) FROM wallets")
                 stats['total_wallets'] = cursor.fetchone()[0]
                 
-                # Wallets meeting criteria (updated to match actual tracking criteria)
-                # Use same criteria as get_tracked_wallets() for consistency
-                # Activity filter: include wallets with NULL last_trade_at OR recent last_trade_at
+                # Wallets meeting STRICT tracking criteria (for statistics display)
+                # This matches get_tracked_wallets() with use_strict_criteria=True
+                # Import strict criteria constants
+                from wallet_analyzer import (
+                    MIN_TRADES, WIN_RATE_THRESHOLD, MAX_DAILY_FREQUENCY,
+                    MINIMUM_MARKETS, MINIMUM_VOLUME, MINIMUM_ROI,
+                    MINIMUM_AVG_PNL, MINIMUM_AVG_STAKE
+                )
+                
                 three_months_ago = (datetime.now(timezone.utc) - timedelta(days=90)).isoformat()
+                # Use STRICT filtering criteria: all quality metrics checked
                 cursor.execute("""
                     SELECT COUNT(*) FROM wallets
-                    WHERE traded_total >= 6 AND traded_total <= 1500
-                    AND win_rate >= 0.65 AND win_rate <= 1.0
-                    AND (daily_trading_frequency IS NULL OR daily_trading_frequency <= 35.0)
-                    AND (last_trade_at IS NULL OR datetime(last_trade_at) >= datetime(?))
-                """, (three_months_ago,))
+                    WHERE traded_total >= ? AND traded_total <= 1500
+                    AND win_rate >= ? AND win_rate <= 1.0
+                    AND (daily_trading_frequency IS NULL OR daily_trading_frequency <= ?)
+                    AND (last_trade_at IS NULL OR last_trade_at >= ?)
+                    AND (total_markets_traded IS NULL OR total_markets_traded >= ?)
+                    AND (total_volume IS NULL OR total_volume >= ?)
+                    AND (roi IS NULL OR roi >= ?)
+                    AND (avg_pnl_per_market IS NULL OR avg_pnl_per_market >= ?)
+                    AND (avg_stake IS NULL OR avg_stake >= ?)
+                """, (MIN_TRADES, WIN_RATE_THRESHOLD, MAX_DAILY_FREQUENCY, three_months_ago,
+                     MINIMUM_MARKETS, MINIMUM_VOLUME, MINIMUM_ROI,
+                     MINIMUM_AVG_PNL, MINIMUM_AVG_STAKE))
                 stats['tracked_wallets'] = cursor.fetchone()[0]
                 
                 # Win rate distribution
@@ -415,7 +656,15 @@ class PolymarketDB:
             # Group by side (direction)
             key = self.sha(f"{condition_id}:{outcome_index}:{side}")
             window_start = timestamp - (window_minutes * 60)
-            entry = {"wallet": wallet, "trade_id": trade_id, "ts": timestamp, "price": price}
+            entry = {
+                "wallet": wallet, 
+                "trade_id": trade_id, 
+                "ts": timestamp, 
+                "price": price,
+                "conditionId": condition_id,  # Сохраняем condition_id
+                "outcomeIndex": outcome_index,  # Сохраняем outcome_index
+                "side": side  # Сохраняем side
+            }
             if market_title:
                 entry["marketTitle"] = market_title
             if market_slug:
@@ -435,26 +684,49 @@ class PolymarketDB:
                     obj = {"events": [entry], "first_ts": timestamp, "last_ts": timestamp}
                 else:
                     obj = json.loads(row[0])
-                    # Remove stale events
-                    obj["events"] = [e for e in obj.get("events", []) if e["ts"] >= window_start]
-                    # Add new event
+                    # Add new event first
                     obj["events"].append(entry)
-                    # Deduplicate wallets (keep latest per wallet)
+                    # Deduplicate wallets (keep latest per wallet) before filtering
                     obj["events"] = self._dedupe_wallets(obj["events"])
+                    
+                    # CRITICAL FIX: Filter events based on the LATEST event timestamp, not the new event
+                    # This ensures the window is calculated from the most recent event in the window
+                    if obj["events"]:
+                        latest_ts = max(e["ts"] for e in obj["events"])
+                        window_start_ts = latest_ts - (window_minutes * 60)
+                        # Remove stale events (events outside the window from the latest event)
+                        obj["events"] = [e for e in obj["events"] if e["ts"] >= window_start_ts]
+                    
                     # Update timestamps
                     if obj["events"]:
                         obj["first_ts"] = min(e["ts"] for e in obj["events"])
                         obj["last_ts"] = max(e["ts"] for e in obj["events"])
                 
+                updated_at_iso = self.now_iso()
+                data_json = json.dumps(obj)
                 cursor.execute("""
                     INSERT INTO rolling_buys(k, data, updated_at)
                     VALUES(?,?,?)
                     ON CONFLICT(k) DO UPDATE SET 
                         data=excluded.data, 
                         updated_at=excluded.updated_at
-                """, (key, json.dumps(obj), self.now_iso()))
+                """, (key, data_json, updated_at_iso))
                 
-                conn.commit()
+                try:
+                    conn.commit()
+                    # Verify the commit worked by checking if row exists
+                    cursor.execute("SELECT updated_at FROM rolling_buys WHERE k = ?", (key,))
+                    verify_row = cursor.fetchone()
+                    events_count = len(obj.get('events', []))
+                    wallets_count = len({e.get('wallet') for e in obj.get('events', [])})
+                    if verify_row:
+                        logger.info(f"[DB] ✅ Updated rolling_buys: key={key[:20]}... updated_at={updated_at_iso} events={events_count} wallets={wallets_count} VERIFIED")
+                    else:
+                        logger.error(f"[DB] ❌ Commit failed - row not found after commit: key={key[:20]}...")
+                except Exception as commit_error:
+                    logger.error(f"[DB] ❌ Commit error: {commit_error} for key={key[:20]}...")
+                    conn.rollback()
+                    raise
                 return key, obj
                 
         except Exception as e:
@@ -779,10 +1051,14 @@ class PolymarketDB:
                 cursor.execute("DELETE FROM rolling_buys WHERE updated_at < ?", (cutoff_iso,))
                 rolling_removed = cursor.rowcount
                 
+                # Clean old order flow metrics
+                cursor.execute("DELETE FROM order_flow_metrics WHERE detected_at < ?", (cutoff_iso,))
+                order_flow_removed = cursor.rowcount
+                
                 conn.commit()
                 
-                if alerts_removed > 0 or rolling_removed > 0:
-                    logger.info(f"Cleaned up {alerts_removed} old alerts and {rolling_removed} old rolling buys")
+                if alerts_removed > 0 or rolling_removed > 0 or order_flow_removed > 0:
+                    logger.info(f"Cleaned up {alerts_removed} old alerts, {rolling_removed} old rolling buys, and {order_flow_removed} old order flow metrics")
                     
         except Exception as e:
             logger.error(f"Error cleaning up old data: {e}")
@@ -1057,7 +1333,10 @@ class PolymarketDB:
     def cache_analysis_result(self, address: str, traded_total: int, win_rate: float,
                              realized_pnl_total: float, daily_frequency: float,
                              analysis_result: str, ttl_hours: int = 24,
-                             last_trade_at: Optional[str] = None, source: Optional[str] = None) -> bool:
+                             last_trade_at: Optional[str] = None, source: Optional[str] = None,
+                             is_insider_candidate: Optional[bool] = None,
+                             insider_detection_reason: Optional[str] = None,
+                             total_markets_traded: Optional[int] = None) -> bool:
         """Cache analysis result for wallet"""
         try:
             with self.get_connection() as conn:
@@ -1070,42 +1349,70 @@ class PolymarketDB:
                 columns = [row[1] for row in cursor.fetchall()]
                 has_created_at = 'created_at' in columns
                 
+                # Build dynamic INSERT and UPDATE clauses for insider fields
+                insert_fields = [
+                    "address", "traded_total", "win_rate", "realized_pnl_total",
+                    "daily_trading_frequency", "analysis_result", "analyzed_at", "expires_at",
+                    "last_trade_at", "source"
+                ]
+                insert_values = [
+                    address.lower(), traded_total, win_rate, realized_pnl_total,
+                    daily_frequency, analysis_result, now.isoformat(), expires_at.isoformat(),
+                    last_trade_at, source
+                ]
+                
+                update_fields = [
+                    "traded_total = excluded.traded_total",
+                    "win_rate = excluded.win_rate",
+                    "realized_pnl_total = excluded.realized_pnl_total",
+                    "daily_trading_frequency = excluded.daily_trading_frequency",
+                    "analysis_result = excluded.analysis_result",
+                    "analyzed_at = excluded.analyzed_at",
+                    "expires_at = excluded.expires_at",
+                    "last_trade_at = excluded.last_trade_at",
+                    "source = excluded.source"
+                ]
+                
+                # Add insider fields if provided
+                if is_insider_candidate is not None:
+                    insert_fields.append("is_insider_candidate")
+                    insert_values.append(1 if is_insider_candidate else 0)
+                    update_fields.append("is_insider_candidate = excluded.is_insider_candidate")
+                
+                if insider_detection_reason is not None:
+                    insert_fields.append("insider_detection_reason")
+                    insert_values.append(insider_detection_reason)
+                    update_fields.append("insider_detection_reason = excluded.insider_detection_reason")
+                
+                if total_markets_traded is not None:
+                    insert_fields.append("total_markets_traded")
+                    insert_values.append(total_markets_traded)
+                    update_fields.append("total_markets_traded = excluded.total_markets_traded")
+                
                 if has_created_at:
-                    # Use INSERT OR REPLACE with created_at preservation
-                    # If record exists, preserve original created_at; if new, set to now
-                    cursor.execute("""
-                        INSERT INTO wallet_analysis_cache(
-                            address, traded_total, win_rate, realized_pnl_total,
-                            daily_trading_frequency, analysis_result, analyzed_at, expires_at,
-                            last_trade_at, source, created_at
-                        )
-                        VALUES(?,?,?,?,?,?,?,?,?,?,?)
+                    insert_fields.append("created_at")
+                    insert_values.append(now.isoformat())
+                    # created_at is preserved (not updated)
+                
+                placeholders = ",".join(["?"] * len(insert_values))
+                insert_clause = ",".join(insert_fields)
+                update_clause = ", ".join(update_fields)
+                
+                if has_created_at:
+                    query = f"""
+                        INSERT INTO wallet_analysis_cache({insert_clause})
+                        VALUES({placeholders})
                         ON CONFLICT(address) DO UPDATE SET
-                            traded_total = excluded.traded_total,
-                            win_rate = excluded.win_rate,
-                            realized_pnl_total = excluded.realized_pnl_total,
-                            daily_trading_frequency = excluded.daily_trading_frequency,
-                            analysis_result = excluded.analysis_result,
-                            analyzed_at = excluded.analyzed_at,
-                            expires_at = excluded.expires_at,
-                            last_trade_at = excluded.last_trade_at,
-                            source = excluded.source
+                            {update_clause}
                             -- created_at is preserved (not updated)
-                    """, (address.lower(), traded_total, win_rate, realized_pnl_total,
-                         daily_frequency, analysis_result, now.isoformat(), expires_at.isoformat(),
-                         last_trade_at, source, now.isoformat()))
+                    """
                 else:
-                    # Fallback for databases without created_at column
-                    cursor.execute("""
-                        INSERT OR REPLACE INTO wallet_analysis_cache(
-                            address, traded_total, win_rate, realized_pnl_total,
-                            daily_trading_frequency, analysis_result, analyzed_at, expires_at,
-                            last_trade_at, source
-                        )
-                        VALUES(?,?,?,?,?,?,?,?,?,?)
-                    """, (address.lower(), traded_total, win_rate, realized_pnl_total,
-                         daily_frequency, analysis_result, now.isoformat(), expires_at.isoformat(),
-                         last_trade_at, source))
+                    query = f"""
+                        INSERT OR REPLACE INTO wallet_analysis_cache({insert_clause})
+                        VALUES({placeholders})
+                    """
+                
+                cursor.execute(query, tuple(insert_values))
                 
                 conn.commit()
                 return True
@@ -1150,6 +1457,120 @@ class PolymarketDB:
                 conn.commit()
         except Exception as e:
             logger.error(f"Failed to insert raw collected wallet {address} from {source}: {e}")
+    
+    # Wallet category statistics operations
+    def upsert_wallet_category_stats(self, wallet_address: str, category: str, markets: int,
+                                     volume: float, pnl: float, winrate: float, roi: float,
+                                     avg_pnl: float, is_a_list_trader: bool) -> bool:
+        """Insert or update wallet category statistics"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                now = self.now_iso()
+                
+                cursor.execute("""
+                    INSERT INTO wallet_category_stats(
+                        wallet_address, category, markets, volume, pnl, winrate, roi,
+                        avg_pnl, is_a_list_trader, updated_at
+                    )
+                    VALUES(?,?,?,?,?,?,?,?,?,?)
+                    ON CONFLICT(wallet_address, category) DO UPDATE SET
+                        markets=excluded.markets,
+                        volume=excluded.volume,
+                        pnl=excluded.pnl,
+                        winrate=excluded.winrate,
+                        roi=excluded.roi,
+                        avg_pnl=excluded.avg_pnl,
+                        is_a_list_trader=excluded.is_a_list_trader,
+                        updated_at=excluded.updated_at
+                """, (wallet_address.lower(), category, markets, volume, pnl, winrate, roi,
+                     avg_pnl, 1 if is_a_list_trader else 0, now))
+                
+                conn.commit()
+                return True
+        except Exception as e:
+            logger.error(f"Error upserting wallet category stats for {wallet_address}/{category}: {e}")
+            return False
+    
+    def get_wallet_category_stats(self, wallet_address: str, category: str) -> Optional[Dict[str, Any]]:
+        """Get category statistics for a wallet"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT * FROM wallet_category_stats
+                    WHERE wallet_address = ? AND category = ?
+                """, (wallet_address.lower(), category))
+                row = cursor.fetchone()
+                return dict(row) if row else None
+        except Exception as e:
+            logger.error(f"Error getting wallet category stats for {wallet_address}/{category}: {e}")
+            return None
+    
+    def is_wallet_a_list_in_category(self, wallet_address: str, category: str) -> bool:
+        """Check if wallet is A List trader in a specific category"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT is_a_list_trader FROM wallet_category_stats
+                    WHERE wallet_address = ? AND category = ?
+                """, (wallet_address.lower(), category))
+                row = cursor.fetchone()
+                return bool(row[0]) if row and row[0] is not None else False
+        except Exception as e:
+            logger.debug(f"Error checking A List status for {wallet_address}/{category}: {e}")
+            return False
+    
+    def get_wallets_with_a_list_in_category(self, category: str) -> List[str]:
+        """Get list of wallet addresses that are A List traders in a specific category"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT wallet_address FROM wallet_category_stats
+                    WHERE category = ? AND is_a_list_trader = 1
+                """, (category,))
+                return [row[0] for row in cursor.fetchall()]
+        except Exception as e:
+            logger.error(f"Error getting A List wallets for category {category}: {e}")
+            return []
+    
+    def get_category_stats_summary(self) -> Dict[str, Any]:
+        """Get summary statistics about categories"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                
+                # Count wallets with at least one A List category
+                cursor.execute("""
+                    SELECT COUNT(DISTINCT wallet_address) FROM wallet_category_stats
+                    WHERE is_a_list_trader = 1
+                """)
+                wallets_with_a_list = cursor.fetchone()[0]
+                
+                # Count by category
+                cursor.execute("""
+                    SELECT category, COUNT(*) as count, 
+                           SUM(CASE WHEN is_a_list_trader = 1 THEN 1 ELSE 0 END) as a_list_count
+                    FROM wallet_category_stats
+                    GROUP BY category
+                    ORDER BY count DESC
+                """)
+                category_counts = {}
+                for row in cursor.fetchall():
+                    category_counts[row[0]] = {
+                        'total': row[1],
+                        'a_list': row[2]
+                    }
+                
+                return {
+                    'wallets_with_a_list': wallets_with_a_list,
+                    'category_counts': category_counts
+                }
+        except Exception as e:
+            logger.error(f"Error getting category stats summary: {e}")
+            return {}
 
 # Example usage and testing
     def get_tracked_wallet_addresses(self) -> List[str]:
@@ -1163,6 +1584,471 @@ class PolymarketDB:
         except Exception as e:
             logger.error(f"Error getting tracked wallet addresses: {e}")
             return []
+    
+    def mark_wallet_as_insider_candidate(self, address: str, reason: str, total_markets_traded: Optional[int] = None) -> bool:
+        """Mark wallet as insider candidate with reason"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                now = self.now_iso()
+                
+                update_fields = [
+                    "is_insider_candidate=1",
+                    "insider_detection_reason=?",
+                    "insider_detected_at=?",
+                    "updated_at=?"
+                ]
+                
+                values = [reason, now, now]
+                
+                if total_markets_traded is not None:
+                    update_fields.append("total_markets_traded=?")
+                    values.append(total_markets_traded)
+                
+                values.append(address.lower())
+                
+                query = f"""
+                    UPDATE wallets
+                    SET {', '.join(update_fields)}
+                    WHERE address = ?
+                """
+                
+                cursor.execute(query, tuple(values))
+                conn.commit()
+                return cursor.rowcount > 0
+        except Exception as e:
+            logger.error(f"Error marking wallet as insider candidate {address}: {e}")
+            return False
+    
+    def get_insider_candidates(self, limit: int = 100, min_position_size: Optional[float] = None) -> List[Dict[str, Any]]:
+        """Get insider candidate wallets"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                
+                query = """
+                    SELECT * FROM wallets
+                    WHERE is_insider_candidate = 1
+                """
+                params = []
+                
+                if min_position_size is not None:
+                    # Note: position size is not stored directly, would need to calculate from trades
+                    # For now, we'll just filter by insider flag
+                    pass
+                
+                query += " ORDER BY insider_detected_at DESC LIMIT ?"
+                params.append(limit)
+                
+                cursor.execute(query, tuple(params))
+                rows = cursor.fetchall()
+                return [dict(row) for row in rows]
+        except Exception as e:
+            logger.error(f"Error getting insider candidates: {e}")
+            return []
+    
+    def clear_insider_flag(self, address: str) -> bool:
+        """Clear insider flag for a wallet"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                now = self.now_iso()
+                
+                cursor.execute("""
+                    UPDATE wallets
+                    SET is_insider_candidate = 0,
+                        insider_detection_reason = NULL,
+                        insider_detected_at = NULL,
+                        updated_at = ?
+                    WHERE address = ?
+                """, (now, address.lower()))
+                
+                conn.commit()
+                return cursor.rowcount > 0
+        except Exception as e:
+            logger.error(f"Error clearing insider flag for {address}: {e}")
+            return False
+    
+    # Open Interest operations
+    def insert_open_interest(self, condition_id: str, open_interest: float, timestamp: str) -> bool:
+        """Insert open interest data point"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                now = self.now_iso()
+                
+                cursor.execute("""
+                    INSERT INTO open_interest_history(condition_id, open_interest, timestamp, created_at)
+                    VALUES(?, ?, ?, ?)
+                """, (condition_id, open_interest, timestamp, now))
+                
+                conn.commit()
+                return True
+        except Exception as e:
+            logger.error(f"Error inserting open interest for {condition_id}: {e}")
+            return False
+    
+    def get_recent_open_interest(self, condition_id: str, minutes: int = 5) -> List[Dict[str, Any]]:
+        """Get open interest history for last N minutes"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cutoff_time = (datetime.now(timezone.utc) - timedelta(minutes=minutes)).isoformat()
+                
+                cursor.execute("""
+                    SELECT * FROM open_interest_history
+                    WHERE condition_id = ? AND timestamp >= ?
+                    ORDER BY timestamp DESC
+                """, (condition_id, cutoff_time))
+                
+                rows = cursor.fetchall()
+                return [dict(row) for row in rows]
+        except Exception as e:
+            logger.error(f"Error getting recent open interest for {condition_id}: {e}")
+            return []
+    
+    def calculate_oi_spike(self, condition_id: str, threshold_percent: float = 20.0, max_minutes: Optional[float] = None) -> Optional[Dict[str, Any]]:
+        """Calculate if open interest spiked above threshold within a time window
+        
+        Args:
+            condition_id: Market condition ID
+            threshold_percent: Minimum percentage increase to consider a spike
+            max_minutes: Maximum time window in minutes between samples. If None, no time constraint is enforced.
+                        If specified and time difference exceeds this window, returns None.
+        
+        Returns:
+            Dict with spike details if spike detected within window, None otherwise
+        """
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                
+                # Get the two most recent OI data points
+                cursor.execute("""
+                    SELECT open_interest, timestamp
+                    FROM open_interest_history
+                    WHERE condition_id = ?
+                    ORDER BY timestamp DESC
+                    LIMIT 2
+                """, (condition_id,))
+                
+                rows = cursor.fetchall()
+                if len(rows) < 2:
+                    return None  # Need at least 2 data points to calculate spike
+                
+                new_oi = rows[0]['open_interest']
+                old_oi = rows[1]['open_interest']
+                new_timestamp_str = rows[0]['timestamp']
+                old_timestamp_str = rows[1]['timestamp']
+                
+                if old_oi is None or old_oi == 0 or new_oi is None:
+                    return None
+                
+                # Enforce time window if max_minutes is specified
+                if max_minutes is not None:
+                    try:
+                        # Parse timestamps (assuming ISO format)
+                        new_timestamp = datetime.fromisoformat(new_timestamp_str.replace('Z', '+00:00'))
+                        old_timestamp = datetime.fromisoformat(old_timestamp_str.replace('Z', '+00:00'))
+                        
+                        # Ensure both timestamps are timezone-aware
+                        if new_timestamp.tzinfo is None:
+                            new_timestamp = new_timestamp.replace(tzinfo=timezone.utc)
+                        if old_timestamp.tzinfo is None:
+                            old_timestamp = old_timestamp.replace(tzinfo=timezone.utc)
+                        
+                        time_diff = (new_timestamp - old_timestamp).total_seconds() / 60.0  # Convert to minutes
+                        
+                        if time_diff > max_minutes:
+                            logger.debug(f"OI spike check skipped: time difference {time_diff:.1f} min exceeds max window {max_minutes} min for {condition_id[:20]}...")
+                            return None
+                    except (ValueError, TypeError) as e:
+                        logger.debug(f"Could not parse timestamps for OI spike check: {e}")
+                        # Continue without time constraint if parsing fails
+                
+                spike_percent = ((new_oi - old_oi) / old_oi) * 100.0
+                
+                if spike_percent >= threshold_percent:
+                    return {
+                        'old_oi': old_oi,
+                        'new_oi': new_oi,
+                        'spike_percent': spike_percent,
+                        'timestamp': rows[0]['timestamp']
+                    }
+                
+                return None
+        except Exception as e:
+            logger.error(f"Error calculating OI spike for {condition_id}: {e}")
+            return None
+    
+    def cleanup_old_oi_data(self, days_to_keep: int = 7) -> int:
+        """Clean up old open interest history data"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cutoff_date = (datetime.now(timezone.utc) - timedelta(days=days_to_keep)).isoformat()
+                
+                cursor.execute("DELETE FROM open_interest_history WHERE created_at < ?", (cutoff_date,))
+                removed_count = cursor.rowcount
+                
+                conn.commit()
+                
+                if removed_count > 0:
+                    logger.info(f"Cleaned up {removed_count} old OI data points")
+                
+                return removed_count
+        except Exception as e:
+            logger.error(f"Error cleaning up old OI data: {e}")
+            return 0
+    
+    # Whale position operations
+    def insert_whale_position(self, user_address: str, condition_id: str, outcome_index: int,
+                            position_size_usd: float, position_type: str) -> bool:
+        """Insert whale position change"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                now = self.now_iso()
+                
+                cursor.execute("""
+                    INSERT INTO whale_positions(user_address, condition_id, outcome_index, 
+                                              position_size_usd, position_type, detected_at, alerted)
+                    VALUES(?, ?, ?, ?, ?, ?, 0)
+                """, (user_address.lower(), condition_id, outcome_index, position_size_usd, position_type, now))
+                
+                conn.commit()
+                return True
+        except Exception as e:
+            logger.error(f"Error inserting whale position for {user_address}: {e}")
+            return False
+    
+    def get_pending_whale_alerts(self, limit: int = 10) -> List[Dict[str, Any]]:
+        """Get whale positions that haven't been alerted yet"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    SELECT * FROM whale_positions
+                    WHERE alerted = 0
+                    ORDER BY detected_at DESC
+                    LIMIT ?
+                """, (limit,))
+                
+                rows = cursor.fetchall()
+                return [dict(row) for row in rows]
+        except Exception as e:
+            logger.error(f"Error getting pending whale alerts: {e}")
+            return []
+    
+    def mark_whale_position_alerted(self, id: int) -> bool:
+        """Mark whale position as alerted"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    UPDATE whale_positions
+                    SET alerted = 1
+                    WHERE id = ?
+                """, (id,))
+                
+                conn.commit()
+                return cursor.rowcount > 0
+        except Exception as e:
+            logger.error(f"Error marking whale position as alerted {id}: {e}")
+            return False
+    
+    def get_last_whale_position(self, user_address: str, condition_id: str) -> Optional[Dict[str, Any]]:
+        """Get last known whale position for comparison"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    SELECT * FROM whale_positions
+                    WHERE user_address = ? AND condition_id = ?
+                    ORDER BY detected_at DESC
+                    LIMIT 1
+                """, (user_address.lower(), condition_id))
+                
+                row = cursor.fetchone()
+                return dict(row) if row else None
+        except Exception as e:
+            logger.error(f"Error getting last whale position for {user_address}: {e}")
+            return None
+    
+    def get_active_markets_from_rolling_buys(self, minutes: int = 30) -> List[str]:
+        """Get list of active market condition_ids from recent rolling_buys
+        
+        Note: This method returns markets that have had recent consensus activity (rolling_buys),
+        which is used to scope OI monitoring. This is a narrower scope than all tracked markets.
+        """
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cutoff_time = (datetime.now(timezone.utc) - timedelta(minutes=minutes)).isoformat()
+                
+                cursor.execute("""
+                    SELECT DISTINCT json_extract(data, '$.events[0].conditionId') as condition_id
+                    FROM rolling_buys
+                    WHERE updated_at >= ?
+                    AND json_extract(data, '$.events[0].conditionId') IS NOT NULL
+                """, (cutoff_time,))
+                
+                rows = cursor.fetchall()
+                condition_ids = [row[0] for row in rows if row[0]]
+                return condition_ids
+        except Exception as e:
+            logger.error(f"Error getting active markets from rolling_buys: {e}")
+            return []
+    
+    def get_a_list_wallets(self) -> List[str]:
+        """Get list of A-list wallet addresses (wallets with high win rate and PnL)"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                
+                # Get wallets that are A-list traders in any category
+                cursor.execute("""
+                    SELECT DISTINCT wallet_address
+                    FROM wallet_category_stats
+                    WHERE is_a_list_trader = 1
+                """)
+                
+                rows = cursor.fetchall()
+                wallets = [row[0] for row in rows]
+                
+                # Also get wallets from main wallets table with high performance
+                cursor.execute("""
+                    SELECT address FROM wallets
+                    WHERE win_rate >= 0.7 AND realized_pnl_total > 1000
+                    ORDER BY realized_pnl_total DESC
+                    LIMIT 100
+                """)
+                
+                additional_wallets = [row[0] for row in cursor.fetchall()]
+                
+                # Combine and deduplicate
+                all_wallets = list(set(wallets + additional_wallets))
+                return all_wallets
+        except Exception as e:
+            logger.error(f"Error getting A-list wallets: {e}")
+            return []
+    
+    # Order flow metrics operations
+    def insert_order_flow_metric(self, condition_id: str, outcome_index: Optional[int], 
+                                 window_start: str, window_end: str,
+                                 buy_count: int, sell_count: int,
+                                 buy_volume: float, sell_volume: float,
+                                 buy_sell_ratio: float, is_imbalanced: bool,
+                                 imbalance_direction: str) -> bool:
+        """Insert order flow metric record"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                now = self.now_iso()
+                
+                cursor.execute("""
+                    INSERT INTO order_flow_metrics(
+                        condition_id, outcome_index, window_start, window_end,
+                        buy_count, sell_count, buy_volume, sell_volume,
+                        buy_sell_ratio, is_imbalanced, imbalance_direction, detected_at, alerted
+                    )
+                    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+                """, (
+                    condition_id, outcome_index, window_start, window_end,
+                    buy_count, sell_count, buy_volume, sell_volume,
+                    buy_sell_ratio, 1 if is_imbalanced else 0, imbalance_direction, now
+                ))
+                
+                conn.commit()
+                return True
+        except Exception as e:
+            logger.error(f"Error inserting order flow metric for {condition_id}: {e}")
+            return False
+    
+    def get_latest_order_flow(self, condition_id: str, outcome_index: Optional[int] = None) -> Optional[Dict[str, Any]]:
+        """Get most recent order flow metric for a market"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                
+                query = """
+                    SELECT * FROM order_flow_metrics
+                    WHERE condition_id = ?
+                """
+                params = [condition_id]
+                
+                if outcome_index is not None:
+                    query += " AND outcome_index = ?"
+                    params.append(outcome_index)
+                
+                query += " ORDER BY detected_at DESC LIMIT 1"
+                
+                cursor.execute(query, tuple(params))
+                row = cursor.fetchone()
+                return dict(row) if row else None
+        except Exception as e:
+            logger.error(f"Error getting latest order flow for {condition_id}: {e}")
+            return None
+    
+    def get_pending_order_flow_alerts(self, limit: int = 10) -> List[Dict[str, Any]]:
+        """Get order flow metrics where alerted=0 and is_imbalanced=1"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    SELECT * FROM order_flow_metrics
+                    WHERE alerted = 0 AND is_imbalanced = 1
+                    ORDER BY detected_at DESC
+                    LIMIT ?
+                """, (limit,))
+                
+                rows = cursor.fetchall()
+                return [dict(row) for row in rows]
+        except Exception as e:
+            logger.error(f"Error getting pending order flow alerts: {e}")
+            return []
+    
+    def mark_order_flow_alerted(self, id: int) -> bool:
+        """Mark order flow metric as alerted"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    UPDATE order_flow_metrics
+                    SET alerted = 1
+                    WHERE id = ?
+                """, (id,))
+                
+                conn.commit()
+                return cursor.rowcount > 0
+        except Exception as e:
+            logger.error(f"Error marking order flow metric as alerted {id}: {e}")
+            return False
+    
+    def cleanup_old_order_flow_metrics(self, days_to_keep: int = 7) -> int:
+        """Delete order flow metrics older than specified days"""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cutoff_date = (datetime.now(timezone.utc) - timedelta(days=days_to_keep)).isoformat()
+                
+                cursor.execute("DELETE FROM order_flow_metrics WHERE detected_at < ?", (cutoff_date,))
+                removed_count = cursor.rowcount
+                
+                conn.commit()
+                
+                if removed_count > 0:
+                    logger.info(f"Cleaned up {removed_count} old order flow metrics")
+                
+                return removed_count
+        except Exception as e:
+            logger.error(f"Error cleaning up old order flow metrics: {e}")
+            return 0
 
 if __name__ == "__main__":
     # Test database operations

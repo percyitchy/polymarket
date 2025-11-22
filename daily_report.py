@@ -349,8 +349,13 @@ def main():
     
     # Send to Telegram
     notifier = TelegramNotifier()
-    # Use reports_chat_id if available, otherwise use main chat_id
-    target_chat = notifier.reports_chat_id if hasattr(notifier, 'reports_chat_id') and notifier.reports_chat_id else notifier.chat_id
+    # Use reports_channel_id for reports if configured, otherwise reports_chat_id, fallback to chat_id
+    if hasattr(notifier, 'reports_channel_id') and notifier.reports_channel_id:
+        target_chat = notifier.reports_channel_id
+    elif hasattr(notifier, 'reports_chat_id') and notifier.reports_chat_id:
+        target_chat = notifier.reports_chat_id
+    else:
+        target_chat = notifier.chat_id
     # Create a temporary notifier with target chat if needed
     if target_chat != notifier.chat_id:
         temp_notifier = TelegramNotifier(chat_id=target_chat)

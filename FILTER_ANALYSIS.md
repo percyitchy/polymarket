@@ -69,3 +69,7 @@ LAST_TRADE_MAX_DAYS = 90  # 3 месяца
 
 
 
+
+
+
+
