@@ -5,7 +5,7 @@ Ready-to-use SSH commands for verifying and comparing code on the remote server.
 ## Connection
 
 ```bash
-ssh ubuntu@YOUR_SERVER_IP
+ssh ubuntu@
 ```
 
 ## Navigate to Project Directory
@@ -189,33 +189,33 @@ From your **local machine**, upload files to server:
 
 ```bash
 # Upload utils/http_client.py
-scp /Users/johnbravo/polymarket/utils/http_client.py ubuntu@YOUR_SERVER_IP:~/polymarket/utils/
+scp /Users/johnbravo/polymarket/utils/http_client.py ubuntu@:~/polymarket/utils/
 
 # Upload bet_monitor.py
-scp /Users/johnbravo/polymarket/bet_monitor.py ubuntu@YOUR_SERVER_IP:~/polymarket/
+scp /Users/johnbravo/polymarket/bet_monitor.py ubuntu@:~/polymarket/
 
 # Upload price_fetcher.py
-scp /Users/johnbravo/polymarket/price_fetcher.py ubuntu@YOUR_SERVER_IP:~/polymarket/
+scp /Users/johnbravo/polymarket/price_fetcher.py ubuntu@~/polymarket/
 
 # Upload notify.py (if modified)
-scp /Users/johnbravo/polymarket/notify.py ubuntu@YOUR_SERVER_IP:~/polymarket/
+scp /Users/johnbravo/polymarket/notify.py ubuntu@:~/polymarket/
 
 # Upload verification scripts
-scp verify_remote_code.sh ubuntu@YOUR_SERVER_IP:~/polymarket/
-scp compare_code_snippets.sh ubuntu@YOUR_SERVER_IP:~/polymarket/
+scp verify_remote_code.sh ubuntu@:~/polymarket/
+scp compare_code_snippets.sh ubuntu@:~/polymarket/
 ```
 
 ## Upload and Run Verification Script
 
 ```bash
 # From local machine - upload script
-scp verify_remote_code.sh ubuntu@YOUR_SERVER_IP:~/polymarket/
+scp verify_remote_code.sh ubuntu@:~/polymarket/
 
 # SSH and run
-ssh ubuntu@YOUR_SERVER_IP 'cd ~/polymarket && chmod +x verify_remote_code.sh && ./verify_remote_code.sh'
+ssh ubuntu@ 'cd ~/polymarket && chmod +x verify_remote_code.sh && ./verify_remote_code.sh'
 
 # Download results
-scp ubuntu@YOUR_SERVER_IP:~/polymarket/remote_checksums.txt ./
+scp ubuntu@:~/polymarket/remote_checksums.txt ./
 ```
 
 ## Restart Services
@@ -225,13 +225,13 @@ After deploying files, restart services to load changes:
 ### Using restart_services.sh
 
 ```bash
-ssh ubuntu@YOUR_SERVER_IP 'cd ~/polymarket && ./restart_services.sh'
+ssh ubuntu@ 'cd ~/polymarket && ./restart_services.sh'
 ```
 
 ### Manual Restart Commands
 
 ```bash
-ssh ubuntu@YOUR_SERVER_IP
+ssh ubuntu@
 cd ~/polymarket
 
 # Reload systemd daemon
@@ -253,23 +253,23 @@ sudo systemctl list-timers polymarket-daily-*.timer --no-pager
 ### One-liner Restart
 
 ```bash
-ssh ubuntu@YOUR_SERVER_IP 'cd ~/polymarket && sudo systemctl daemon-reload && sudo systemctl restart polymarket-bot.service polymarket-daily-analysis.timer polymarket-daily-report.timer polymarket-daily-refresh.timer 2>/dev/null; echo "Services restarted"'
+ssh ubuntu@] 'cd ~/polymarket && sudo systemctl daemon-reload && sudo systemctl restart polymarket-bot.service polymarket-daily-analysis.timer polymarket-daily-report.timer polymarket-daily-refresh.timer 2>/dev/null; echo "Services restarted"'
 ```
 
 ## Check Service Logs
 
 ```bash
 # Main bot logs
-ssh ubuntu@YOUR_SERVER_IP 'journalctl -u polymarket-bot.service -n 50 --no-pager'
+ssh ubuntu@ 'journalctl -u polymarket-bot.service -n 50 --no-pager'
 
 # Daily analysis logs
-ssh ubuntu@YOUR_SERVER_IP 'journalctl -u polymarket-daily-analysis.service -n 50 --no-pager'
+ssh ubuntu@ 'journalctl -u polymarket-daily-analysis.service -n 50 --no-pager'
 
 # Follow logs in real-time
-ssh ubuntu@YOUR_SERVER_IP 'journalctl -u polymarket-bot.service -f'
+ssh ubuntu@'journalctl -u polymarket-bot.service -f'
 
 # Check for errors
-ssh ubuntu@YOUR_SERVER_IP 'journalctl -u polymarket-bot.service --since "1 hour ago" | grep -i error'
+ssh ubuntu@ 'journalctl -u polymarket-bot.service --since "1 hour ago" | grep -i error'
 ```
 
 ## Quick Verification Checklist
@@ -307,10 +307,10 @@ cd /Users/johnbravo/polymarket
 ./verify_local_code.sh
 
 # Generate remote checksums (on server)
-ssh ubuntu@YOUR_SERVER_IP 'cd ~/polymarket && ./verify_remote_code.sh'
+ssh ubuntu 'cd ~/polymarket && ./verify_remote_code.sh'
 
 # Download remote checksums
-scp ubuntu@YOUR_SERVER_IP:~/polymarket/remote_checksums.txt ./
+scp ubuntu@ ~/polymarket/remote_checksums.txt ./
 
 # Compare
 diff local_checksums.txt remote_checksums.txt
@@ -325,26 +325,26 @@ If you're not sure where the project is located:
 
 ```bash
 # Search common locations
-ssh ubuntu@YOUR_SERVER_IP 'find ~ /opt /home -name "bet_monitor.py" -type f 2>/dev/null | head -5'
+ssh ubuntu 'find ~ /opt /home -name "bet_monitor.py" -type f 2>/dev/null | head -5'
 
 # Check for polymarket directory
-ssh ubuntu@YOUR_SERVER_IP 'find ~ -type d -name "polymarket" 2>/dev/null'
+ssh ubuntu 'find ~ -type d -name "polymarket" 2>/dev/null'
 
 # Check running processes for hints
-ssh ubuntu@YOUR_SERVER_IP 'ps aux | grep -i polymarket | grep -v grep'
+ssh ubuntu 'ps aux | grep -i polymarket | grep -v grep'
 ```
 
 ## Environment Check
 
 ```bash
 # Check Python version
-ssh ubuntu@YOUR_SERVER_IP 'python3 --version'
+ssh ubuntu 'python3 --version'
 
 # Check if virtual environment is used
-ssh ubuntu@YOUR_SERVER_IP 'cd ~/polymarket && test -d venv && echo "venv found" || echo "no venv"'
+ssh ubuntu 'cd ~/polymarket && test -d venv && echo "venv found" || echo "no venv"'
 
 # Check file permissions
-ssh ubuntu@YOUR_SERVER_IP 'cd ~/polymarket && ls -la utils/http_client.py bet_monitor.py price_fetcher.py notify.py'
+ssh ubuntu 'cd ~/polymarket && ls -la utils/http_client.py bet_monitor.py price_fetcher.py notify.py'
 ```
 
 ## Notes
