@@ -3,7 +3,7 @@
 # Upload script for Polymarket Bot files to server
 # Usage: ./upload.sh
 
-SERVER="YOUR_SERVER_IP"
+SERVER=""
 USER="ubuntu"
 REMOTE_DIR="/opt/polymarket-bot"
 
@@ -38,7 +38,7 @@ done
 echo "✅ Upload complete!"
 echo ""
 echo "🔧 Next steps on server:"
-echo "1. SSH to server: ssh -l ubuntu YOUR_SERVER_IP"
+echo "1. SSH to server: ssh -l ubuntu "
 echo "2. Run deployment: cd /opt/polymarket-bot && chmod +x deploy.sh && ./deploy.sh"
 echo "3. Start service: sudo systemctl start polymarket-bot"
 echo "4. Check status: sudo systemctl status polymarket-bot"
